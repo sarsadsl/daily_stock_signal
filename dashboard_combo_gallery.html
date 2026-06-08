@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard 整合方向提案</title>
+  <style>
+    :root {
+      --ink: #182033;
+      --muted: #667085;
+      --line: #d8e0ec;
+      --panel: #ffffff;
+      --bg: #f4f7fb;
+      --red: #d92d43;
+      --green: #0f8a62;
+      --blue: #2457c5;
+      --teal: #0f766e;
+      --amber: #c98113;
+      --shadow: 0 16px 38px rgba(20, 30, 50, .10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(36, 87, 197, .10), rgba(15, 118, 110, .08)),
+        var(--bg);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    .shell {
+      width: min(1560px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 22px 0 38px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    h1 { margin: 0; font-size: 26px; line-height: 1.2; }
+    .lead {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .link {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .concepts {
+      display: grid;
+      gap: 18px;
+    }
+    .concept {
+      overflow: hidden;
+      border: 1px solid rgba(216, 224, 236, .95);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .concept-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+    .concept h2 { margin: 0; font-size: 18px; }
+    .concept p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .tag {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      background: #fff;
+    }
+    .preview {
+      padding: 14px;
+      min-height: 640px;
+      background: #f8fafc;
+    }
+    .dashboard {
+      min-height: 610px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 12px;
+    }
+    .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .title strong { display: block; font-size: 18px; }
+    .title span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .actions, .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .btn, .chip, .badge {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+    }
+    .chip, .badge {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #344054;
+    }
+    .badge.twse { color: #164e8f; background: #e9f2ff; border-color: #cfe0ff; }
+    .badge.tpex { color: #8a4d00; background: #fff3df; border-color: #ffe1ad; }
+    .summary {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .summary-card, .panel, .stock-card, .lane {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .summary-card {
+      padding: 11px;
+    }
+    .summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .summary-card strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      gap: 12px;
+      min-height: 0;
+    }
+    .panel-head {
+      min-height: 42px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 11px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8fbff);
+    }
+    .panel-head strong { font-size: 14px; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      padding: 10px;
+    }
+    .stock-card {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .stock-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 10px;
+    }
+    .stock-card h3 { margin: 0; font-size: 15px; }
+    .stock-card .meta { color: var(--muted); font-size: 11px; margin-top: 3px; }
+    .signal {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 0 8px;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .stars { color: #f59e0b; letter-spacing: 0; white-space: nowrap; }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 7px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .row strong { color: var(--ink); }
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      padding: 10px;
+    }
+    .lane h3 {
+      margin: 0;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+    .lane-body {
+      display: grid;
+      gap: 8px;
+      padding: 9px;
+    }
+    .mini {
+      display: grid;
+      gap: 5px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 12px;
+    }
+    .rank-list {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+    }
+    .rank {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .rank-no {
+      width: 26px;
+      height: 26px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #edf4ff;
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 12px;
+    }
+    .symbol strong { display: block; font-size: 13px; }
+    .symbol span { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .notes {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .note {
+      padding-left: 9px;
+      border-left: 3px solid var(--teal);
+      color: #344054;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .soft-radar {
+      --panel: #ffffff;
+      --bg-panel: #f8fafc;
+    }
+    .soft-radar .preview {
+      background:
+        linear-gradient(135deg, rgba(217,45,67,.07), rgba(15,118,110,.07)),
+        #f8fafc;
+    }
+    .soft-radar .btn { background: linear-gradient(135deg, var(--red), var(--teal)); }
+    .soft-radar .stock-card {
+      box-shadow: 0 10px 24px rgba(15,118,110,.08);
+    }
+
+    .clean-desk .preview { background: #f5f7fb; }
+    .clean-desk .bar,
+    .clean-desk .summary-card,
+    .clean-desk .panel,
+    .clean-desk .stock-card,
+    .clean-desk .lane {
+      border-radius: 6px;
+      box-shadow: none;
+    }
+    .clean-desk .btn { background: var(--blue); }
+    .clean-desk .signal {
+      color: #174ea6;
+      background: #edf4ff;
+      border-color: #cfe0ff;
+    }
+
+    .focused-night {
+      --ink: #e8eef6;
+      --muted: #9aa7b8;
+      --line: #2d3747;
+      --panel: #151b24;
+      --bg: #0f141b;
+      color: var(--ink);
+    }
+    .focused-night .concept-head,
+    .focused-night .preview,
+    .focused-night .bar,
+    .focused-night .panel-head,
+    .focused-night .lane h3 {
+      background: #111720;
+    }
+    .focused-night .preview {
+      background:
+        linear-gradient(135deg, rgba(217,45,67,.08), rgba(15,138,98,.08)),
+        #0f141b;
+    }
+    .focused-night .chip,
+    .focused-night .badge,
+    .focused-night .stock-card,
+    .focused-night .mini,
+    .focused-night .rank {
+      background: #151b24;
+      border-color: #2d3747;
+      color: #dbe4ef;
+    }
+    .focused-night .summary-card,
+    .focused-night .panel,
+    .focused-night .lane {
+      background: #151b24;
+      border-color: #2d3747;
+    }
+    .focused-night .btn { background: #0f8a62; }
+    .focused-night .rank-no {
+      color: #dbeafe;
+      background: rgba(36,87,197,.25);
+    }
+    .focused-night .signal {
+      color: #ffd166;
+      background: rgba(255,209,102,.10);
+      border-color: rgba(255,209,102,.30);
+    }
+    .focused-night .row strong,
+    .focused-night .symbol strong { color: #f4f7fb; }
+    .focused-night .note { color: #cbd5e1; }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100vw - 20px, 1560px); }
+      .top, .concept-head, .bar { flex-direction: column; align-items: start; }
+      .summary, .cards, .kanban { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <h1>Dashboard 整合方向提案</h1>
+        <p class="lead">保留投資雷達卡片的方向，並把 UX 的 2、4、5 合在一起：上方每日摘要，中間候選卡片，右側流程與排名。</p>
+      </div>
+      <div class="links">
+        <a class="link" href="dashboard_style_gallery.html">UI 風格範本</a>
+        <a class="link" href="dashboard_layout_gallery.html">呈現方式範本</a>
+        <a class="link" href="signal_dashboard.html">目前 Dashboard</a>
+      </div>
+    </header>
+
+    <main class="concepts">
+      <section class="concept soft-radar">
+        <div class="concept-head">
+          <div>
+            <h2>方案 A · 柔和雷達版</h2>
+            <p>保留卡片感，但降低裝飾與色彩壓力。適合正式套用，閱讀舒服、決策順序清楚。</p>
+          </div>
+          <span class="tag">建議優先</span>
+        </div>
+        <div class="preview">
+          <div class="dashboard">
+            <div class="bar">
+              <div class="title"><strong>今日訊號雷達</strong><span>摘要先行，卡片挑股，流程輔助確認</span></div>
+              <div class="actions"><span class="chip">只看 5★</span><span class="chip">成交量 > 3000張</span><span class="btn">同步今日資料</span></div>
+            </div>
+            <div class="summary">
+              <div class="summary-card"><span>今日結論</span><strong>優先看回測型訊號</strong></div>
+              <div class="summary-card"><span>符合股票</span><strong>119</strong></div>
+              <div class="summary-card"><span>5★候選</span><strong>32</strong></div>
+              <div class="summary-card"><span>資料日期</span><strong>06/08</strong></div>
+            </div>
+            <div class="workspace">
+              <section class="panel">
+                <div class="panel-head"><strong>候選卡片</strong><div class="chips"><span class="chip">回測月線</span><span class="chip">帶量紅K</span></div></div>
+                <div class="cards">
+                  <article class="stock-card"><header><div><h3>5410 國眾</h3><div class="meta">TPEX · 1,043張</div></div><span class="stars">★★★★★</span></header><span class="signal">周月季線上揚首次回測月線</span><div class="row"><span>收盤</span><strong>39.25</strong></div></article>
+                  <article class="stock-card"><header><div><h3>4931 新盛力</h3><div class="meta">TPEX · 25,980張</div></div><span class="stars">★★★★★</span></header><span class="signal">主升段回測10MA</span><div class="row"><span>收盤</span><strong>266.5</strong></div></article>
+                  <article class="stock-card"><header><div><h3>2379 瑞昱</h3><div class="meta">TWSE · 8,438張</div></div><span class="stars">★★★★★</span></header><span class="signal">周月季線上揚首次回測月線</span><div class="row"><span>收盤</span><strong>596</strong></div></article>
+                  <article class="stock-card"><header><div><h3>6788 華景電</h3><div class="meta">TPEX · 3,150張</div></div><span class="stars">★★★★★</span></header><span class="signal">均線糾結後帶量紅K</span><div class="row"><span>收盤</span><strong>441</strong></div></article>
+                </div>
+              </section>
+              <aside class="panel">
+                <div class="panel-head"><strong>流程與排名</strong><span class="badge">Top 4</span></div>
+                <div class="kanban">
+                  <section class="lane"><h3>高分</h3><div class="lane-body"><div class="mini"><strong>5410</strong><span class="stars">★★★★★</span></div><div class="mini"><strong>4931</strong><span class="stars">★★★★★</span></div></div></section>
+                  <section class="lane"><h3>量能確認</h3><div class="lane-body"><div class="mini"><strong>2379</strong><span>8,438張</span></div><div class="mini"><strong>6788</strong><span>3,150張</span></div></div></section>
+                </div>
+                <div class="rank-list">
+                  <div class="rank"><span class="rank-no">1</span><div class="symbol"><strong>5410 國眾</strong><span>首次回測月線</span></div><span class="stars">★★★★★</span></div>
+                  <div class="rank"><span class="rank-no">2</span><div class="symbol"><strong>4931 新盛力</strong><span>主升段回測10MA</span></div><span class="stars">★★★★★</span></div>
+                </div>
+                <div class="notes"><div class="note">首頁先講結論，右側保留流程，卡片負責挑股。</div></div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="concept clean-desk">
+        <div class="concept-head">
+          <div>
+            <h2>方案 B · 乾淨工作台版</h2>
+            <p>把卡片與流程做得更安靜，少一點情緒感。適合你想每天反覆使用，不想被 UI 干擾。</p>
+          </div>
+          <span class="tag">最耐看</span>
+        </div>
+        <div class="preview">
+          <div class="dashboard">
+            <div class="bar">
+              <div class="title"><strong>訊號工作台</strong><span>摘要、候選、流程、排名在同一頁完成</span></div>
+              <div class="actions"><span class="chip">5★</span><span class="chip">TPEX</span><span class="chip">月線回測</span><span class="btn">同步</span></div>
+            </div>
+            <div class="summary">
+              <div class="summary-card"><span>今日摘要</span><strong>119 檔符合</strong></div>
+              <div class="summary-card"><span>高分</span><strong>32</strong></div>
+              <div class="summary-card"><span>主訊號</span><strong>首次回測</strong></div>
+              <div class="summary-card"><span>低量排除</span><strong>1000張</strong></div>
+            </div>
+            <div class="workspace">
+              <section class="panel">
+                <div class="panel-head"><strong>候選清單</strong><span class="badge">依評分排序</span></div>
+                <div class="cards">
+                  <article class="stock-card"><header><div><h3>5410 國眾</h3><div class="meta">TPEX</div></div><span class="stars">★★★★★</span></header><span class="signal">首次回測月線</span><div class="row"><span>量</span><strong>1,043張</strong></div></article>
+                  <article class="stock-card"><header><div><h3>2379 瑞昱</h3><div class="meta">TWSE</div></div><span class="stars">★★★★★</span></header><span class="signal">首次回測月線</span><div class="row"><span>量</span><strong>8,438張</strong></div></article>
+                  <article class="stock-card"><header><div><h3>4931 新盛力</h3><div class="meta">TPEX</div></div><span class="stars">★★★★★</span></header><span class="signal">回測10MA</span><div class="row"><span>量</span><strong>25,980張</strong></div></article>
+                  <article class="stock-card"><header><div><h3>3691 碩禾</h3><div class="meta">TPEX</div></div><span class="stars">★★★★☆</span></header><span class="signal">首次回測月線</span><div class="row"><span>量</span><strong>1,976張</strong></div></article>
+                </div>
+              </section>
+              <aside class="panel">
+                <div class="panel-head"><strong>布局流程</strong><span class="badge">可收合</span></div>
+                <div class="kanban">
+                  <section class="lane"><h3>待確認</h3><div class="lane-body"><div class="mini"><strong>5410 國眾</strong><span>隔日守線</span></div></div></section>
+                  <section class="lane"><h3>觀察名單</h3><div class="lane-body"><div class="mini"><strong>2379 瑞昱</strong><span>量能足夠</span></div></div></section>
+                </div>
+                <div class="rank-list">
+                  <div class="rank"><span class="rank-no">1</span><div class="symbol"><strong>5410 國眾</strong><span>高分回測</span></div><span class="stars">★★★★★</span></div>
+                  <div class="rank"><span class="rank-no">2</span><div class="symbol"><strong>2379 瑞昱</strong><span>量能較佳</span></div><span class="stars">★★★★★</span></div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="concept focused-night">
+        <div class="concept-head">
+          <div>
+            <h2>方案 C · 深色專注版</h2>
+            <p>保留卡片與流程，但改成夜間交易台感。適合晚間同步後集中挑選，不過整體存在感比較強。</p>
+          </div>
+          <span class="tag">夜間使用</span>
+        </div>
+        <div class="preview">
+          <div class="dashboard">
+            <div class="bar">
+              <div class="title"><strong>Night Signal Radar</strong><span>20:00 sync · candidates · workflow · ranking</span></div>
+              <div class="actions"><span class="chip">5★</span><span class="chip">Volume OK</span><span class="btn">Sync</span></div>
+            </div>
+            <div class="summary">
+              <div class="summary-card"><span>Conclusion</span><strong>Focus pullbacks</strong></div>
+              <div class="summary-card"><span>Matched</span><strong>119</strong></div>
+              <div class="summary-card"><span>5★</span><strong>32</strong></div>
+              <div class="summary-card"><span>Failed</span><strong>0</strong></div>
+            </div>
+            <div class="workspace">
+              <section class="panel">
+                <div class="panel-head"><strong>Candidate Cards</strong><span class="badge">Score desc</span></div>
+                <div class="cards">
+                  <article class="stock-card"><header><div><h3>5410 國眾</h3><div class="meta">TPEX · 1,043張</div></div><span class="stars">★★★★★</span></header><span class="signal">首次回測月線</span><div class="row"><span>Close</span><strong>39.25</strong></div></article>
+                  <article class="stock-card"><header><div><h3>4931 新盛力</h3><div class="meta">TPEX · 25,980張</div></div><span class="stars">★★★★★</span></header><span class="signal">回測10MA</span><div class="row"><span>Close</span><strong>266.5</strong></div></article>
+                  <article class="stock-card"><header><div><h3>2379 瑞昱</h3><div class="meta">TWSE · 8,438張</div></div><span class="stars">★★★★★</span></header><span class="signal">首次回測月線</span><div class="row"><span>Close</span><strong>596</strong></div></article>
+                  <article class="stock-card"><header><div><h3>6788 華景電</h3><div class="meta">TPEX · 3,150張</div></div><span class="stars">★★★★★</span></header><span class="signal">帶量紅K</span><div class="row"><span>Close</span><strong>441</strong></div></article>
+                </div>
+              </section>
+              <aside class="panel">
+                <div class="panel-head"><strong>Workflow</strong><span class="badge">Radar</span></div>
+                <div class="kanban">
+                  <section class="lane"><h3>High Score</h3><div class="lane-body"><div class="mini"><strong>5410</strong><span class="stars">★★★★★</span></div><div class="mini"><strong>4931</strong><span class="stars">★★★★★</span></div></div></section>
+                  <section class="lane"><h3>Watch</h3><div class="lane-body"><div class="mini"><strong>2379</strong><span>Volume OK</span></div><div class="mini"><strong>6788</strong><span>Breakout</span></div></div></section>
+                </div>
+                <div class="rank-list">
+                  <div class="rank"><span class="rank-no">1</span><div class="symbol"><strong>5410 國眾</strong><span>pullback</span></div><span class="stars">★★★★★</span></div>
+                  <div class="rank"><span class="rank-no">2</span><div class="symbol"><strong>4931 新盛力</strong><span>10MA</span></div><span class="stars">★★★★★</span></div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard 呈現方式範本</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e1ec;
+      --blue: #2457c5;
+      --red: #d92d43;
+      --green: #0f8a62;
+      --teal: #0f766e;
+      --amber: #c98113;
+      --violet: #6d3fc8;
+      --shadow: 0 16px 38px rgba(20, 30, 50, .10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(36,87,197,.10), rgba(15,118,110,.08)),
+        var(--bg);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    .shell {
+      width: min(1500px, calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+    .lead {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .link {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--blue);
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .gallery {
+      display: grid;
+      gap: 16px;
+    }
+    .option {
+      overflow: hidden;
+      border: 1px solid rgba(217, 225, 236, .95);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .option-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+    .option h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .option p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .tag {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .preview {
+      padding: 14px;
+      min-height: 420px;
+      background: #f8fafc;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .panel-head {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8fbff);
+    }
+    .panel-head strong { font-size: 14px; }
+    .actions, .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .btn, .chip, .badge {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+    }
+    .chip, .badge {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #344054;
+    }
+    .badge.twse { color: #164e8f; background: #e9f2ff; border-color: #cfe0ff; }
+    .badge.tpex { color: #8a4d00; background: #fff3df; border-color: #ffe1ad; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .stat {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .stat strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .stars {
+      color: #f59e0b;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+    .signal {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 0 8px;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      background: #fff7ed;
+      color: #9a3412;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .symbol strong {
+      display: block;
+      font-size: 14px;
+    }
+    .symbol span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 10px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .chart {
+      height: 156px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, transparent 24%, rgba(0,0,0,.05) 25%, transparent 26%, transparent 49%, rgba(0,0,0,.05) 50%, transparent 51%, transparent 74%, rgba(0,0,0,.05) 75%, transparent 76%),
+        linear-gradient(135deg, rgba(217,45,67,.18), rgba(15,138,98,.12));
+      position: relative;
+      overflow: hidden;
+    }
+    .chart::before {
+      content: "";
+      position: absolute;
+      inset: 24px 18px 46px;
+      border-right: 3px solid var(--red);
+      border-bottom: 3px solid var(--red);
+      transform: skewX(-26deg);
+    }
+    .chart::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 14px;
+      height: 28px;
+      background: repeating-linear-gradient(90deg, rgba(217,45,67,.55) 0 8px, transparent 8px 15px, rgba(15,138,98,.48) 15px 23px, transparent 23px 30px);
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stock-card {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .stock-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .stock-card h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 7px;
+      margin-top: 7px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .row strong { color: var(--ink); }
+    .two-col {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 12px;
+    }
+    .watch-list {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+    }
+    .watch-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+    .watch-item.active {
+      border-color: #f7b955;
+      box-shadow: inset 4px 0 0 var(--amber);
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .detail-box {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      min-height: 74px;
+    }
+    .detail-box span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .lane {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .lane h3 {
+      margin: 0;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      background: #fbfcfe;
+    }
+    .lane-body {
+      display: grid;
+      gap: 8px;
+      padding: 9px;
+    }
+    .mini-card {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .brief {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+    }
+    .brief-main {
+      display: grid;
+      gap: 10px;
+    }
+    .rank-list {
+      display: grid;
+      gap: 9px;
+    }
+    .rank-item {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .rank-no {
+      width: 28px;
+      height: 28px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #edf4ff;
+      color: var(--blue);
+      font-weight: 900;
+    }
+    .note-list {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .note-list div {
+      padding-left: 10px;
+      border-left: 3px solid var(--teal);
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    @media (max-width: 1100px) {
+      .two-col, .brief { grid-template-columns: 1fr; }
+      .cards, .kanban { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px) {
+      .shell { width: min(100vw - 20px, 1500px); }
+      .top, .option-head { flex-direction: column; align-items: start; }
+      .cards, .kanban, .detail-grid, .stats { grid-template-columns: 1fr; }
+      .table-scroll { overflow-x: auto; }
+      table { min-width: 720px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <div>
+        <h1>Dashboard 呈現方式範本</h1>
+        <p class="lead">這一頁比較的是資訊怎麼排、怎麼讀、怎麼點。可以搭配你已選好的 UI 風格套用。</p>
+      </div>
+      <div class="actions">
+        <a class="link" href="dashboard_style_gallery.html">回 UI 風格範本</a>
+        <a class="link" href="signal_dashboard.html">回目前 Dashboard</a>
+      </div>
+    </header>
+
+    <main class="gallery">
+      <section class="option">
+        <div class="option-head">
+          <div>
+            <h2>1. 總覽表格優先</h2>
+            <p>適合你每天掃很多檔。保留表格為核心，重點是高分排序、快速篩選、點列展開 K 線。</p>
+          </div>
+          <span class="tag">大量掃描最快</span>
+        </div>
+        <div class="preview">
+          <div class="stats">
+            <div class="stat"><span>符合股票</span><strong>119</strong></div>
+            <div class="stat"><span>5★</span><strong>32</strong></div>
+            <div class="stat"><span>4★</span><strong>46</strong></div>
+            <div class="stat"><span>TWSE</span><strong>54</strong></div>
+            <div class="stat"><span>TPEX</span><strong>65</strong></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <strong>訊號清單</strong>
+              <div class="chips"><span class="chip">全部</span><span class="chip">5★</span><span class="chip">回測月線</span><span class="btn">同步今日</span></div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th>股票</th><th>市場</th><th>訊號</th><th>評分</th><th>收盤</th><th>成交量</th></tr></thead>
+                <tbody>
+                  <tr><td class="symbol"><strong>5410 國眾</strong><span>2026-06-08</span></td><td><span class="badge tpex">TPEX</span></td><td><span class="signal">周月季線上揚首次回測月線</span></td><td><span class="stars">★★★★★</span><br>5/5</td><td>39.25</td><td>1,043張</td></tr>
+                  <tr><td class="symbol"><strong>4931 新盛力</strong><span>2026-06-08</span></td><td><span class="badge tpex">TPEX</span></td><td><span class="signal">主升段回測10MA</span></td><td><span class="stars">★★★★★</span><br>5/5</td><td>266.5</td><td>25,980張</td></tr>
+                  <tr><td class="symbol"><strong>2379 瑞昱</strong><span>2026-06-08</span></td><td><span class="badge twse">TWSE</span></td><td><span class="signal">周月季線上揚首次回測月線</span></td><td><span class="stars">★★★★★</span><br>5/5</td><td>596</td><td>8,438張</td></tr>
+                  <tr><td class="symbol"><strong>3691 碩禾</strong><span>2026-06-08</span></td><td><span class="badge tpex">TPEX</span></td><td><span class="signal">周月季線上揚首次回測月線</span></td><td><span class="stars">★★★★☆</span><br>4/5</td><td>154.5</td><td>1,976張</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div>
+            <h2>2. 候選卡片優先</h2>
+            <p>適合先挑入口標的。每檔是一張候選卡，優先呈現評分、訊號、量與收盤價，點卡片再展開細節。</p>
+          </div>
+          <span class="tag">挑股感最強</span>
+        </div>
+        <div class="preview">
+          <div class="panel-head" style="border:1px solid var(--line);border-radius:8px;margin-bottom:10px">
+            <strong>今日候選池</strong>
+            <div class="chips"><span class="chip">只看 5★</span><span class="chip">量 > 3000張</span><span class="chip">TPEX</span></div>
+          </div>
+          <div class="cards">
+            <article class="stock-card">
+              <header><div><h3>5410 國眾</h3><span class="badge tpex">TPEX</span></div><span class="stars">★★★★★</span></header>
+              <span class="signal">周月季線上揚首次回測月線</span>
+              <div class="row"><span>收盤</span><strong>39.25</strong></div>
+              <div class="row"><span>成交量</span><strong>1,043張</strong></div>
+            </article>
+            <article class="stock-card">
+              <header><div><h3>4931 新盛力</h3><span class="badge tpex">TPEX</span></div><span class="stars">★★★★★</span></header>
+              <span class="signal">主升段回測10MA</span>
+              <div class="row"><span>收盤</span><strong>266.5</strong></div>
+              <div class="row"><span>成交量</span><strong>25,980張</strong></div>
+            </article>
+            <article class="stock-card">
+              <header><div><h3>2379 瑞昱</h3><span class="badge twse">TWSE</span></div><span class="stars">★★★★★</span></header>
+              <span class="signal">周月季線上揚首次回測月線</span>
+              <div class="row"><span>收盤</span><strong>596</strong></div>
+              <div class="row"><span>成交量</span><strong>8,438張</strong></div>
+            </article>
+            <article class="stock-card">
+              <header><div><h3>6788 華景電</h3><span class="badge tpex">TPEX</span></div><span class="stars">★★★★★</span></header>
+              <span class="signal">均線糾結後帶量紅K</span>
+              <div class="row"><span>收盤</span><strong>441</strong></div>
+              <div class="row"><span>成交量</span><strong>3,150張</strong></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div>
+            <h2>3. 左清單右詳情</h2>
+            <p>適合邊看列表邊看 K 線。不需要展開列，左邊選股票，右邊固定顯示 K 線、評分依據與進場觀察。</p>
+          </div>
+          <span class="tag">閱讀最連續</span>
+        </div>
+        <div class="preview">
+          <div class="two-col">
+            <div class="panel">
+              <div class="panel-head"><strong>候選清單</strong><span class="chip">119 檔</span></div>
+              <div class="watch-list">
+                <div class="watch-item active"><div class="symbol"><strong>5410 國眾</strong><span>TPEX · 周月季線上揚首次回測月線</span></div><div><span class="stars">★★★★★</span> <span class="badge">39.25 / 1,043張</span></div></div>
+                <div class="watch-item"><div class="symbol"><strong>4931 新盛力</strong><span>TPEX · 主升段回測10MA</span></div><div><span class="stars">★★★★★</span> <span class="badge">266.5 / 25,980張</span></div></div>
+                <div class="watch-item"><div class="symbol"><strong>2379 瑞昱</strong><span>TWSE · 首次回測月線</span></div><div><span class="stars">★★★★★</span> <span class="badge">596 / 8,438張</span></div></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><strong>5410 國眾 · 日 K 線與評分</strong><span class="badge tpex">TPEX</span></div>
+              <div style="padding:12px">
+                <div class="chart"></div>
+                <div class="detail-grid">
+                  <div class="detail-box"><span>評分</span><strong class="stars">★★★★★</strong><br>5/5</div>
+                  <div class="detail-box"><span>訊號</span><span class="signal">周月季線上揚首次回測月線</span></div>
+                  <div class="detail-box"><span>依據</span>短中期均線多頭、月線與季線同步上揚、量能接近均量。</div>
+                  <div class="detail-box"><span>觀察</span>若隔日守住回測區且量能不失真，可列入優先追蹤。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div>
+            <h2>4. 流程看板</h2>
+            <p>適合把篩選變成工作流：先看 5★，再看量能、再看 K 線，最後放進觀察名單。</p>
+          </div>
+          <span class="tag">布局流程清楚</span>
+        </div>
+        <div class="preview">
+          <div class="kanban">
+            <section class="lane">
+              <h3>Step 1 · 高分訊號</h3>
+              <div class="lane-body">
+                <div class="mini-card"><strong>5410 國眾</strong><span class="stars">★★★★★</span><span>首次回測月線</span></div>
+                <div class="mini-card"><strong>4931 新盛力</strong><span class="stars">★★★★★</span><span>回測10MA</span></div>
+              </div>
+            </section>
+            <section class="lane">
+              <h3>Step 2 · 量能確認</h3>
+              <div class="lane-body">
+                <div class="mini-card"><strong>2379 瑞昱</strong><span>8,438張</span><span>量能足夠</span></div>
+                <div class="mini-card"><strong>6788 華景電</strong><span>3,150張</span><span>帶量紅K</span></div>
+              </div>
+            </section>
+            <section class="lane">
+              <h3>Step 3 · K 線檢查</h3>
+              <div class="lane-body">
+                <div class="mini-card"><strong>5410 國眾</strong><span>守住回測區</span><span>等待隔日確認</span></div>
+                <div class="mini-card"><strong>4931 新盛力</strong><span>強勢但漲幅大</span><span>注意追價</span></div>
+              </div>
+            </section>
+            <section class="lane">
+              <h3>Step 4 · 觀察名單</h3>
+              <div class="lane-body">
+                <div class="mini-card"><strong>優先</strong><span>5410 / 2379</span><span>隔日開盤追蹤</span></div>
+                <div class="mini-card"><strong>次優</strong><span>3691 / 5351</span><span>等回測更乾淨</span></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div>
+            <h2>5. 每日摘要 + 排名</h2>
+            <p>適合每天晚上 8 點推播與網頁首頁。先給結論，再給 Top 10，再讓你進入完整清單。</p>
+          </div>
+          <span class="tag">最像決策報告</span>
+        </div>
+        <div class="preview">
+          <div class="brief">
+            <div class="brief-main">
+              <div class="panel">
+                <div class="panel-head"><strong>今日摘要</strong><span class="chip">2026-06-08</span></div>
+                <div style="padding:10px">
+                  <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+                    <div class="stat"><span>符合股票</span><strong>119</strong></div>
+                    <div class="stat"><span>5★</span><strong>32</strong></div>
+                    <div class="stat"><span>主訊號</span><strong>首次回測</strong></div>
+                  </div>
+                  <div class="note-list">
+                    <div>今日高分訊號集中在「周月季線上揚首次回測月線」與「主升段回測10MA」。</div>
+                    <div>部分帶量紅K個股已出現追價風險，建議優先看回測型訊號。</div>
+                    <div>成交量低於 1000 張已排除，清單適合直接做隔日觀察名單。</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rank-list">
+              <div class="rank-item"><span class="rank-no">1</span><div class="symbol"><strong>5410 國眾</strong><span>首次回測月線</span></div><span class="stars">★★★★★</span></div>
+              <div class="rank-item"><span class="rank-no">2</span><div class="symbol"><strong>4931 新盛力</strong><span>主升段回測10MA</span></div><span class="stars">★★★★★</span></div>
+              <div class="rank-item"><span class="rank-no">3</span><div class="symbol"><strong>2379 瑞昱</strong><span>首次回測月線</span></div><span class="stars">★★★★★</span></div>
+              <div class="rank-item"><span class="rank-no">4</span><div class="symbol"><strong>6788 華景電</strong><span>帶量紅K</span></div><span class="stars">★★★★★</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

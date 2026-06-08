@@ -1,0 +1,2199 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台股互動 K 線工具</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #d8dee8;
+      --soft: #eef2f7;
+      --up: #d7263d;
+      --down: #148f62;
+      --blue: #2563eb;
+      --orange: #f97316;
+      --teal: #0f766e;
+      --violet: #7c3aed;
+      --entry: #db2777;
+      --exit: #9333ea;
+      --sample: #f59e0b;
+      --walk: #0891b2;
+      --walk-exit: #0f766e;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .brand .meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control,
+    .icon-button,
+    .file-button {
+      height: 36px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 8px;
+      box-shadow: none;
+    }
+
+    .control {
+      min-width: 210px;
+      padding: 0 34px 0 12px;
+    }
+
+    .search-control {
+      min-width: 260px;
+      padding-right: 12px;
+    }
+
+    .icon-button,
+    .file-button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 36px;
+      padding: 0 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .icon-button:hover,
+    .file-button:hover,
+    .control:hover {
+      border-color: #9aa8bb;
+    }
+
+    .file-button input {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ma-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .ma-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 36px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+    }
+
+    .ma-toggle input {
+      accent-color: var(--blue);
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+
+    .main {
+      min-height: 0;
+      padding: 10px 12px 12px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 10px;
+    }
+
+    .chart-shell,
+    .side {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .chart-shell {
+      position: relative;
+      overflow: hidden;
+      height: clamp(500px, calc(100vh - 82px), 720px);
+      min-height: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      cursor: crosshair;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 4;
+      width: min(310px, calc(100% - 28px));
+      padding: 8px 9px;
+      border: 1px solid rgba(100, 116, 139, 0.18);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      color: var(--ink);
+      box-shadow: none;
+      pointer-events: none;
+      font-size: 13px;
+      line-height: 1.45;
+      display: block;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.95);
+    }
+
+    .tooltip strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .side {
+      padding: 14px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      max-height: clamp(500px, calc(100vh - 82px), 720px);
+      overflow: auto;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .compare-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+      min-width: 0;
+    }
+
+    .compare-panel .title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .compare-panel .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .compare-panel .row strong {
+      color: var(--ink);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfe;
+      min-width: 0;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric .value {
+      margin-top: 4px;
+      font-size: 18px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 340px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    th,
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--soft);
+      text-align: right;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: inherit;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    .section-title {
+      width: 100%;
+      margin: 2px 0 0;
+      padding: 8px 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .section-title::after {
+      content: "⌄";
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section-title[aria-expanded="false"]::after {
+      content: "›";
+    }
+
+    .section-content[hidden] {
+      display: none;
+    }
+
+    .rule-note {
+      margin: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .trade-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 260px;
+    }
+
+    .fit-table table {
+      font-size: 12px;
+    }
+
+    .fit-table th,
+    .fit-table td {
+      padding: 7px 7px;
+    }
+
+    .fit-table td:first-child {
+      max-width: 128px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fit-table th:last-child,
+    .fit-table td:last-child {
+      min-width: 58px;
+      white-space: nowrap;
+    }
+
+    .clickable-row {
+      cursor: pointer;
+    }
+
+    .clickable-row:hover,
+    .clickable-row.active {
+      background: #eef6ff;
+    }
+
+    .marker-key {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .marker-key span {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    @media (max-width: 960px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-shell {
+        height: 560px;
+      }
+
+      canvas {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar,
+      .main {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .control {
+        min-width: 100%;
+      }
+
+      .toolbar,
+      .ma-group {
+        width: 100%;
+      }
+
+      .ma-group {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .ma-toggle {
+        justify-content: center;
+        padding: 0 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>台股互動 K 線工具</h1>
+        <div class="meta" id="rangeMeta">讀取資料中</div>
+      </div>
+      <div class="toolbar">
+        <input class="control search-control" id="symbolSearch" list="symbolSuggestions" type="search" placeholder="搜尋代號或名稱" aria-label="搜尋股票">
+        <datalist id="symbolSuggestions"></datalist>
+        <select class="control" id="symbolSelect" aria-label="股票"></select>
+        <select class="control" id="strategySelect" aria-label="策略">
+          <option value="auto">自動策略</option>
+          <option value="tsmc">台積電策略</option>
+          <option value="phison">群聯策略</option>
+        </select>
+        <div class="ma-group" aria-label="均線">
+          <label class="ma-toggle" style="color: var(--blue)"><input type="checkbox" value="5" checked><span class="swatch"></span>5MA</label>
+          <label class="ma-toggle" style="color: var(--orange)"><input type="checkbox" value="10" checked><span class="swatch"></span>10MA</label>
+          <label class="ma-toggle" style="color: var(--teal)"><input type="checkbox" value="20" checked><span class="swatch"></span>20MA</label>
+          <label class="ma-toggle" style="color: var(--violet)"><input type="checkbox" value="60" checked><span class="swatch"></span>60MA</label>
+        </div>
+        <button class="icon-button" id="zoomOut" title="縮小" aria-label="縮小">−</button>
+        <button class="icon-button" id="zoomIn" title="放大" aria-label="放大">＋</button>
+        <button class="icon-button" id="resetView" title="重設視圖" aria-label="重設視圖">⌂</button>
+        <button class="icon-button" id="downloadPng" title="下載圖檔" aria-label="下載圖檔">⇩</button>
+        <label class="file-button" title="匯入 CSV" aria-label="匯入 CSV">＋CSV<input id="fileInput" type="file" accept=".csv" multiple></label>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="chart-shell">
+        <canvas id="chart"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+      </section>
+
+      <aside class="side">
+        <div class="metric-grid">
+          <div class="metric"><div class="label">收盤</div><div class="value" id="lastClose">--</div></div>
+          <div class="metric"><div class="label">漲跌</div><div class="value" id="lastChange">--</div></div>
+          <div class="metric"><div class="label">成交量</div><div class="value" id="lastVolume">--</div></div>
+          <div class="metric"><div class="label">期間</div><div class="value" id="visibleCount">--</div></div>
+          <div class="metric"><div class="label">策略報酬</div><div class="value" id="strategyReturn">--</div></div>
+          <div class="metric"><div class="label">交易次數</div><div class="value" id="tradeCount">--</div></div>
+        </div>
+        <div class="status" id="status"></div>
+        <div class="marker-key">
+          <span style="color: var(--entry)"><i class="dot"></i>策略進場</span>
+          <span style="color: var(--exit)"><i class="dot"></i>策略出場</span>
+          <span style="color: var(--sample)"><i class="dot"></i>樣本買點</span>
+          <span style="color: var(--walk)"><i class="dot"></i>演練買賣</span>
+        </div>
+        <div class="compare-grid">
+          <div class="compare-panel">
+            <div class="title">策略回測結果</div>
+            <div class="row"><span>報酬</span><strong id="strategyCompareReturn">--</strong></div>
+            <div class="row"><span>勝率</span><strong id="strategyCompareWinRate">--</strong></div>
+            <div class="row"><span>交易</span><strong id="strategyCompareTrades">--</strong></div>
+            <div class="row"><span>損益</span><strong id="strategyComparePnl">--</strong></div>
+          </div>
+          <div class="compare-panel">
+            <div class="title">WA 演練結果</div>
+            <div class="row"><span>報酬</span><strong id="waCompareReturn">--</strong></div>
+            <div class="row"><span>勝率</span><strong id="waCompareWinRate">--</strong></div>
+            <div class="row"><span>交易</span><strong id="waCompareTrades">--</strong></div>
+            <div class="row"><span>損益</span><strong id="waComparePnl">--</strong></div>
+          </div>
+        </div>
+        <p class="rule-note" id="strategyNote"></p>
+        <button class="section-title" type="button" aria-expanded="true" aria-controls="walkForwardSection">Walk-forward 演練</button>
+        <div class="section-content" id="walkForwardSection">
+          <div class="status" id="walkForwardMeta">讀取演練結果中</div>
+          <div class="trade-wrap fit-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>股票</th>
+                  <th>今天</th>
+                  <th>策略</th>
+                  <th>交易</th>
+                  <th>報酬</th>
+                </tr>
+              </thead>
+              <tbody id="walkForwardRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="section-title" type="button" aria-expanded="false" aria-controls="strategyMatrixSection">策略互套比較</button>
+        <div class="section-content" id="strategyMatrixSection" hidden>
+          <div class="trade-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>策略</th>
+                  <th>股票</th>
+                  <th>報酬</th>
+                  <th>交易</th>
+                </tr>
+              </thead>
+              <tbody id="strategyMatrixRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="section-title" type="button" aria-expanded="false" aria-controls="sampleSection">樣本買點評估</button>
+        <div class="section-content" id="sampleSection" hidden>
+          <div class="trade-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>型態</th>
+                  <th>進場</th>
+                  <th>20日</th>
+                  <th>期末</th>
+                </tr>
+              </thead>
+              <tbody id="sampleRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="section-title" type="button" aria-expanded="false" aria-controls="tradeSection">策略回測交易</button>
+        <div class="section-content" id="tradeSection" hidden>
+          <div class="trade-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>買進</th>
+                  <th>賣出</th>
+                  <th>進</th>
+                  <th>出</th>
+                  <th>報酬</th>
+                </tr>
+              </thead>
+              <tbody id="tradeRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="section-title" type="button" aria-expanded="false" aria-controls="waTradeSection">WA 演練交易</button>
+        <div class="section-content" id="waTradeSection" hidden>
+          <div class="trade-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>買進</th>
+                  <th>賣出</th>
+                  <th>進</th>
+                  <th>出</th>
+                  <th>報酬</th>
+                </tr>
+              </thead>
+              <tbody id="waTradeRows"></tbody>
+            </table>
+          </div>
+        </div>
+        <button class="section-title" type="button" aria-expanded="false" aria-controls="recentSection">近期資料</button>
+        <div class="section-content" id="recentSection" hidden>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>開</th>
+                  <th>高</th>
+                  <th>低</th>
+                  <th>收</th>
+                  <th>量</th>
+                </tr>
+              </thead>
+              <tbody id="recentRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const SOURCES = [
+      { label: "2330 台積電 TWSE", path: "data/twse_2330_2025-05-29_2026-05-29.csv" },
+      { label: "8299 群聯 TPEx", path: "data/tpex_8299_2025-05-29_2026-05-29.csv" }
+    ];
+
+    const MA_COLORS = {
+      5: "#2563eb",
+      10: "#f97316",
+      20: "#0f766e",
+      60: "#7c3aed"
+    };
+
+    const state = {
+      datasets: [],
+      current: 0,
+      start: 0,
+      end: 0,
+      hoverIndex: null,
+      dragStart: null,
+      dragWindow: null,
+      strategyKey: "auto",
+      walkForwardSummary: [],
+      walkForwardTrades: [],
+      activeWalkForwardStock: null,
+      marketIndexLoaded: false,
+      marketSources: [],
+      loadingStockNos: new Set()
+    };
+
+    const canvas = document.getElementById("chart");
+    const ctx = canvas.getContext("2d");
+    const tooltip = document.getElementById("tooltip");
+    const searchInput = document.getElementById("symbolSearch");
+    const suggestions = document.getElementById("symbolSuggestions");
+    const select = document.getElementById("symbolSelect");
+    const strategySelect = document.getElementById("strategySelect");
+    const statusEl = document.getElementById("status");
+    const rangeMeta = document.getElementById("rangeMeta");
+    const recentRows = document.getElementById("recentRows");
+    const tradeRows = document.getElementById("tradeRows");
+    const waTradeRows = document.getElementById("waTradeRows");
+    const sampleRows = document.getElementById("sampleRows");
+    const strategyMatrixRows = document.getElementById("strategyMatrixRows");
+    const walkForwardRows = document.getElementById("walkForwardRows");
+    const walkForwardMeta = document.getElementById("walkForwardMeta");
+
+    const SAMPLE_BUYS = {
+      "2330": [
+        "2025-09-10",
+        "2025-11-24",
+        "2025-12-18",
+        "2026-02-06",
+        "2026-03-09",
+        "2026-03-31"
+      ],
+      "8299": [
+        "2025-09-05",
+        "2025-09-26",
+        "2025-10-27",
+        "2025-11-05",
+        "2025-12-22",
+        "2026-03-09",
+        "2026-04-28"
+      ]
+    };
+
+    function parseCsv(text) {
+      const rows = [];
+      let row = [];
+      let field = "";
+      let quoted = false;
+      const clean = text.replace(/^\uFEFF/, "");
+      for (let i = 0; i < clean.length; i += 1) {
+        const char = clean[i];
+        const next = clean[i + 1];
+        if (quoted) {
+          if (char === '"' && next === '"') {
+            field += '"';
+            i += 1;
+          } else if (char === '"') {
+            quoted = false;
+          } else {
+            field += char;
+          }
+        } else if (char === '"') {
+          quoted = true;
+        } else if (char === ",") {
+          row.push(field);
+          field = "";
+        } else if (char === "\n") {
+          row.push(field);
+          rows.push(row);
+          row = [];
+          field = "";
+        } else if (char !== "\r") {
+          field += char;
+        }
+      }
+      if (field || row.length) {
+        row.push(field);
+        rows.push(row);
+      }
+      const header = rows.shift();
+      return rows.filter((item) => item.length === header.length).map((item) => {
+        const out = {};
+        header.forEach((key, index) => {
+          out[key] = item[index];
+        });
+        return out;
+      });
+    }
+
+    function normalizeRows(rows, fallbackLabel) {
+      const data = rows.map((row) => ({
+        market: row.market || "",
+        stockNo: row.stock_no || "",
+        stockName: row.stock_name || "",
+        date: row.date,
+        open: Number(row.open),
+        high: Number(row.high),
+        low: Number(row.low),
+        close: Number(row.close),
+        change: Number(row.change),
+        volume: Number(row.volume_shares),
+        turnover: Number(row.turnover_twd)
+      })).filter((row) => Number.isFinite(row.close));
+
+      data.sort((a, b) => a.date.localeCompare(b.date));
+      const first = data[0] || {};
+      const label = `${first.stockNo || fallbackLabel} ${first.stockName || ""} ${String(first.market || "").toUpperCase()}`.trim();
+      return {
+        label,
+        rows: data,
+        ma: {
+          5: movingAverage(data, 5),
+          10: movingAverage(data, 10),
+          20: movingAverage(data, 20),
+          60: movingAverage(data, 60)
+        },
+        avgVolume20: movingAverage(data.map((row) => ({ close: row.volume })), 20),
+        backtest: null,
+        sampleBuys: [],
+        crossBacktests: {}
+      };
+    }
+
+    function movingAverage(rows, windowSize) {
+      let total = 0;
+      return rows.map((row, index) => {
+        total += row.close;
+        if (index >= windowSize) {
+          total -= rows[index - windowSize].close;
+        }
+      return index >= windowSize - 1 ? total / windowSize : null;
+      });
+    }
+
+    function valueAt(series, index) {
+      return index >= 0 && index < series.length ? series[index] : null;
+    }
+
+    function isRising(series, index, lookback = 5) {
+      const now = valueAt(series, index);
+      const before = valueAt(series, index - lookback);
+      return now !== null && before !== null && now > before;
+    }
+
+    function slopePct(series, index, lookback = 20) {
+      const now = valueAt(series, index);
+      const before = valueAt(series, index - lookback);
+      if (now === null || before === null || before === 0) return null;
+      return now / before - 1;
+    }
+
+    function crossedBelow(rows, series, index) {
+      const now = valueAt(series, index);
+      const prev = valueAt(series, index - 1);
+      return now !== null && prev !== null && rows[index].close < now && rows[index - 1].close >= prev;
+    }
+
+    function maBullish(dataset, index) {
+      const ma5 = valueAt(dataset.ma[5], index);
+      const ma10 = valueAt(dataset.ma[10], index);
+      const ma20 = valueAt(dataset.ma[20], index);
+      const ma60 = valueAt(dataset.ma[60], index);
+      return ma5 !== null && ma10 !== null && ma20 !== null && ma60 !== null && ma5 > ma10 && ma10 > ma20 && ma20 > ma60;
+    }
+
+    function maCompression(dataset, index, threshold = 0.05) {
+      const checkIndex = index - 1;
+      const values = [5, 10, 20, 60].map((windowSize) => valueAt(dataset.ma[windowSize], checkIndex));
+      if (values.some((value) => value === null)) return false;
+      const max = Math.max(...values);
+      const min = Math.min(...values);
+      return max / min - 1 <= threshold;
+    }
+
+    function recentMaCompression(dataset, index, lookback = 15, threshold = 0.09) {
+      const start = Math.max(60, index - lookback);
+      for (let cursor = start; cursor <= index; cursor += 1) {
+        if (maCompression(dataset, cursor, threshold)) return true;
+      }
+      return false;
+    }
+
+    function priorHigh(rows, index, lookback) {
+      const start = Math.max(0, index - lookback);
+      if (start >= index) return null;
+      return Math.max(...rows.slice(start, index).map((row) => row.high));
+    }
+
+    function fuzzyBreakoutSignal(dataset, index) {
+      const rows = dataset.rows;
+      if (index < 60) return null;
+      const row = rows[index];
+      const avgVol = valueAt(dataset.avgVolume20, index);
+      const ma20 = valueAt(dataset.ma[20], index);
+      const ma60 = valueAt(dataset.ma[60], index);
+      if (avgVol === null || ma20 === null || ma60 === null || avgVol <= 0) return null;
+
+      const redK = row.close > row.open;
+      const bodyPct = row.open ? (row.close - row.open) / row.open : 0;
+      const rangeSize = row.high - row.low;
+      const closePosition = rangeSize > 0 ? (row.close - row.low) / rangeSize : 1;
+      const volumeOk = row.volume >= avgVol * 1.6;
+      const longRed = redK && bodyPct >= 0.045 && closePosition >= 0.7;
+      const high20 = priorHigh(rows, index, 20);
+      const high5 = priorHigh(rows, index, 5);
+      const high3 = priorHigh(rows, index, 3);
+      const breakout = (high20 !== null && row.close >= high20 * 0.995)
+        || (high5 !== null && row.close >= high5 * 0.985)
+        || (high3 !== null && row.close >= high3);
+      const baseOrTrend = recentMaCompression(dataset, index, 20, 0.09)
+        || (row.close > ma20 && ma20 > ma60 && isRising(dataset.ma[20], index, 5));
+      return volumeOk && longRed && breakout && baseOrTrend ? "均線糾結後帶量長紅突破" : null;
+    }
+
+    function recentBreakoutObserved(dataset, index) {
+      const start = Math.max(60, index - 40);
+      for (let cursor = start; cursor <= index; cursor += 1) {
+        if (fuzzyBreakoutSignal(dataset, cursor)) return true;
+      }
+      return false;
+    }
+
+    function mainUptrend(dataset, index) {
+      const rows = dataset.rows;
+      const ma20 = valueAt(dataset.ma[20], index);
+      const ma60 = valueAt(dataset.ma[60], index);
+      const ma60Slope = slopePct(dataset.ma[60], index, 20);
+      return ma20 !== null
+        && ma60 !== null
+        && ma60Slope !== null
+        && ma20 > ma60
+        && rows[index].close > ma60
+        && ma60Slope >= 0.03
+        && recentBreakoutObserved(dataset, index);
+    }
+
+    function mainUptrendPullbackSignal(dataset, index) {
+      if (!mainUptrend(dataset, index)) return null;
+      const rows = dataset.rows;
+      const ma10 = valueAt(dataset.ma[10], index);
+      const ma20 = valueAt(dataset.ma[20], index);
+      const prevMa20 = valueAt(dataset.ma[20], index - 1);
+      if (ma10 === null || ma20 === null) return null;
+      const row = rows[index];
+      const prev = rows[index - 1];
+      const touches20 = row.low <= ma20 * 1.03 && row.close >= ma20 * 0.98;
+      const recovers20 = prevMa20 !== null && row.close >= ma20 && prev.close < prevMa20;
+      const touches10 = row.low <= ma10 * 1.02 && row.close >= ma10 && row.close >= row.open;
+      if (touches20 || recovers20) return "主升段回測月線";
+      if (touches10) return "主升段回測10MA";
+      return null;
+    }
+
+    function tsmcSignal(dataset, index) {
+      const rows = dataset.rows;
+      if (index < 60) return null;
+      const mainPullback = mainUptrendPullbackSignal(dataset, index);
+      if (mainPullback) return mainPullback;
+      const uptrend = mainUptrend(dataset, index);
+      const pullbackToMonth = uptrend && maBullish(dataset, index) && crossedBelow(rows, dataset.ma[20], index);
+      const pullbackToQuarter = uptrend && crossedBelow(rows, dataset.ma[60], index);
+      if (pullbackToMonth) return "跌破月線且均線多頭";
+      if (pullbackToQuarter) return "季線上揚跌破季線";
+      return null;
+    }
+
+    function phisonSignal(dataset, index) {
+      const rows = dataset.rows;
+      if (index < 60) return null;
+      const mainPullback = mainUptrendPullbackSignal(dataset, index);
+      if (mainPullback) return mainPullback;
+      const avgVol = valueAt(dataset.avgVolume20, index);
+      const ma20 = valueAt(dataset.ma[20], index);
+      const ma60 = valueAt(dataset.ma[60], index);
+      const prevMa20 = valueAt(dataset.ma[20], index - 1);
+      const redK = rows[index].close > rows[index].open;
+      const trendOk = ma20 !== null
+        && ma60 !== null
+        && ma20 > ma60
+        && rows[index].close > ma60
+        && isRising(dataset.ma[60], index, 10);
+      const volumeRedK = avgVol !== null
+        && redK
+        && rows[index].volume > avgVol * 1.8
+        && rows[index].close > rows[index - 1].high;
+      const gapRedK = avgVol !== null
+        && redK
+        && rows[index].open > rows[index - 1].high
+        && rows[index].volume > avgVol * 1.2;
+      const compressionBreak = maCompression(dataset, index) && (volumeRedK || gapRedK);
+      const maRising = trendOk && isRising(dataset.ma[5], index, 5) && isRising(dataset.ma[20], index, 5);
+      const firstMonthRetest = ma20 !== null
+        && prevMa20 !== null
+        && rows[index].low <= ma20 * 1.02
+        && rows[index].close >= ma20
+        && rows[index - 1].low > prevMa20 * 1.02;
+      if (mainUptrend(dataset, index) && maRising && firstMonthRetest) return "周月季線上揚首次回測月線";
+      return null;
+    }
+
+    function defaultStrategyKey(dataset) {
+      const stockNo = dataset.rows[0]?.stockNo;
+      if (stockNo === "2330") return "tsmc";
+      if (stockNo === "8299") return "phison";
+      return "tsmc";
+    }
+
+    function activeStrategyKey(dataset) {
+      if (state.strategyKey === "tsmc" || state.strategyKey === "phison") {
+        return state.strategyKey;
+      }
+      if (dataset.crossBacktests?.tsmc && dataset.crossBacktests?.phison) {
+        const lastIndex = dataset.rows.length - 1;
+        const recentFloor = Math.max(0, lastIndex - 90);
+        const recentScore = (result) => {
+          const recentTrades = result.trades.filter((trade) => trade.entryIndex >= recentFloor);
+          if (!recentTrades.length) return null;
+          const avgReturn = recentTrades.reduce((sum, trade) => sum + trade.returnPct, 0) / recentTrades.length;
+          return { count: recentTrades.length, avgReturn };
+        };
+        const tsmcRecent = recentScore(dataset.crossBacktests.tsmc);
+        const phisonRecent = recentScore(dataset.crossBacktests.phison);
+        if (tsmcRecent && phisonRecent) {
+          return phisonRecent.avgReturn > tsmcRecent.avgReturn ? "phison" : "tsmc";
+        }
+        if (phisonRecent) return "phison";
+        if (tsmcRecent) return "tsmc";
+        return dataset.crossBacktests.phison.returnPct > dataset.crossBacktests.tsmc.returnPct ? "phison" : "tsmc";
+      }
+      return defaultStrategyKey(dataset);
+    }
+
+    function strategySignal(strategyKey, dataset, index) {
+      return strategyKey === "phison" ? phisonSignal(dataset, index) : tsmcSignal(dataset, index);
+    }
+
+    function classifySampleBuy(dataset, index) {
+      const rows = dataset.rows;
+      const row = rows[index];
+      const prev = rows[index - 1];
+      const avgVol = valueAt(dataset.avgVolume20, index);
+      const redK = row.close > row.open;
+      const volumeRatio = avgVol ? row.volume / avgVol : null;
+      const gapUp = prev ? row.open > prev.high : false;
+      const ma20 = valueAt(dataset.ma[20], index);
+      const ma60 = valueAt(dataset.ma[60], index);
+      const values = [5, 10, 20, 60].map((windowSize) => valueAt(dataset.ma[windowSize], index)).filter((value) => value !== null);
+      const compression = values.length === 4 ? Math.max(...values) / Math.min(...values) - 1 : null;
+      const near20 = ma20 !== null ? Math.abs(row.close / ma20 - 1) <= 0.08 || row.low <= ma20 * 1.03 : false;
+      const near60 = ma60 !== null ? Math.abs(row.close / ma60 - 1) <= 0.08 || row.low <= ma60 * 1.03 : false;
+
+      if (compression !== null && compression <= 0.08 && redK && volumeRatio !== null && volumeRatio >= 1.5) return "糾結後帶量紅K";
+      if (gapUp && redK && volumeRatio !== null && volumeRatio >= 1.2) return "跳空量增紅K";
+      if (gapUp) return "跳空突破";
+      if (near60 && isRising(dataset.ma[60], index, 5)) return "回測上揚季線";
+      if (near20) return "回測月線附近";
+      if (redK && volumeRatio !== null && volumeRatio >= 1.2) return "量增紅K";
+      return redK ? "紅K轉強" : "強趨勢回測";
+    }
+
+    function buildSampleBuys(dataset) {
+      const dates = SAMPLE_BUYS[dataset.rows[0]?.stockNo] || [];
+      const lastClose = dataset.rows[dataset.rows.length - 1]?.close;
+      return dates.map((dateText) => {
+        const index = dataset.rows.findIndex((row) => row.date === dateText);
+        if (index < 0) return null;
+        const row = dataset.rows[index];
+        const exit20 = dataset.rows[Math.min(dataset.rows.length - 1, index + 20)].close;
+        const stopPrice = row.close * 0.85;
+        let stopped = false;
+        let stopDate = "";
+        for (let cursor = index + 1; cursor < dataset.rows.length; cursor += 1) {
+          if (dataset.rows[cursor].low <= stopPrice) {
+            stopped = true;
+            stopDate = dataset.rows[cursor].date;
+            break;
+          }
+        }
+        return {
+          index,
+          date: row.date,
+          type: classifySampleBuy(dataset, index),
+          entryPrice: row.close,
+          return20: exit20 / row.close - 1,
+          returnToEnd: lastClose / row.close - 1,
+          stopped,
+          stopDate
+        };
+      }).filter(Boolean);
+    }
+
+    function strategyName(strategyKey) {
+      return strategyKey === "phison" ? "群聯策略" : "台積電策略";
+    }
+
+    function strategyNoteByKey(strategyKey) {
+      if (strategyKey === "tsmc") {
+        return "台積電規則：均線糾結後帶量長紅突破只作觀察；主升段成立後，回測 10MA/20MA 或跌破月季線才進場。主升段需 20MA > 60MA、60MA 20日斜率 >= 3%、股價在 60MA 上，且近期有突破觀察訊號。";
+      }
+      if (strategyKey === "phison") {
+        return "群聯規則：均線糾結後帶量長紅突破只作觀察；主升段成立後，回測 10MA/20MA 或首次回測並收回 20MA 才進場。若 60MA 20日斜率低於 3%，視為整理，停止主升段回測買進。";
+      }
+      return "匯入股票未設定專屬策略。";
+    }
+
+    function runBacktest(dataset, strategyKey = defaultStrategyKey(dataset)) {
+      const rows = dataset.rows;
+      const markers = [];
+      const trades = [];
+      let openPositions = [];
+      const minEntryGap = 10;
+      let lastEntryIndex = -10000;
+
+      for (let index = 1; index < rows.length; index += 1) {
+        const stillOpen = [];
+        openPositions.forEach((position) => {
+          if (index > position.entryIndex && rows[index].low <= position.stopPrice) {
+            const exitPrice = position.stopPrice;
+            const ret = exitPrice / position.entryPrice - 1;
+            const trade = {
+              ...position,
+              exitIndex: index,
+              exitDate: rows[index].date,
+              exitPrice,
+              returnPct: ret,
+              exitReason: "停損"
+            };
+            trades.push(trade);
+            markers.push({ index, type: "sell", price: exitPrice, label: "停損" });
+          } else {
+            stillOpen.push(position);
+          }
+        });
+        openPositions = stillOpen;
+
+        const reason = strategySignal(strategyKey, dataset, index);
+        if (reason && index - lastEntryIndex >= minEntryGap) {
+          const entryPrice = rows[index].close;
+          openPositions.push({
+            entryIndex: index,
+            entryDate: rows[index].date,
+            entryPrice,
+            stopPrice: entryPrice * 0.85,
+            entryReason: reason
+          });
+          markers.push({ index, type: "buy", price: entryPrice, label: reason });
+          lastEntryIndex = index;
+        }
+      }
+
+      if (openPositions.length) {
+        const exitIndex = rows.length - 1;
+        const exitPrice = rows[exitIndex].close;
+        openPositions.forEach((position) => {
+          const ret = exitPrice / position.entryPrice - 1;
+          trades.push({
+            ...position,
+            exitIndex,
+            exitDate: rows[exitIndex].date,
+            exitPrice,
+            returnPct: ret,
+            exitReason: "期末估值"
+          });
+          markers.push({ index: exitIndex, type: "sell", price: exitPrice, label: "期末估值" });
+        });
+      }
+
+      const returnPct = trades.length
+        ? trades.reduce((sum, trade) => sum + trade.returnPct, 0) / trades.length
+        : 0;
+
+      return {
+        strategyKey,
+        trades,
+        markers,
+        returnPct,
+        note: strategyNoteByKey(strategyKey)
+      };
+    }
+
+    function activeStrategyNote(dataset) {
+      if (state.strategyKey === "auto" && dataset?.backtest?.strategyKey) {
+        return `自動策略：優先比較最近 90 個交易日內有訊號的策略，選擇 ${strategyName(dataset.backtest.strategyKey)}。${strategyNoteByKey(dataset.backtest.strategyKey)}`;
+      }
+      return dataset?.backtest?.note || "";
+    }
+
+    function sourceKey(source) {
+      return source.path || source.label;
+    }
+
+    async function loadWalkForwardReport() {
+      try {
+        const [summaryResponse, detailResponse] = await Promise.all([
+          fetch("reports/walk_forward_drill_summary.csv"),
+          fetch("reports/walk_forward_drill_trades.csv")
+        ]);
+        if (!summaryResponse.ok) throw new Error(`${summaryResponse.status}`);
+        state.walkForwardSummary = parseCsv(await summaryResponse.text());
+        state.walkForwardTrades = detailResponse.ok ? parseCsv(await detailResponse.text()) : [];
+        renderWalkForwardReport(state.walkForwardSummary);
+      } catch (error) {
+        walkForwardMeta.textContent = "尚未產生 walk-forward 報表";
+        walkForwardRows.innerHTML = `<tr><td colspan="5">請先執行 walk_forward_drill.py</td></tr>`;
+      }
+    }
+
+    function renderWalkForwardReport(rows) {
+      const totalTrades = rows.reduce((sum, row) => sum + Number(row.test_trades || 0), 0);
+      const totalPnl = rows.reduce((sum, row) => sum + Number(row.pnl || 0), 0);
+      const totalInvested = rows.reduce((sum, row) => sum + Number(row.invested || 0), 0);
+      const totalReturn = totalInvested ? totalPnl / totalInvested : 0;
+      walkForwardMeta.textContent = `${rows.length} 檔 / ${totalTrades} 筆，總報酬 ${formatNumber(totalReturn * 100, 2)}%`;
+      walkForwardRows.innerHTML = rows.map((row) => {
+        const avgReturn = Number(row.avg_return || 0);
+        const stockLabel = `${row.stock_no} ${row.stock_name}`;
+        const drillDate = row.drill_today ? row.drill_today.slice(5) : "";
+        const compactStrategy = row.chosen_strategy || "";
+        return `
+          <tr class="clickable-row ${state.activeWalkForwardStock === row.stock_no ? "active" : ""}" data-stock-no="${row.stock_no}">
+            <td>${stockLabel}</td>
+            <td>${drillDate}</td>
+            <td>${compactStrategy}</td>
+            <td>${row.test_trades}</td>
+            <td style="color: ${avgReturn >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(avgReturn * 100, 2)}%</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function walkForwardTradesFor(stockNo) {
+      return state.walkForwardTrades.filter((trade) => trade.stock_no === stockNo);
+    }
+
+    async function loadDatasetForStock(stockNo) {
+      if (state.loadingStockNos.has(stockNo)) return null;
+      const existingIndex = state.datasets.findIndex((dataset) => dataset.rows[0]?.stockNo === stockNo);
+      if (existingIndex >= 0) return existingIndex;
+
+      if (!state.marketSources.length) {
+        await loadMarketIndexSources();
+      }
+      const source = state.marketSources.find((item) => item.stock_no === stockNo || item.label?.startsWith(`${stockNo} `));
+      if (!source?.path) return null;
+
+      state.loadingStockNos.add(stockNo);
+      walkForwardMeta.textContent = `正在載入 ${stockNo}...`;
+      try {
+        const response = await fetch(source.path, { cache: "no-store" });
+        if (!response.ok) throw new Error(`${response.status}`);
+        const dataset = normalizeRows(parseCsv(await response.text()), source.label);
+        state.datasets.push(dataset);
+        refreshSelect();
+        return state.datasets.length - 1;
+      } catch (error) {
+        console.warn(`Unable to load ${source.path}`, error);
+        return null;
+      } finally {
+        state.loadingStockNos.delete(stockNo);
+        renderWalkForwardReport(state.walkForwardSummary);
+      }
+    }
+
+    async function selectWalkForwardStock(stockNo) {
+      state.activeWalkForwardStock = stockNo;
+      renderWalkForwardReport(state.walkForwardSummary);
+      let index = state.datasets.findIndex((dataset) => dataset.rows[0]?.stockNo === stockNo);
+      if (index < 0) {
+        index = await loadDatasetForStock(stockNo);
+      }
+      if (index >= 0) {
+        setDataset(index);
+        const trades = walkForwardTradesFor(stockNo);
+        const entryIndexes = trades
+          .map((trade) => currentRows().findIndex((row) => row.date === trade.entry_date))
+          .filter((entryIndex) => entryIndex >= 0);
+        if (entryIndexes.length) {
+          const first = Math.max(0, Math.min(...entryIndexes) - 12);
+          const last = Math.min(currentRows().length - 1, Math.max(...entryIndexes) + 45);
+          state.start = first;
+          state.end = Math.max(first, last);
+        }
+        draw();
+      } else {
+        walkForwardMeta.textContent = `找不到 ${stockNo} 的 K 線資料`;
+      }
+    }
+
+    async function loadMarketIndexSources() {
+      try {
+        const response = await fetch("data/market_index.json", { cache: "no-store" });
+        if (!response.ok) return [];
+        const items = await response.json();
+        const existing = new Set(SOURCES.map(sourceKey));
+        state.marketSources = items;
+        return items
+          .filter((item) => item.path && !existing.has(item.path))
+          .map((item) => ({ label: item.label, path: item.path, stock_no: item.stock_no }));
+      } catch (error) {
+        console.warn("Unable to load market index", error);
+        return [];
+      }
+    }
+
+    function ensureBacktests(dataset) {
+      if (!dataset.crossBacktests || !dataset.crossBacktests.tsmc) {
+        dataset.crossBacktests = {
+          tsmc: runBacktest(dataset, "tsmc"),
+          phison: runBacktest(dataset, "phison")
+        };
+      }
+      dataset.backtest = dataset.crossBacktests[activeStrategyKey(dataset)];
+      if (!dataset.sampleBuys.length) {
+        dataset.sampleBuys = buildSampleBuys(dataset);
+      }
+    }
+
+    function mergeDatasets(primary, secondary) {
+      const merged = [];
+      const seen = new Set();
+      [...primary, ...secondary].forEach((dataset) => {
+        const first = dataset.rows?.[0] || {};
+        const key = first.stockNo || dataset.label;
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        merged.push(dataset);
+      });
+      return merged;
+    }
+
+    async function loadSources() {
+      const loaded = [];
+      const sources = [...SOURCES, ...(await loadMarketIndexSources())];
+      for (const source of sources) {
+        try {
+          const response = await fetch(source.path);
+          if (!response.ok) throw new Error(`${response.status}`);
+          const dataset = normalizeRows(parseCsv(await response.text()), source.label);
+          loaded.push(dataset);
+          if (loaded.length === 1) {
+            state.datasets = mergeDatasets(loaded, state.datasets);
+            refreshSelect();
+            setDataset(0);
+          } else if (loaded.length % 100 === 0) {
+            state.datasets = mergeDatasets(state.datasets, loaded);
+            refreshSelect();
+            statusEl.textContent = `已載入 ${loaded.length} / ${sources.length} 檔。`;
+          }
+        } catch (error) {
+          console.warn(`Unable to load ${source.path}`, error);
+        }
+      }
+      const selectedStockNo = currentDataset()?.rows?.[0]?.stockNo;
+      state.datasets = mergeDatasets(state.datasets, loaded);
+      state.marketIndexLoaded = sources.length > SOURCES.length;
+      refreshSelect();
+      if (state.datasets.length) {
+        const selectedIndex = selectedStockNo
+          ? state.datasets.findIndex((dataset) => dataset.rows[0]?.stockNo === selectedStockNo)
+          : -1;
+        setDataset(selectedIndex >= 0 ? selectedIndex : state.current);
+      } else {
+        statusEl.textContent = "請匯入 CSV";
+      }
+    }
+
+    function datasetSearchText(dataset) {
+      const first = dataset.rows?.[0] || {};
+      return `${dataset.label || ""} ${first.stockNo || ""} ${first.stockName || ""} ${first.market || ""}`.toLowerCase();
+    }
+
+    function matchingDatasetIndexes(query) {
+      const text = query.trim().toLowerCase();
+      if (!text) {
+        return state.datasets.map((_, index) => index);
+      }
+      return state.datasets
+        .map((dataset, index) => ({ dataset, index }))
+        .filter((item) => datasetSearchText(item.dataset).includes(text))
+        .map((item) => item.index);
+    }
+
+    function refreshSelect() {
+      const matches = matchingDatasetIndexes(searchInput.value);
+      const visibleIndexes = matches.slice(0, 80);
+      select.innerHTML = "";
+      visibleIndexes.forEach((index) => {
+        const dataset = state.datasets[index];
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = dataset.label;
+        select.appendChild(option);
+      });
+
+      suggestions.innerHTML = "";
+      matches.slice(0, 30).forEach((index) => {
+        const option = document.createElement("option");
+        option.value = state.datasets[index].label;
+        suggestions.appendChild(option);
+      });
+
+      if (!searchInput.value.trim() && state.datasets[state.current] && !visibleIndexes.includes(state.current)) {
+        const option = document.createElement("option");
+        option.value = String(state.current);
+        option.textContent = state.datasets[state.current].label;
+        select.insertBefore(option, select.firstChild);
+      }
+      select.value = String(state.current);
+    }
+
+    function selectSearchResult() {
+      const matches = matchingDatasetIndexes(searchInput.value);
+      if (matches.length) {
+        setDataset(matches[0]);
+      } else {
+        refreshSelect();
+      }
+    }
+
+    function setDataset(index) {
+      state.current = index;
+      if (currentDataset()) {
+        ensureBacktests(currentDataset());
+      }
+      const rows = currentRows();
+      state.start = 0;
+      state.end = Math.max(0, rows.length - 1);
+      state.hoverIndex = rows.length ? rows.length - 1 : null;
+      select.value = String(index);
+      searchInput.value = currentDataset()?.label || "";
+      refreshSelect();
+      draw();
+    }
+
+    function setStrategy(strategyKey) {
+      state.strategyKey = strategyKey;
+      if (currentDataset()) {
+        ensureBacktests(currentDataset());
+      }
+      draw();
+    }
+
+    function currentDataset() {
+      return state.datasets[state.current];
+    }
+
+    function currentRows() {
+      return currentDataset()?.rows || [];
+    }
+
+    function checkedMas() {
+      return Array.from(document.querySelectorAll(".ma-toggle input:checked")).map((item) => Number(item.value));
+    }
+
+    function formatNumber(value, fraction = 0) {
+      if (!Number.isFinite(value)) return "--";
+      return value.toLocaleString("en-US", {
+        maximumFractionDigits: fraction,
+        minimumFractionDigits: fraction
+      });
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      const width = Math.max(640, Math.floor(rect.width));
+      const height = Math.max(480, Math.floor(rect.height));
+      if (canvas.width !== Math.floor(width * ratio) || canvas.height !== Math.floor(height * ratio)) {
+        canvas.width = Math.floor(width * ratio);
+        canvas.height = Math.floor(height * ratio);
+      }
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { width, height };
+    }
+
+    function getLayout(width, height) {
+      return {
+        left: 68,
+        right: 72,
+        top: 34,
+        priceBottom: Math.round(height * 0.7),
+        volumeTop: Math.round(height * 0.75),
+        bottom: height - 38,
+        width,
+        height
+      };
+    }
+
+    function visibleRows() {
+      return currentRows().slice(state.start, state.end + 1);
+    }
+
+    function priceRange(rows) {
+      const dataset = currentDataset();
+      let min = Infinity;
+      let max = -Infinity;
+      rows.forEach((row, localIndex) => {
+        const index = state.start + localIndex;
+        min = Math.min(min, row.low);
+        max = Math.max(max, row.high);
+        checkedMas().forEach((windowSize) => {
+          const value = dataset.ma[windowSize][index];
+          if (value !== null) {
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+          }
+        });
+      });
+      const pad = Math.max((max - min) * 0.08, 1);
+      return { min: min - pad, max: max + pad };
+    }
+
+    function xForIndex(index, layout) {
+      const count = Math.max(1, state.end - state.start);
+      const innerWidth = layout.width - layout.left - layout.right;
+      return layout.left + ((index - state.start) / count) * innerWidth;
+    }
+
+    function indexForX(x, layout) {
+      const innerWidth = layout.width - layout.left - layout.right;
+      const ratio = Math.min(1, Math.max(0, (x - layout.left) / innerWidth));
+      return Math.round(state.start + ratio * (state.end - state.start));
+    }
+
+    function yForPrice(price, layout, range) {
+      const height = layout.priceBottom - layout.top;
+      return layout.top + ((range.max - price) / (range.max - range.min)) * height;
+    }
+
+    function yForVolume(volume, layout, maxVolume) {
+      const height = layout.bottom - layout.volumeTop;
+      return layout.bottom - (volume / maxVolume) * height;
+    }
+
+    function draw() {
+      const rows = currentRows();
+      const dataset = currentDataset();
+      const { width, height } = resizeCanvas();
+      const layout = getLayout(width, height);
+      ctx.clearRect(0, 0, width, height);
+
+      if (!rows.length || !dataset) {
+        return;
+      }
+
+      state.start = Math.max(0, Math.min(state.start, rows.length - 1));
+      state.end = Math.max(state.start, Math.min(state.end, rows.length - 1));
+      const windowRows = visibleRows();
+      const range = priceRange(windowRows);
+      const maxVolume = Math.max(...windowRows.map((row) => row.volume), 1);
+
+      drawBackground(layout, range, maxVolume);
+      drawCandles(windowRows, layout, range);
+      drawMovingAverages(layout, range);
+      drawVolume(windowRows, layout, maxVolume);
+      state.markerTagRects = [];
+      state.markerPointRects = [];
+      drawTradeMarkers(layout, range);
+      drawWalkForwardMarkers(layout, range);
+      drawSampleMarkers(layout, range);
+      drawAxes(windowRows, layout, range, maxVolume);
+      drawHover(layout, range);
+      updateSidePanel();
+    }
+
+    function drawBackground(layout, range, maxVolume) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, layout.width, layout.height);
+      ctx.strokeStyle = "#e5eaf1";
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i += 1) {
+        const y = layout.top + ((layout.priceBottom - layout.top) / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(layout.left, y);
+        ctx.lineTo(layout.width - layout.right, y);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= 2; i += 1) {
+        const y = layout.volumeTop + ((layout.bottom - layout.volumeTop) / 2) * i;
+        ctx.beginPath();
+        ctx.moveTo(layout.left, y);
+        ctx.lineTo(layout.width - layout.right, y);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.strokeRect(layout.left, layout.top, layout.width - layout.left - layout.right, layout.priceBottom - layout.top);
+      ctx.strokeRect(layout.left, layout.volumeTop, layout.width - layout.left - layout.right, layout.bottom - layout.volumeTop);
+    }
+
+    function drawCandles(rows, layout, range) {
+      const count = Math.max(1, state.end - state.start + 1);
+      const slot = (layout.width - layout.left - layout.right) / count;
+      const bodyWidth = Math.max(2, Math.min(12, slot * 0.68));
+      rows.forEach((row, localIndex) => {
+        const index = state.start + localIndex;
+        const x = xForIndex(index, layout);
+        const up = row.close >= row.open;
+        const color = up ? getComputedStyle(document.documentElement).getPropertyValue("--up").trim() : getComputedStyle(document.documentElement).getPropertyValue("--down").trim();
+        const openY = yForPrice(row.open, layout, range);
+        const closeY = yForPrice(row.close, layout, range);
+        const highY = yForPrice(row.high, layout, range);
+        const lowY = yForPrice(row.low, layout, range);
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, highY);
+        ctx.lineTo(x, lowY);
+        ctx.stroke();
+        const top = Math.min(openY, closeY);
+        const height = Math.max(1, Math.abs(openY - closeY));
+        ctx.fillRect(x - bodyWidth / 2, top, bodyWidth, height);
+      });
+    }
+
+    function drawMovingAverages(layout, range) {
+      const dataset = currentDataset();
+      checkedMas().forEach((windowSize) => {
+        ctx.beginPath();
+        ctx.strokeStyle = MA_COLORS[windowSize];
+        ctx.lineWidth = 1.7;
+        let started = false;
+        for (let index = state.start; index <= state.end; index += 1) {
+          const value = dataset.ma[windowSize][index];
+          if (value === null) {
+            started = false;
+            continue;
+          }
+          const x = xForIndex(index, layout);
+          const y = yForPrice(value, layout, range);
+          if (!started) {
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      });
+    }
+
+    function drawVolume(rows, layout, maxVolume) {
+      const count = Math.max(1, state.end - state.start + 1);
+      const slot = (layout.width - layout.left - layout.right) / count;
+      const barWidth = Math.max(2, Math.min(12, slot * 0.68));
+      rows.forEach((row, localIndex) => {
+        const index = state.start + localIndex;
+        const x = xForIndex(index, layout);
+        const y = yForVolume(row.volume, layout, maxVolume);
+        ctx.fillStyle = row.close >= row.open ? "rgba(215, 38, 61, 0.32)" : "rgba(20, 143, 98, 0.32)";
+        ctx.fillRect(x - barWidth / 2, y, barWidth, layout.bottom - y);
+      });
+    }
+
+    function drawTradeMarkers(layout, range) {
+      const markers = currentDataset().backtest?.markers || [];
+      const entryColor = getComputedStyle(document.documentElement).getPropertyValue("--entry").trim();
+      const exitColor = getComputedStyle(document.documentElement).getPropertyValue("--exit").trim();
+      markers.forEach((marker) => {
+        if (marker.index < state.start || marker.index > state.end) return;
+        const x = xForIndex(marker.index, layout);
+        const y = yForPrice(marker.price, layout, range);
+        const markerPoint = reserveMarkerPoint(x, y);
+        const drawX = markerPoint.x;
+        const drawY = markerPoint.y;
+        const color = marker.type === "buy" ? entryColor : exitColor;
+        const label = marker.type === "buy" ? "策買" : "策賣";
+        const tagY = marker.type === "buy"
+          ? Math.max(layout.top + 6, drawY - 42)
+          : Math.min(layout.priceBottom - 24, drawY + 20);
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = 0.22;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, layout.top);
+        ctx.lineTo(x, layout.bottom);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (marker.type === "buy") {
+          ctx.moveTo(drawX, drawY - 18);
+          ctx.lineTo(drawX - 12, drawY + 4);
+          ctx.lineTo(drawX + 12, drawY + 4);
+        } else {
+          ctx.moveTo(drawX, drawY + 18);
+          ctx.lineTo(drawX - 12, drawY - 4);
+          ctx.lineTo(drawX + 12, drawY - 4);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        drawMarkerTag(drawX, tagY, label, color, layout);
+        ctx.restore();
+      });
+    }
+
+    function reserveMarkerPoint(x, y) {
+      const offsets = [0, -16, 16, -32, 32, -48, 48];
+      for (const offset of offsets) {
+        const rect = { x: x + offset - 14, y: y - 20, width: 28, height: 40 };
+        if (!collides(rect, state.markerPointRects || [], 4)) {
+          state.markerPointRects.push(rect);
+          return { x: x + offset, y };
+        }
+      }
+      const fallback = { x: x + 56, y };
+      state.markerPointRects.push({ x: fallback.x - 14, y: y - 20, width: 28, height: 40 });
+      return fallback;
+    }
+
+    function collides(rect, rects, gap = 0) {
+      return rects.some((item) => !(
+        rect.x + rect.width + gap < item.x
+        || item.x + item.width + gap < rect.x
+        || rect.y + rect.height + gap < item.y
+        || item.y + item.height + gap < rect.y
+      ));
+    }
+
+    function drawMarkerTag(x, y, text, color, layout) {
+      ctx.save();
+      ctx.font = "700 12px Microsoft JhengHei, Arial";
+      const paddingX = 7;
+      const width = Math.ceil(ctx.measureText(text).width + paddingX * 2);
+      const height = 22;
+      const tagX = Math.max(layout.left, Math.min(x - width / 2, layout.width - layout.right - width));
+      const candidates = [0, 24, -24, 48, -48, 72, -72, 96, -96];
+      let tagY = Math.max(layout.top + 4, Math.min(y, layout.priceBottom - height - 4));
+      let placed = false;
+      for (const offset of candidates) {
+        const nextY = Math.max(layout.top + 4, Math.min(y + offset, layout.priceBottom - height - 4));
+        const rect = { x: tagX, y: nextY, width, height };
+        if (!collides(rect, state.markerTagRects || [], 4)) {
+          tagY = nextY;
+          state.markerTagRects.push(rect);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        state.markerTagRects.push({ x: tagX, y: tagY, width, height });
+      }
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      roundedRectPath(tagX, tagY, width, height, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, tagX + width / 2, tagY + height / 2 + 0.5);
+      ctx.restore();
+    }
+
+    function roundedRectPath(x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + width - r, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+      ctx.lineTo(x + width, y + height - r);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+      ctx.lineTo(x + r, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function drawWalkForwardMarkers(layout, range) {
+      const dataset = currentDataset();
+      const stockNo = dataset?.rows[0]?.stockNo;
+      if (!stockNo || state.activeWalkForwardStock !== stockNo) return;
+      const rows = currentRows();
+      const indexByDate = new Map(rows.map((row, index) => [row.date, index]));
+      walkForwardTradesFor(stockNo).forEach((trade) => {
+        [
+          { date: trade.entry_date, price: Number(trade.entry_price), type: "buy", label: "WF買" },
+          { date: trade.exit_date, price: Number(trade.exit_price), type: "sell", label: trade.exit_reason }
+        ].forEach((marker) => {
+          const index = indexByDate.get(marker.date);
+          if (index === undefined || index < state.start || index > state.end) return;
+          const x = xForIndex(index, layout);
+          const y = yForPrice(marker.price, layout, range);
+          const markerPoint = reserveMarkerPoint(x, y);
+          const drawX = markerPoint.x;
+          const drawY = markerPoint.y;
+          const color = marker.type === "buy"
+            ? getComputedStyle(document.documentElement).getPropertyValue("--walk").trim()
+            : getComputedStyle(document.documentElement).getPropertyValue("--walk-exit").trim();
+          const tagText = marker.type === "buy" ? "演買" : "演賣";
+          const tagY = marker.type === "buy"
+            ? Math.max(layout.top + 30, drawY - 34)
+            : Math.min(layout.priceBottom - 24, drawY + 12);
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.globalAlpha = 0.2;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x, layout.top);
+          ctx.lineTo(x, layout.bottom);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = color;
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(drawX, drawY, 9, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          drawMarkerTag(drawX, tagY, tagText, color, layout);
+          ctx.restore();
+        });
+      });
+    }
+
+    function drawSampleMarkers(layout, range) {
+      const samples = currentDataset().sampleBuys || [];
+      samples.forEach((sample) => {
+        if (sample.index < state.start || sample.index > state.end) return;
+        const x = xForIndex(sample.index, layout);
+        const y = yForPrice(sample.entryPrice, layout, range) - 22;
+        ctx.save();
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--sample").trim();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y - 8);
+        ctx.lineTo(x + 8, y);
+        ctx.lineTo(x, y + 8);
+        ctx.lineTo(x - 8, y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    function drawAxes(rows, layout, range, maxVolume) {
+      ctx.fillStyle = "#64748b";
+      ctx.font = "12px Microsoft JhengHei, Arial";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      for (let i = 0; i <= 5; i += 1) {
+        const value = range.max - ((range.max - range.min) / 5) * i;
+        const y = layout.top + ((layout.priceBottom - layout.top) / 5) * i;
+        ctx.fillText(formatNumber(value, 2), layout.width - 10, y);
+      }
+      for (let i = 0; i <= 2; i += 1) {
+        const value = maxVolume - (maxVolume / 2) * i;
+        const y = layout.volumeTop + ((layout.bottom - layout.volumeTop) / 2) * i;
+        ctx.fillText(compactNumber(value), layout.width - 10, y);
+      }
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      const tickCount = Math.min(7, rows.length);
+      for (let i = 0; i < tickCount; i += 1) {
+        const localIndex = Math.round((rows.length - 1) * (i / Math.max(1, tickCount - 1)));
+        const globalIndex = state.start + localIndex;
+        const x = xForIndex(globalIndex, layout);
+        ctx.fillText(rows[localIndex].date.slice(5), x, layout.bottom + 11);
+      }
+    }
+
+    function drawHover(layout, range) {
+      const rows = currentRows();
+      if (state.hoverIndex === null || state.hoverIndex < state.start || state.hoverIndex > state.end) {
+        updateInfoPanel(rows[rows.length - 1]?.date ? rows.length - 1 : null);
+        return;
+      }
+      const x = xForIndex(state.hoverIndex, layout);
+      const row = rows[state.hoverIndex];
+      const y = yForPrice(row.close, layout, range);
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.38)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, layout.top);
+      ctx.lineTo(x, layout.bottom);
+      ctx.moveTo(layout.left, y);
+      ctx.lineTo(layout.width - layout.right, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      updateInfoPanel(state.hoverIndex);
+    }
+
+    function updateInfoPanel(index) {
+      const rows = currentRows();
+      if (index === null || index === undefined || !rows[index]) {
+        tooltip.innerHTML = "<strong>移動到 K 線查看資料</strong>";
+        return;
+      }
+      const row = rows[index];
+      const maLines = checkedMas().map((windowSize) => {
+        const value = currentDataset().ma[windowSize][index];
+        return value === null ? "" : `<div>${windowSize}MA: ${formatNumber(value, 2)}</div>`;
+      }).join("");
+      const markers = currentDataset().backtest?.markers.filter((item) => item.index === index) || [];
+      const sample = currentDataset().sampleBuys?.find((item) => item.index === index);
+      const markerLine = markers.length ? markers.slice(0, 6).map((marker) =>
+        `<div>${marker.type === "buy" ? "買進" : "賣出"}：${marker.label} @ ${formatNumber(marker.price, 2)}</div>`
+      ).join("") : "";
+      const wfLines = state.activeWalkForwardStock === currentDataset()?.rows[0]?.stockNo
+        ? walkForwardTradesFor(state.activeWalkForwardStock).flatMap((trade) => {
+          const lines = [];
+          if (trade.entry_date === row.date) lines.push(`<div>WF買進：${trade.entry_reason} @ ${formatNumber(Number(trade.entry_price), 2)}</div>`);
+          if (trade.exit_date === row.date) lines.push(`<div>WF出場：${trade.exit_reason} @ ${formatNumber(Number(trade.exit_price), 2)}</div>`);
+          return lines;
+        }).join("")
+        : "";
+      const sampleLine = sample ? `<div>樣本買點：${sample.type}，20日 ${formatNumber(sample.return20 * 100, 2)}%</div>` : "";
+      tooltip.innerHTML = `
+        <strong>${row.date}</strong>
+        <div>開 ${formatNumber(row.open, 2)}　高 ${formatNumber(row.high, 2)}</div>
+        <div>低 ${formatNumber(row.low, 2)}　收 ${formatNumber(row.close, 2)}</div>
+        <div>漲跌 ${formatNumber(row.change, 2)}　量 ${compactNumber(row.volume)}</div>
+        ${maLines}
+        ${markerLine}
+        ${wfLines}
+        ${sampleLine}
+      `;
+    }
+
+    function compactNumber(value) {
+      if (Math.abs(value) >= 100000000) return `${formatNumber(value / 100000000, 2)}億`;
+      if (Math.abs(value) >= 10000) return `${formatNumber(value / 10000, 1)}萬`;
+      return formatNumber(value);
+    }
+
+    function summarizeReturnTrades(trades, getReturnPct) {
+      const total = trades.length;
+      const returnSum = trades.reduce((sum, trade) => sum + getReturnPct(trade), 0);
+      const wins = trades.filter((trade) => getReturnPct(trade) > 0).length;
+      return {
+        trades: total,
+        wins,
+        winRate: total ? wins / total : 0,
+        returnPct: total ? returnSum / total : 0,
+        pnl: returnSum * 100000
+      };
+    }
+
+    function setCompareValue(id, value, colorValue = null) {
+      const element = document.getElementById(id);
+      element.textContent = value;
+      if (colorValue !== null) {
+        element.style.color = colorValue >= 0 ? "var(--up)" : "var(--down)";
+      } else {
+        element.style.color = "var(--ink)";
+      }
+    }
+
+    function renderResultComparison(backtest, wfTrades) {
+      const strategySummary = summarizeReturnTrades(backtest.trades || [], (trade) => Number(trade.returnPct || 0));
+      const wfSummary = summarizeReturnTrades(wfTrades, (trade) => Number(trade.return_pct || 0));
+
+      setCompareValue("strategyCompareReturn", `${formatNumber(strategySummary.returnPct * 100, 2)}%`, strategySummary.returnPct);
+      setCompareValue("strategyCompareWinRate", strategySummary.trades ? `${formatNumber(strategySummary.winRate * 100, 2)}%` : "--");
+      setCompareValue("strategyCompareTrades", `${strategySummary.trades}`);
+      setCompareValue("strategyComparePnl", compactNumber(strategySummary.pnl), strategySummary.pnl);
+
+      setCompareValue("waCompareReturn", wfSummary.trades ? `${formatNumber(wfSummary.returnPct * 100, 2)}%` : "--", wfSummary.trades ? wfSummary.returnPct : null);
+      setCompareValue("waCompareWinRate", wfSummary.trades ? `${formatNumber(wfSummary.winRate * 100, 2)}%` : "--");
+      setCompareValue("waCompareTrades", wfSummary.trades ? `${wfSummary.trades}` : "--");
+      setCompareValue("waComparePnl", wfSummary.trades ? compactNumber(wfSummary.pnl) : "--", wfSummary.trades ? wfSummary.pnl : null);
+    }
+
+    function renderStrategyTrades(backtest) {
+      tradeRows.innerHTML = backtest.trades.length ? backtest.trades.map((trade) => `
+        <tr>
+          <td>${trade.entryDate}<br>${trade.entryReason || ""}</td>
+          <td>${trade.exitDate}<br>${trade.exitReason}</td>
+          <td>${formatNumber(trade.entryPrice, 2)}</td>
+          <td>${formatNumber(trade.exitPrice, 2)}</td>
+          <td style="color: ${trade.returnPct >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(trade.returnPct * 100, 2)}%</td>
+        </tr>
+      `).join("") : `<tr><td colspan="5">策略回測沒有觸發進場</td></tr>`;
+    }
+
+    function renderWalkForwardTradesForCurrentStock() {
+      const stockNo = currentDataset()?.rows?.[0]?.stockNo;
+      const wfTrades = stockNo ? walkForwardTradesFor(stockNo) : [];
+      waTradeRows.innerHTML = wfTrades.length ? wfTrades.map((trade) => {
+        const returnPct = Number(trade.return_pct || 0);
+        return `
+          <tr>
+            <td>${trade.entry_date}<br>${trade.entry_reason || ""}</td>
+            <td>${trade.exit_date}<br>${trade.exit_reason || ""}</td>
+            <td>${formatNumber(Number(trade.entry_price), 2)}</td>
+            <td>${formatNumber(Number(trade.exit_price), 2)}</td>
+            <td style="color: ${returnPct >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(returnPct * 100, 2)}%</td>
+          </tr>
+        `;
+      }).join("") : `<tr><td colspan="5">這檔沒有 WA 演練交易資料</td></tr>`;
+      return wfTrades;
+    }
+
+    function updateSidePanel() {
+      const rows = currentRows();
+      const last = state.hoverIndex === null ? rows[rows.length - 1] : rows[state.hoverIndex];
+      const firstVisible = rows[state.start];
+      const lastVisible = rows[state.end];
+      const up = last.close >= last.open;
+      document.getElementById("lastClose").textContent = formatNumber(last.close, 2);
+      document.getElementById("lastChange").textContent = formatNumber(last.change, 2);
+      document.getElementById("lastChange").style.color = up ? "var(--up)" : "var(--down)";
+      document.getElementById("lastVolume").textContent = compactNumber(last.volume);
+      document.getElementById("visibleCount").textContent = `${state.end - state.start + 1} 日`;
+      const backtest = currentDataset().backtest || { trades: [], returnPct: 0, note: "" };
+      document.getElementById("strategyReturn").textContent = `${formatNumber(backtest.returnPct * 100, 2)}%`;
+      document.getElementById("strategyReturn").style.color = backtest.returnPct >= 0 ? "var(--up)" : "var(--down)";
+      document.getElementById("tradeCount").textContent = `${backtest.trades.length}`;
+      document.getElementById("strategyNote").textContent = activeStrategyNote(currentDataset());
+      rangeMeta.textContent = `${currentDataset().label} · ${firstVisible.date} - ${lastVisible.date}`;
+      statusEl.textContent = `已載入 ${state.datasets.length} 檔。滾輪縮放，拖曳平移`;
+      renderStrategyMatrix();
+      renderStrategyTrades(backtest);
+      const wfTrades = renderWalkForwardTradesForCurrentStock();
+      renderResultComparison(backtest, wfTrades);
+
+      const samples = currentDataset().sampleBuys || [];
+      sampleRows.innerHTML = samples.length ? samples.map((sample) => `
+        <tr>
+          <td>${sample.date}${sample.stopped ? `<br>停損 ${sample.stopDate}` : ""}</td>
+          <td>${sample.type}</td>
+          <td>${formatNumber(sample.entryPrice, 2)}</td>
+          <td style="color: ${sample.return20 >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(sample.return20 * 100, 2)}%</td>
+          <td style="color: ${sample.returnToEnd >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(sample.returnToEnd * 100, 2)}%</td>
+        </tr>
+      `).join("") : `<tr><td colspan="5">目前沒有設定樣本買點</td></tr>`;
+
+      recentRows.innerHTML = rows.slice(Math.max(0, rows.length - 18)).reverse().map((row) => `
+        <tr>
+          <td>${row.date}</td>
+          <td>${formatNumber(row.open, 2)}</td>
+          <td>${formatNumber(row.high, 2)}</td>
+          <td>${formatNumber(row.low, 2)}</td>
+          <td>${formatNumber(row.close, 2)}</td>
+          <td>${compactNumber(row.volume)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderStrategyMatrix() {
+      const rows = [];
+      const current = currentDataset();
+      if (current) ensureBacktests(current);
+      state.datasets.forEach((dataset) => {
+        if (!dataset.crossBacktests || !dataset.crossBacktests.tsmc) return;
+        ["tsmc", "phison"].forEach((strategyKey) => {
+          const result = dataset.crossBacktests[strategyKey];
+          rows.push({
+            strategyKey,
+            stock: dataset.label,
+            result
+          });
+        });
+      });
+      rows.sort((a, b) => b.result.returnPct - a.result.returnPct);
+      strategyMatrixRows.innerHTML = rows.slice(0, 60).map((item) => `
+        <tr>
+          <td>${strategyName(item.strategyKey)}</td>
+          <td>${item.stock}</td>
+          <td style="color: ${item.result.returnPct >= 0 ? "var(--up)" : "var(--down)"}">${formatNumber(item.result.returnPct * 100, 2)}%</td>
+          <td>${item.result.trades.length}</td>
+        </tr>
+      `).join("");
+    }
+
+    function zoom(factor, centerIndex = null) {
+      const rows = currentRows();
+      const currentSize = state.end - state.start + 1;
+      const nextSize = Math.max(30, Math.min(rows.length, Math.round(currentSize * factor)));
+      const center = centerIndex ?? Math.round((state.start + state.end) / 2);
+      let start = Math.round(center - nextSize / 2);
+      start = Math.max(0, Math.min(start, rows.length - nextSize));
+      state.start = start;
+      state.end = start + nextSize - 1;
+      draw();
+    }
+
+    function pan(delta) {
+      const rows = currentRows();
+      const size = state.end - state.start + 1;
+      let start = state.start + delta;
+      start = Math.max(0, Math.min(start, rows.length - size));
+      state.start = start;
+      state.end = start + size - 1;
+      draw();
+    }
+
+    function pointerPosition(event) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    }
+
+    searchInput.addEventListener("input", () => {
+      const exactIndex = state.datasets.findIndex((dataset) => dataset.label === searchInput.value);
+      if (exactIndex >= 0) {
+        setDataset(exactIndex);
+        return;
+      }
+      refreshSelect();
+    });
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        selectSearchResult();
+      }
+      if (event.key === "Escape") {
+        searchInput.value = "";
+        refreshSelect();
+      }
+    });
+    walkForwardRows.addEventListener("click", (event) => {
+      const row = event.target.closest("[data-stock-no]");
+      if (row) selectWalkForwardStock(row.dataset.stockNo);
+    });
+    document.querySelectorAll(".section-title").forEach((button) => {
+      button.addEventListener("click", () => {
+        const content = document.getElementById(button.getAttribute("aria-controls"));
+        const expanded = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!expanded));
+        content.hidden = expanded;
+      });
+    });
+    select.addEventListener("change", () => setDataset(Number(select.value)));
+    strategySelect.addEventListener("change", () => setStrategy(strategySelect.value));
+    document.querySelectorAll(".ma-toggle input").forEach((input) => input.addEventListener("change", draw));
+    document.getElementById("zoomIn").addEventListener("click", () => zoom(0.72));
+    document.getElementById("zoomOut").addEventListener("click", () => zoom(1.35));
+    document.getElementById("resetView").addEventListener("click", () => setDataset(state.current));
+    document.getElementById("downloadPng").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = `${currentDataset().label.replace(/\s+/g, "_")}_kline.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
+    document.getElementById("fileInput").addEventListener("change", async (event) => {
+      const files = Array.from(event.target.files || []);
+      for (const file of files) {
+        const dataset = normalizeRows(parseCsv(await file.text()), file.name);
+        state.datasets.push(dataset);
+      }
+      refreshSelect();
+      if (files.length) setDataset(state.datasets.length - 1);
+      event.target.value = "";
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+      const { width, height } = resizeCanvas();
+      const layout = getLayout(width, height);
+      const pos = pointerPosition(event);
+      if (state.dragStart) {
+        const rows = currentRows();
+        const span = state.dragWindow.end - state.dragWindow.start + 1;
+        const slot = (layout.width - layout.left - layout.right) / Math.max(1, span);
+        const delta = Math.round((state.dragStart.x - pos.x) / slot);
+        let start = state.dragWindow.start + delta;
+        start = Math.max(0, Math.min(start, rows.length - span));
+        state.start = start;
+        state.end = start + span - 1;
+      }
+      state.hoverIndex = indexForX(pos.x, layout);
+      draw();
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+      if (!state.dragStart) {
+        state.hoverIndex = null;
+        draw();
+      }
+    });
+
+    canvas.addEventListener("mousedown", (event) => {
+      state.dragStart = pointerPosition(event);
+      state.dragWindow = { start: state.start, end: state.end };
+      canvas.style.cursor = "grabbing";
+    });
+
+    window.addEventListener("mouseup", () => {
+      state.dragStart = null;
+      state.dragWindow = null;
+      canvas.style.cursor = "crosshair";
+    });
+
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const { width, height } = resizeCanvas();
+      const layout = getLayout(width, height);
+      const pos = pointerPosition(event);
+      zoom(event.deltaY > 0 ? 1.18 : 0.84, indexForX(pos.x, layout));
+    }, { passive: false });
+
+    window.addEventListener("resize", draw);
+
+    loadWalkForwardReport();
+    loadSources();
+  </script>
+</body>
+</html>

@@ -302,13 +302,6 @@
       background: #f8fafc;
     }
 
-    .quickbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px 0;
-    }
     .quick-label {
       color: var(--muted);
       font-size: 12px;
@@ -384,10 +377,13 @@
       display: grid;
       grid-template-columns: minmax(720px, 1fr) minmax(500px, 38vw);
       gap: 14px;
-      align-items: start;
+      align-items: stretch;
     }
     .main-panel, .side-panel {
       min-width: 0;
+      height: clamp(560px, 72vh, 760px);
+      display: flex;
+      flex-direction: column;
       border: 1px solid var(--line);
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -395,6 +391,7 @@
       overflow: clip;
     }
     .panel-head {
+      flex: 0 0 auto;
       min-height: 50px;
       display: flex;
       align-items: center;
@@ -414,11 +411,12 @@
     }
 
     .table-wrap {
+      flex: 1 1 auto;
       overflow-y: scroll;
       overflow-x: auto;
-      height: clamp(360px, 58vh, 680px);
+      height: auto;
       max-height: none;
-      min-height: 360px;
+      min-height: 0;
       scrollbar-gutter: stable both-edges;
     }
     table {
@@ -468,6 +466,52 @@
       padding: 12px 14px 14px 18px;
       background: linear-gradient(180deg, #fff, #f8fbff);
       box-shadow: inset 4px 0 0 var(--amber);
+    }
+    .expand-detail-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .expand-detail-title {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+    .expand-detail-title strong { font-size: 17px; }
+    .expand-reasons {
+      margin-bottom: 10px;
+    }
+    .expand-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .expand-stat {
+      min-width: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      font-variant-numeric: tabular-nums;
+    }
+    .expand-stat span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .expand-stat strong {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 5px;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.2;
     }
     .expand-summary {
       display: flex;
@@ -606,16 +650,19 @@
     .score-pill .score-stars span,
     .radar-mini .score-stars span,
     .rank-item .score-stars span,
-    .focus-stat .score-stars span { opacity: 1; }
+    .focus-stat .score-stars span,
+    .expand-stat .score-stars span { opacity: 1; }
     .score-pill .score-stars .star-step,
     .radar-mini .score-stars .star-step,
     .rank-item .score-stars .star-step,
-    .focus-stat .score-stars .star-step {
+    .focus-stat .score-stars .star-step,
+    .expand-stat .score-stars .star-step {
       font-size: var(--star-size);
     }
     .radar-mini .score-stars,
     .rank-item .score-stars,
-    .focus-stat .score-stars {
+    .focus-stat .score-stars,
+    .expand-stat .score-stars {
       font-weight: 900;
       opacity: 1;
     }
@@ -674,13 +721,14 @@
       font-weight: 800;
     }
     .cards {
+      flex: 1 1 auto;
       display: none;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       padding: 12px;
-      height: clamp(360px, 58vh, 680px);
+      height: auto;
       max-height: none;
-      min-height: 360px;
+      min-height: 0;
       overflow-y: scroll;
       overflow-x: hidden;
       scrollbar-gutter: stable both-edges;
@@ -747,16 +795,23 @@
       padding-top: 10px;
       border-top: 1px solid var(--line);
     }
+    .card-expanded.selected-only {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
     .signal-card.selected-row .kline-canvas {
-      height: 320px;
+      height: 260px;
     }
 
     .side-body {
+      flex: 1 1 auto;
       display: grid;
       gap: 14px;
       padding: 13px;
-      height: clamp(360px, 62vh, 720px);
+      height: auto;
       max-height: none;
+      min-height: 0;
       overflow-y: scroll;
       overflow-x: hidden;
       scrollbar-gutter: stable;
@@ -768,15 +823,25 @@
       font-weight: 800;
     }
     .bar-list { display: grid; gap: 8px; }
-    .bar-item { display: grid; gap: 5px; }
+    .bar-item {
+      --tone-main: var(--blue);
+      --tone-2: var(--teal);
+      --tone-soft: rgba(37, 99, 235, 0.12);
+      display: grid;
+      gap: 5px;
+      padding: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+    }
     .bar-line {
       display: flex;
       justify-content: space-between;
       gap: 10px;
       font-size: 13px;
     }
+    .bar-line strong { color: var(--tone-main); }
     .bar {
-      height: 8px;
+      height: 10px;
       overflow: hidden;
       border-radius: 999px;
       background: #e8eef6;
@@ -785,12 +850,23 @@
       display: block;
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, var(--blue), var(--teal));
+      background: linear-gradient(90deg, var(--tone-main), var(--tone-2));
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.38) inset;
     }
     .chips {
       display: flex;
       flex-wrap: wrap;
       gap: 7px;
+    }
+    .quick-filter-panel .chips {
+      max-height: 128px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .quick-filter-panel .quick-chip {
+      min-height: 28px;
+      padding: 0 10px;
+      font-size: 12px;
     }
     .focus-card {
       display: grid;
@@ -939,6 +1015,69 @@
       margin-bottom: 0;
       color: var(--ink);
     }
+    .side-panel .panel-head {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.28) 1px, transparent 1.8px) 0 0 / 10px 10px,
+        linear-gradient(90deg, rgba(37, 99, 235, 0.14), rgba(8, 145, 178, 0.12), rgba(15, 118, 110, 0.14)),
+        #fffdf7;
+    }
+    .side-body > .radar-section:nth-child(2) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.11) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(239, 246, 255, 0.94), rgba(236, 254, 255, 0.72));
+    }
+    .side-body > .radar-section:nth-child(3) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.13) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(236, 253, 245, 0.94), rgba(255, 251, 235, 0.76));
+    }
+    .side-body > .radar-section:nth-child(4) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(124, 58, 237, 0.12) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(245, 243, 255, 0.92), rgba(236, 254, 255, 0.78));
+    }
+    .tone-0 {
+      --tone-main: #2563eb;
+      --tone-2: #0ea5e9;
+      --tone-soft: rgba(37, 99, 235, 0.12);
+      --tone-bg: #eff6ff;
+      --tone-ink: #174ea6;
+    }
+    .tone-1 {
+      --tone-main: #0f766e;
+      --tone-2: #22c55e;
+      --tone-soft: rgba(15, 118, 110, 0.13);
+      --tone-bg: #ecfdf5;
+      --tone-ink: #065f46;
+    }
+    .tone-2 {
+      --tone-main: #0891b2;
+      --tone-2: #14b8a6;
+      --tone-soft: rgba(8, 145, 178, 0.13);
+      --tone-bg: #ecfeff;
+      --tone-ink: #155e75;
+    }
+    .tone-3 {
+      --tone-main: #c98212;
+      --tone-2: #facc15;
+      --tone-soft: rgba(201, 130, 18, 0.14);
+      --tone-bg: #fffbeb;
+      --tone-ink: #92400e;
+    }
+    .tone-4 {
+      --tone-main: #7c3aed;
+      --tone-2: #6366f1;
+      --tone-soft: rgba(124, 58, 237, 0.13);
+      --tone-bg: #f5f3ff;
+      --tone-ink: #5b21b6;
+    }
+    .tone-5 {
+      --tone-main: #4f46e5;
+      --tone-2: #2563eb;
+      --tone-soft: rgba(79, 70, 229, 0.13);
+      --tone-bg: #eef2ff;
+      --tone-ink: #3730a3;
+    }
     .brief-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -952,10 +1091,15 @@
     }
     .brief-card {
       padding: 9px;
+      background:
+        linear-gradient(135deg, var(--tone-soft), rgba(255, 255, 255, 0.7) 58%),
+        var(--tone-bg, #fff);
+      border-color: color-mix(in srgb, var(--tone-main) 42%, var(--line));
+      box-shadow: inset 0 -4px 0 var(--tone-soft);
     }
     .brief-card span {
       display: block;
-      color: var(--muted);
+      color: var(--tone-ink, var(--muted));
       font-size: 11px;
       margin-bottom: 4px;
     }
@@ -966,6 +1110,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: var(--tone-ink, var(--ink));
     }
     .workflow-board {
       display: grid;
@@ -976,16 +1121,21 @@
       min-width: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background:
+        linear-gradient(180deg, var(--tone-soft), rgba(255, 255, 255, 0) 40%),
+        #fff;
       overflow: hidden;
     }
     .workflow-lane h4 {
       margin: 0;
       padding: 8px 9px;
       border-bottom: 1px solid var(--line);
-      background: #fbfcfe;
+      background:
+        radial-gradient(circle at 2px 2px, rgba(21, 32, 51, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
+        linear-gradient(90deg, var(--tone-soft), rgba(255, 255, 255, 0.78));
       font-size: 12px;
-      color: var(--ink);
+      color: var(--tone-ink, var(--ink));
+      box-shadow: inset 5px 0 0 var(--tone-main);
     }
     .lane-body {
       display: grid;
@@ -996,14 +1146,18 @@
       display: grid;
       gap: 4px;
       padding: 8px;
+      background:
+        linear-gradient(90deg, var(--tone-soft), rgba(255, 255, 255, 0.74)),
+        #fff;
+      border-color: color-mix(in srgb, var(--tone-main) 30%, var(--line));
       font-size: 12px;
       cursor: pointer;
       text-align: left;
       font: inherit;
     }
     .radar-mini:hover, .rank-item:hover {
-      border-color: #aebbd0;
-      box-shadow: 0 10px 22px rgba(15, 118, 110, 0.08);
+      border-color: var(--tone-main);
+      box-shadow: 0 10px 22px color-mix(in srgb, var(--tone-main) 18%, transparent);
     }
     .radar-mini strong, .rank-symbol strong {
       display: block;
@@ -1030,6 +1184,10 @@
       gap: 9px;
       align-items: center;
       padding: 9px;
+      background:
+        linear-gradient(90deg, var(--tone-soft), rgba(255, 255, 255, 0.82) 72%),
+        #fff;
+      border-color: color-mix(in srgb, var(--tone-main) 28%, var(--line));
       cursor: pointer;
       text-align: left;
       font: inherit;
@@ -1040,10 +1198,21 @@
       display: inline-grid;
       place-items: center;
       border-radius: 999px;
-      background: #edf4ff;
-      color: #2457c5;
+      background: linear-gradient(135deg, var(--tone-main), var(--tone-2));
+      color: #fff;
       font-size: 12px;
       font-weight: 900;
+      box-shadow: inset 0 -2px 0 rgba(21, 32, 51, 0.18);
+    }
+    .workflow-lane:nth-child(1), .rank-item:nth-child(1) { --tone-main: #2563eb; --tone-2: #0ea5e9; --tone-soft: rgba(37, 99, 235, 0.12); --tone-bg: #eff6ff; --tone-ink: #174ea6; }
+    .workflow-lane:nth-child(2), .rank-item:nth-child(2) { --tone-main: #0f766e; --tone-2: #22c55e; --tone-soft: rgba(15, 118, 110, 0.13); --tone-bg: #ecfdf5; --tone-ink: #065f46; }
+    .workflow-lane:nth-child(3), .rank-item:nth-child(3) { --tone-main: #c98212; --tone-2: #facc15; --tone-soft: rgba(201, 130, 18, 0.14); --tone-bg: #fffbeb; --tone-ink: #92400e; }
+    .workflow-lane:nth-child(4), .rank-item:nth-child(4) { --tone-main: #7c3aed; --tone-2: #6366f1; --tone-soft: rgba(124, 58, 237, 0.13); --tone-bg: #f5f3ff; --tone-ink: #5b21b6; }
+    .rank-item:nth-child(5) { --tone-main: #0891b2; --tone-2: #14b8a6; --tone-soft: rgba(8, 145, 178, 0.13); --tone-bg: #ecfeff; --tone-ink: #155e75; }
+    .chip.tone-0, .chip.tone-1, .chip.tone-2, .chip.tone-3, .chip.tone-4, .chip.tone-5 {
+      color: var(--tone-ink);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), var(--tone-bg));
+      border-color: color-mix(in srgb, var(--tone-main) 35%, var(--line));
     }
     .radar-note {
       padding-left: 10px;
@@ -1126,6 +1295,10 @@
       background: #111720;
       border-color: var(--line);
     }
+    :root[data-theme="dark"] .workflow-lane h4 {
+      color: #f8fafc;
+      box-shadow: inset 5px 0 0 var(--tone-main);
+    }
     :root[data-theme="dark"] tbody tr:hover,
     :root[data-theme="dark"] .expand-row,
     :root[data-theme="dark"] .expand-row:hover {
@@ -1140,6 +1313,7 @@
     :root[data-theme="dark"] .symbol strong,
     :root[data-theme="dark"] .score-guide strong,
     :root[data-theme="dark"] .focus-stat strong,
+    :root[data-theme="dark"] .expand-stat strong,
     :root[data-theme="dark"] .card-row strong {
       color: var(--ink);
     }
@@ -1188,6 +1362,7 @@
     :root[data-theme="dark"] .score-guide,
     :root[data-theme="dark"] .radar-section,
     :root[data-theme="dark"] .focus-stat,
+    :root[data-theme="dark"] .expand-stat,
     :root[data-theme="dark"] .sync-log div {
       background: #111720;
       border-color: var(--line);
@@ -1196,6 +1371,60 @@
     :root[data-theme="dark"] .progress-track,
     :root[data-theme="dark"] .bar {
       background: #222c3a;
+    }
+    :root[data-theme="dark"] .side-panel .panel-head {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
+        linear-gradient(90deg, rgba(37, 99, 235, 0.2), rgba(8, 145, 178, 0.16), rgba(15, 118, 110, 0.18)),
+        #111720;
+    }
+    :root[data-theme="dark"] .brief-card,
+    :root[data-theme="dark"] .radar-mini,
+    :root[data-theme="dark"] .rank-item {
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--tone-main) 18%, transparent), rgba(17, 23, 32, 0.82) 72%),
+        #151b24;
+      border-color: color-mix(in srgb, var(--tone-main) 40%, #2d3747);
+    }
+    :root[data-theme="dark"] .workflow-lane {
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--tone-main) 18%, transparent), rgba(17, 23, 32, 0) 42%),
+        #151b24;
+    }
+    :root[data-theme="dark"] .bar-line strong,
+    :root[data-theme="dark"] .brief-card span {
+      color: color-mix(in srgb, var(--tone-main) 72%, #f8fafc);
+    }
+    :root[data-theme="dark"] .brief-card strong {
+      color: #f8fafc;
+    }
+    :root[data-theme="dark"] .chip.tone-0,
+    :root[data-theme="dark"] .chip.tone-1,
+    :root[data-theme="dark"] .chip.tone-2,
+    :root[data-theme="dark"] .chip.tone-3,
+    :root[data-theme="dark"] .chip.tone-4,
+    :root[data-theme="dark"] .chip.tone-5 {
+      color: color-mix(in srgb, var(--tone-main) 68%, #f8fafc);
+      background: color-mix(in srgb, var(--tone-main) 16%, #111720);
+      border-color: color-mix(in srgb, var(--tone-main) 42%, #2d3747);
+    }
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(2) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(96, 165, 250, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(8, 145, 178, 0.08)),
+        #111720;
+    }
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(3) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(45, 212, 191, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(15, 118, 110, 0.13), rgba(201, 130, 18, 0.08)),
+        #111720;
+    }
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(4) {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(167, 139, 250, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(8, 145, 178, 0.08)),
+        #111720;
     }
     :root[data-theme="dark"] .kline-canvas {
       background: #111720;
@@ -1228,6 +1457,7 @@
     .rank-item,
     .score-guide,
     .focus-stat,
+    .expand-stat,
     .sync-stat,
     .report-link,
     .control,
@@ -1247,6 +1477,7 @@
     .side-panel,
     .signal-card,
     .focus-card,
+    .expand-stat,
     .radar-section,
     .brief-card,
     .workflow-lane,
@@ -1313,7 +1544,7 @@
     }
     .signal-card {
       background:
-        radial-gradient(circle at 2px 2px, rgba(201, 130, 18, 0.08) 1px, transparent 1.8px) 0 0 / 14px 14px,
+        radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.07) 1px, transparent 1.8px) 0 0 / 14px 14px,
         #fff;
     }
     .signal-card:hover,
@@ -1323,8 +1554,11 @@
       box-shadow: 7px 7px 0 rgba(15, 118, 110, 0.18);
     }
     .signal-card.selected-row {
-      border-color: var(--amber);
-      box-shadow: 7px 7px 0 rgba(201, 130, 18, 0.22);
+      background:
+        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.08) 1px, transparent 1.8px) 0 0 / 14px 14px,
+        #f8fbff;
+      border-color: var(--blue);
+      box-shadow: 7px 7px 0 rgba(37, 99, 235, 0.16);
     }
     .badge,
     .signal-label,
@@ -1400,6 +1634,88 @@
       color: rgba(248, 250, 252, 0.86);
       text-shadow: 0 1px 0 rgba(0, 0, 0, 0.48);
     }
+    .sync-panel {
+      margin: 8px 20px 0;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 3px 3px 0 rgba(21, 32, 51, 0.1);
+    }
+    .sync-head {
+      min-height: 34px;
+      padding: 6px 10px;
+      border-bottom: 0;
+    }
+    .sync-title {
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .sync-title strong {
+      font-size: 12px;
+    }
+    .sync-title strong::after {
+      content: "本機測試";
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      margin-left: 8px;
+      padding: 0 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.74);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .sync-title span {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sync-head .count {
+      font-size: 11px;
+    }
+    .sync-panel .progress-track {
+      height: 4px;
+      border-radius: 0;
+    }
+    .sync-body {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 5px 10px 7px;
+    }
+    .sync-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+    }
+    .sync-stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .sync-stat span {
+      margin-bottom: 0;
+      font-size: 11px;
+    }
+    .sync-stat strong {
+      font-size: 12px;
+    }
+    .sync-log {
+      display: none;
+    }
+    :root[data-theme="dark"] .sync-title strong::after {
+      background: rgba(17, 23, 32, 0.9);
+      border-color: var(--line);
+      color: var(--muted);
+    }
     .hidden { display: none !important; }
 
     @media (max-width: 1120px) {
@@ -1407,18 +1723,19 @@
       .summary { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
       .actions { justify-content: flex-start; }
       .table-wrap, .cards {
-        height: clamp(380px, 62vh, 720px);
+        height: auto;
         max-height: none;
         overflow-y: scroll;
       }
       .side-body {
-        height: clamp(340px, 54vh, 640px);
+        height: auto;
         max-height: none;
+        min-height: 0;
         overflow-y: scroll;
       }
     }
     @media (max-width: 760px) {
-      .topbar, .summary, .quickbar, .content, .sync-panel { margin-inline: 0; }
+      .topbar, .summary, .content, .sync-panel { margin-inline: 0; }
       .content { width: 100%; }
       .topbar {
         position: static;
@@ -1446,43 +1763,38 @@
       .icon-button, .mode-button, .file-button { flex: 0 0 38px; }
       .theme-button { flex-basis: 84px; }
 
-      .sync-panel { margin: 8px 12px; }
+      .sync-panel { margin: 6px 12px 0; }
       .sync-head {
-        min-height: 48px;
-        padding: 9px 10px;
+        min-height: 34px;
+        padding: 6px 10px;
         grid-template-columns: minmax(0, 1fr) auto;
       }
-      .sync-title { gap: 4px; }
-      .sync-title strong { font-size: 14px; }
+      .sync-title { gap: 6px; }
+      .sync-title strong { font-size: 12px; }
       .sync-title span {
-        flex-basis: 100%;
+        flex-basis: auto;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
       .sync-body {
-        display: block;
-        padding: 8px 10px 10px;
+        display: grid;
+        padding: 5px 10px 7px;
       }
       .sync-stats {
         display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 2px;
+        flex-wrap: wrap;
+        gap: 6px 12px;
+        overflow-x: visible;
+        padding-bottom: 0;
       }
       .sync-stat {
-        flex: 0 0 116px;
-        padding: 8px;
+        flex: 0 0 auto;
+        padding: 0;
       }
-      .sync-stat strong { font-size: 16px; }
+      .sync-stat strong { font-size: 12px; }
       .sync-log { display: none; }
 
-      .quickbar {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding: 4px 12px 0;
-        min-height: 38px;
-      }
       .quick-label { flex: 0 0 auto; }
       .quick-chip, .chip {
         flex: 0 0 auto;
@@ -1502,7 +1814,8 @@
         padding: 10px 11px 12px;
       }
       .metric strong { font-size: 20px; }
-      .quickbar, .content { padding-inline: 12px; }
+      .content { padding-inline: 12px; }
+      .main-panel, .side-panel { height: auto; }
       .table-wrap { display: none; }
       .cards {
         display: grid;
@@ -1517,6 +1830,8 @@
       .signal-card header { margin-bottom: 8px; }
       .signal-card h3 { font-size: 14px; }
       .card-row { padding: 5px 0; font-size: 12px; }
+      .expand-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .expand-detail-head { align-items: flex-start; }
       .side-body {
         height: auto;
         min-height: 0;
@@ -1527,6 +1842,7 @@
     }
     @media (max-width: 560px) {
       .cards { grid-template-columns: 1fr; }
+      .expand-detail-grid { grid-template-columns: 1fr; }
     }
     :root[data-static-site="true"] .sync-panel,
     :root[data-static-site="true"] #syncButton {
@@ -1580,11 +1896,6 @@
       </div>
     </section>
 
-    <section class="quickbar" aria-label="快速篩選">
-      <span class="quick-label">快速篩選</span>
-      <div class="chips" id="quickChips"></div>
-    </section>
-
     <section class="summary" aria-label="摘要">
       <div class="metric"><span>符合筆數</span><strong id="metricTotal">0</strong></div>
       <div class="metric"><span>股票檔數</span><strong id="metricStocks">0</strong></div>
@@ -1624,9 +1935,9 @@
           <span class="count" id="updateTime">-</span>
         </div>
         <div class="side-body">
-          <section>
-            <h3 class="group-title">焦點股票</h3>
-            <div id="focusPanel"></div>
+          <section class="radar-section quick-filter-panel" aria-label="快速篩選">
+            <h3 class="group-title">快速篩選</h3>
+            <div class="chips" id="quickChips"></div>
           </section>
           <section class="radar-section">
             <h3 class="group-title">今日雷達摘要</h3>
@@ -1727,7 +2038,6 @@
       strategyBars: document.getElementById("strategyBars"),
       reasonChips: document.getElementById("reasonChips"),
       quickChips: document.getElementById("quickChips"),
-      focusPanel: document.getElementById("focusPanel"),
       dailyBrief: document.getElementById("dailyBrief"),
       radarNote: document.getElementById("radarNote"),
       workflowBoard: document.getElementById("workflowBoard"),
@@ -1758,6 +2068,14 @@
       const lots = number / 1000;
       if (lots >= 1) return `${Math.round(lots).toLocaleString("zh-TW")}張`;
       return `${lots.toLocaleString("zh-TW", { maximumFractionDigits: 1 })}張`;
+    }
+    function formatChangePercent(current, previous) {
+      const currentNumber = Number(current);
+      const previousNumber = Number(previous);
+      if (!Number.isFinite(currentNumber) || !Number.isFinite(previousNumber) || previousNumber === 0) return "-";
+      const pct = ((currentNumber - previousNumber) / previousNumber) * 100;
+      const sign = pct > 0 ? "+" : "";
+      return `${sign}${pct.toLocaleString("zh-TW", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
     }
     function csvLineToCells(line) {
       const cells = [];
@@ -1940,9 +2258,9 @@
     function renderBars(target, counts, filterKey) {
       const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
       const max = Math.max(1, ...entries.map(entry => entry[1]));
-      target.innerHTML = entries.map(([name, count]) => {
+      target.innerHTML = entries.map(([name, count], index) => {
         const pct = Math.round((count / max) * 100);
-        return `<div class="bar-item" data-name="${escapeHtml(name)}">
+        return `<div class="bar-item tone-${index % 6}" data-name="${escapeHtml(name)}">
           <div class="bar-line"><span>${escapeHtml(name)}</span><strong>${count}</strong></div>
           <div class="bar"><span style="width:${pct}%"></span></div>
         </div>`;
@@ -1960,8 +2278,8 @@
     }
     function renderReasonChips(rows) {
       const entries = Object.entries(countBy(rows, "reason")).sort((a, b) => b[1] - a[1]).slice(0, 10);
-      el.reasonChips.innerHTML = entries.map(([reason, count]) =>
-        `<button class="chip ${state.filters.reason === reason ? "active" : ""}" type="button" data-reason="${escapeHtml(reason)}">${escapeHtml(reason)} ${count}</button>`
+      el.reasonChips.innerHTML = entries.map(([reason, count], index) =>
+        `<button class="chip tone-${index % 6} ${state.filters.reason === reason ? "active" : ""}" type="button" data-reason="${escapeHtml(reason)}">${escapeHtml(reason)} ${count}</button>`
       ).join("") || `<span class="subtle">-</span>`;
       [...el.reasonChips.querySelectorAll(".chip")].forEach(chip => {
         chip.addEventListener("click", () => {
@@ -2003,16 +2321,47 @@
         .slice(0, limit);
     }
     function radarMiniHtml(row) {
-      return `<button class="radar-mini" type="button" data-radar-id="${escapeHtml(row.id)}">
+      const scoreTone = Math.max(0, Math.min(5, 5 - normalizeScore(row.score)));
+      return `<button class="radar-mini tone-${scoreTone}" type="button" data-radar-id="${escapeHtml(row.id)}">
         <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong>
-        <span>${starHtml(row.score)} · ${formatVolumeLots(row.volume)}</span>
+        <span>${starHtml(row.score)}</span>
       </button>`;
     }
-    function renderWorkflowLane(title, rows) {
-      return `<section class="workflow-lane">
+    function renderWorkflowLane(title, rows, tone = 0) {
+      return `<section class="workflow-lane tone-${tone % 6}">
         <h4>${escapeHtml(title)}</h4>
         <div class="lane-body">${rows.length ? rows.map(radarMiniHtml).join("") : `<span class="subtle">目前無符合</span>`}</div>
       </section>`;
+    }
+    function visibleSignalContainer() {
+      const cardsVisible = el.signalCards && !el.signalCards.classList.contains("hidden") && getComputedStyle(el.signalCards).display !== "none";
+      if (cardsVisible) return el.signalCards;
+      const tableVisible = el.tableWrap && !el.tableWrap.classList.contains("hidden") && getComputedStyle(el.tableWrap).display !== "none";
+      return tableVisible ? el.tableWrap : null;
+    }
+    function alignSelectedSignal(rowId) {
+      if (!rowId) return;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const container = visibleSignalContainer();
+          const target = [...document.querySelectorAll(".cards:not(.hidden) [data-row-id], .table-wrap:not(.hidden) [data-row-id]")]
+            .find(node => node.dataset.rowId === rowId);
+          if (!target) return;
+          const topPadding = 10;
+          if (container && container.scrollHeight > container.clientHeight) {
+            const containerRect = container.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const nextTop = container.scrollTop + targetRect.top - containerRect.top - topPadding;
+            container.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
+          } else {
+            const stickyOffset = document.querySelector(".topbar")?.getBoundingClientRect().height || 0;
+            const targetTop = target.getBoundingClientRect().top + window.scrollY - stickyOffset - topPadding;
+            window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+          }
+          target.classList.add("jump-focus");
+          setTimeout(() => target.classList.remove("jump-focus"), 900);
+        });
+      });
     }
     function selectRow(rowId, options = {}) {
       if (options.forceCards) {
@@ -2022,15 +2371,7 @@
       }
       state.selectedId = options.forceOpen ? rowId : (state.selectedId === rowId ? null : rowId);
       renderTable(sortRows(state.filtered));
-      requestAnimationFrame(() => {
-        const visibleTargets = [
-          ...document.querySelectorAll(".cards:not(.hidden) [data-row-id], .table-wrap:not(.hidden) [data-row-id]")
-        ];
-        const target = visibleTargets.find(node => node.dataset.rowId === state.selectedId);
-        target?.scrollIntoView({ block: "center", behavior: "smooth" });
-        target?.classList.add("jump-focus");
-        if (target) setTimeout(() => target.classList.remove("jump-focus"), 900);
-      });
+      alignSelectedSignal(state.selectedId);
     }
     function bindRadarClicks() {
       [...document.querySelectorAll("[data-radar-id]")].forEach(node => {
@@ -2052,7 +2393,7 @@
         ["5 星訊號", scoreFive.toLocaleString("zh-TW")],
         ["量能確認", highVolume.toLocaleString("zh-TW")],
         ["目前顯示", rows.length.toLocaleString("zh-TW")]
-      ].map(([label, value]) => `<div class="brief-card"><span>${label}</span><strong>${value}</strong></div>`).join("");
+      ].map(([label, value], index) => `<div class="brief-card tone-${index % 6}"><span>${label}</span><strong>${value}</strong></div>`).join("");
       if (el.radarNote) {
         el.radarNote.textContent = rows.length
           ? "優先看高分且成交量放大的標的，再點開日 K 線確認是否仍在可布局位置。"
@@ -2102,32 +2443,26 @@
         ${reasons ? `<div class="score-note">${escapeHtml(reasons)}</div>` : ""}
       </div>`;
     }
-    function focusHtml(row) {
-      if (!row) return `<div class="empty">點擊訊號清單中的股票，會在該列展開日 K 線。</div>`;
+    function klinePanelHtml(row) {
       const marketClass = row.market === "TWSE" ? "twse" : "tpex";
-      return `<div class="focus-card">
-        <div class="focus-title">
-          <div><h3>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</h3><div class="subtle">${escapeHtml(row.date)} · ${row.signals.length} 筆訊號合併</div></div>
+      return `<div class="inline-expand">
+        <div class="expand-detail-head">
+          <div class="expand-detail-title">
+            <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)} 個股資訊</strong>
+            <span class="subtle">${escapeHtml(row.date)} · ${row.signals.length} 筆訊號合併</span>
+          </div>
           <span class="badge ${marketClass}">${escapeHtml(row.market)}</span>
         </div>
-        ${reasonLabelHtml(row)}
-        <div class="focus-grid">
-          <div class="focus-stat"><span>評分</span><strong>${starHtml(row.score)} ${normalizeScore(row.score)}/5</strong></div>
-          <div class="focus-stat"><span>收盤</span><strong>${formatPrice(row.close)}</strong></div>
-          <div class="focus-stat"><span>成交量</span><strong>${formatVolumeLots(row.volume)}</strong></div>
-          <div class="focus-stat"><span>20MA</span><strong>${formatMa(row.ma20)}</strong></div>
-          <div class="focus-stat"><span>60MA</span><strong>${formatMa(row.ma60)}</strong></div>
+        <div class="expand-reasons">${reasonLabelHtml(row)}</div>
+        <div class="expand-detail-grid">
+          <div class="expand-stat"><span>評分</span><strong>${starHtml(row.score)} ${normalizeScore(row.score)}/5</strong></div>
+          <div class="expand-stat"><span>收盤</span><strong>${formatPrice(row.close)}</strong></div>
         </div>
-      </div>`;
-    }
-    function klinePanelHtml(row) {
-      return `<div class="inline-expand">
         <div class="expand-summary">
           <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)} 日 K 線</strong>
           <div class="expand-stats">
             <span>${escapeHtml(row.date)}</span>
             <span>收盤 ${formatPrice(row.close)}</span>
-            <span>量 ${formatVolumeLots(row.volume)}</span>
             <span>${row.signals.length} 筆訊號</span>
           </div>
         </div>
@@ -2164,12 +2499,16 @@
     function cardHtml(row) {
       const marketClass = row.market === "TWSE" ? "twse" : "tpex";
       const selected = state.selectedId === row.id;
+      if (selected) {
+        return `<article class="signal-card selected-row" data-row-id="${escapeHtml(row.id)}">
+          <div class="card-expanded selected-only">${klinePanelHtml(row)}</div>
+        </article>`;
+      }
       return `<article class="signal-card ${selected ? "selected-row" : ""}" data-row-id="${escapeHtml(row.id)}">
         <header><div><h3>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</h3><div class="subtle">${escapeHtml(row.date)}</div></div><span class="badge ${marketClass}">${escapeHtml(row.market)}</span></header>
         <div class="card-row"><span>訊號</span>${reasonLabelHtml(row)}</div>
         <div class="card-row"><span>評分</span>${scoreHtml(row)}</div>
         <div class="card-row"><span>收盤</span><strong>${formatPrice(row.close)}</strong></div>
-        <div class="card-row"><span>成交量</span><strong>${formatVolumeLots(row.volume)}</strong></div>
         ${selected ? `<div class="card-expanded">${klinePanelHtml(row)}</div>` : ""}
       </article>`;
     }
@@ -2360,6 +2699,8 @@
       const infoIndex = safeHoverIndex !== null ? safeHoverIndex : candleRows.length - 1;
       if (candleRows[infoIndex]) {
         const row = candleRows[infoIndex];
+        const prevRow = candleRows[infoIndex - 1];
+        const changePercent = formatChangePercent(row.close, prevRow?.close);
         const x = pad.left + infoIndex * xStep + xStep / 2;
         const y = priceY(row.close);
         if (safeHoverIndex !== null) {
@@ -2382,6 +2723,7 @@
         if (tooltip) {
           tooltip.innerHTML = `<strong>${escapeHtml(row.date)}</strong>
             開 ${formatPrice(row.open)} 高 ${formatPrice(row.high)} 低 ${formatPrice(row.low)} 收 ${formatPrice(row.close)}<br>
+            漲幅 ${escapeHtml(changePercent)}<br>
             量 ${formatVolumeLots(row.volume)}<br>
             5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)}<br>
             20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}`;
@@ -2433,13 +2775,13 @@
       el.signalCards.classList.toggle("hidden", rows.length === 0 || (state.view !== "cards" && !forceCards));
       el.signalCards.style.display = rows.length > 0 && (state.view === "cards" || forceCards) ? "grid" : "";
       const selectedRow = rows.find(row => row.id === state.selectedId);
-      el.focusPanel.innerHTML = focusHtml(selectedRow);
       if (selectedRow) renderSelectedChart(selectedRow);
       [...document.querySelectorAll("[data-row-id]")].forEach(node => {
         node.addEventListener("click", event => {
           if (event.target.closest(".card-expanded")) return;
           state.selectedId = state.selectedId === node.dataset.rowId ? null : node.dataset.rowId;
           renderTable(rows);
+          alignSelectedSignal(state.selectedId);
         });
       });
     }
