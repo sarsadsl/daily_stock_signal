@@ -1,0 +1,2667 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>每日策略訊號</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --panel: #ffffff;
+      --ink: #152033;
+      --muted: #66758c;
+      --line: #dbe3ef;
+      --soft: #edf3fb;
+      --red: #d92d43;
+      --green: #0f8a62;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --amber: #c98212;
+      --shadow: 0 18px 42px rgba(21, 32, 51, 0.1);
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f141b;
+      --panel: #151b24;
+      --ink: #e8eef6;
+      --muted: #9aa7b8;
+      --line: #2d3747;
+      --soft: #1d2531;
+      --red: #ff6b7a;
+      --green: #2dd4a3;
+      --blue: #7aa2ff;
+      --teal: #34d5c3;
+      --amber: #f2b84b;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+    }
+
+    * { box-sizing: border-box; }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #5b7cfa #e7edf6;
+    }
+    :root[data-theme="dark"] * {
+      scrollbar-color: #64748b #111720;
+    }
+    *::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    *::-webkit-scrollbar-track {
+      background: #e7edf6;
+      border-radius: 999px;
+    }
+    *::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #5b7cfa, #0f766e);
+      border: 3px solid #e7edf6;
+      border-radius: 999px;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #315fe8, #0b625c);
+    }
+    html {
+      min-height: 100%;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(21, 32, 51, 0.13) 1px, transparent 1.7px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(15, 118, 110, 0.08) 42%, rgba(217, 45, 67, 0.08)),
+        linear-gradient(180deg, #f8fbff 0, var(--bg) 360px);
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+    :root[data-theme="dark"] body {
+      background:
+        radial-gradient(circle at 1px 1px, rgba(232, 238, 246, 0.16) 1px, transparent 1.8px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(217, 45, 67, 0.1), rgba(15, 138, 98, 0.08) 42%, rgba(37, 99, 235, 0.1)),
+        linear-gradient(180deg, #111720 0, var(--bg) 360px);
+    }
+    button, input, select { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: block;
+      padding-bottom: 24px;
+    }
+
+    .site-footer {
+      margin: 8px 20px 0;
+      padding: 12px 14px;
+      border: 1px solid rgba(21, 32, 51, 0.18);
+      background: rgba(255, 255, 255, 0.48);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      text-align: center;
+    }
+    .site-footer strong {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.8fr) minmax(640px, 1.6fr);
+      gap: 16px;
+      align-items: start;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(219, 227, 239, 0.9);
+      background: rgba(249, 252, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+    .brand h1::before {
+      content: "";
+      width: 12px;
+      height: 32px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--red), var(--teal));
+      box-shadow: 0 0 0 6px rgba(15, 118, 110, 0.08);
+    }
+    .brand .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 4px;
+      border: 1px solid rgba(219, 227, 239, 0.9);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .control, .icon-button, .mode-button, .file-button, .primary-button {
+      height: 38px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 6px 16px rgba(21, 32, 51, 0.04);
+    }
+    .control {
+      min-width: 132px;
+      padding: 0 12px;
+      background: #f8fbff;
+    }
+    .search {
+      min-width: 230px;
+      background: #fff;
+      border-color: var(--line);
+    }
+    #reasonFilter { min-width: 190px; }
+    .icon-button, .mode-button, .file-button, .primary-button {
+      display: inline-grid;
+      place-items: center;
+      min-width: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .primary-button {
+      background: linear-gradient(135deg, #174ea6, #0f766e);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+      font-weight: 700;
+      min-width: 132px;
+    }
+    .primary-button[disabled] {
+      opacity: 0.58;
+      cursor: wait;
+    }
+    .mode-button { color: var(--muted); }
+    .mode-button.active {
+      color: var(--blue);
+      border-color: #9bbcff;
+      background: #edf4ff;
+    }
+    .theme-button {
+      min-width: 84px;
+      gap: 6px;
+      color: #0f4c81;
+      background: #eef7ff;
+      border-color: #cfe0ff;
+      font-weight: 800;
+    }
+    .file-button input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .control:focus, button:focus, .file-button:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.18);
+      outline-offset: 1px;
+    }
+
+    .sync-panel {
+      margin: 14px 20px 0;
+      border: 1px solid rgba(219, 227, 239, 0.95);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .sync-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sync-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+      min-width: 0;
+    }
+    .sync-title strong { font-size: 15px; }
+    .sync-title span { color: var(--muted); font-size: 13px; }
+    .progress-track {
+      height: 10px;
+      overflow: hidden;
+      background: #e7edf6;
+      border-radius: 999px;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--teal), var(--green));
+      transition: width 0.28s ease;
+    }
+    .sync-body {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 14px;
+      padding: 13px 14px 14px;
+    }
+    .sync-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .sync-stat {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .sync-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .sync-stat strong {
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .sync-log {
+      max-height: 112px;
+      overflow: auto;
+      display: grid;
+      gap: 5px;
+      color: #334155;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .sync-log div {
+      padding: 5px 7px;
+      border-radius: 7px;
+      background: #f8fafc;
+    }
+
+    .quickbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px 0;
+    }
+    .quick-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .quick-chip, .chip {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--ink);
+      padding: 0 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .quick-chip:hover, .chip:hover { transform: translateY(-1px); border-color: #a7b4c5; }
+    .quick-chip.active, .chip.active {
+      color: #0f4c81;
+      border-color: #93b4ff;
+      background: #edf4ff;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 14px 20px 0;
+    }
+    .metric {
+      position: relative;
+      min-width: 0;
+      padding: 13px 14px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .metric::after {
+      content: "";
+      position: absolute;
+      inset: auto 13px 0;
+      height: 3px;
+      border-radius: 999px 999px 0 0;
+      background: var(--accent, var(--blue));
+      opacity: 0.8;
+    }
+    .metric:nth-child(1) { --accent: var(--red); }
+    .metric:nth-child(2) { --accent: var(--teal); }
+    .metric:nth-child(3) { --accent: var(--amber); }
+    .metric:nth-child(4) { --accent: var(--blue); }
+    .metric:nth-child(5) { --accent: var(--green); }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 24px;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .content {
+      min-width: 0;
+      width: calc(100vw - 40px);
+      max-width: none;
+      padding: 14px 20px 20px;
+      display: grid;
+      grid-template-columns: minmax(720px, 1fr) minmax(500px, 38vw);
+      gap: 14px;
+      align-items: start;
+    }
+    .main-panel, .side-panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+    .panel-head {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #f8fbff);
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .count, .subtle {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table-wrap {
+      overflow-y: scroll;
+      overflow-x: auto;
+      height: clamp(360px, 58vh, 680px);
+      max-height: none;
+      min-height: 360px;
+      scrollbar-gutter: stable both-edges;
+    }
+    table {
+      width: 100%;
+      min-width: 780px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      color: var(--muted);
+      background: #f8fafc;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    th.sortable { cursor: pointer; }
+    th.sortable::after {
+      content: "↕";
+      margin-left: 5px;
+      color: #9aa8bb;
+      font-size: 11px;
+    }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #f8fbff; }
+    tbody tr.selected-row {
+      background: #fff7ed;
+      box-shadow: inset 4px 0 0 var(--amber);
+    }
+    .expand-row {
+      cursor: default;
+      background: #fff;
+    }
+    .expand-row:hover { background: #fff; }
+    .expand-row td {
+      padding: 0;
+      border-bottom: 1px solid #cfd8e6;
+    }
+    .inline-expand {
+      padding: 12px 14px 14px 18px;
+      background: linear-gradient(180deg, #fff, #f8fbff);
+      box-shadow: inset 4px 0 0 var(--amber);
+    }
+    .expand-summary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .expand-summary strong { font-size: 15px; }
+    .expand-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .symbol { display: grid; gap: 3px; }
+    .symbol strong { font-size: 15px; color: #111827; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .badge.twse { color: #164e8f; background: #e9f2ff; border-color: #cfe0ff; }
+    .badge.tpex { color: #8a4d00; background: #fff3df; border-color: #ffe1ad; }
+    .label-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 150px;
+    }
+    .signal-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border: 1px solid #d8e2f0;
+      border-radius: 999px;
+      background: #f8fbff;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .signal-label.strategy {
+      color: #174ea6;
+      background: #edf4ff;
+      border-color: #cfe0ff;
+    }
+    .signal-label.reason {
+      color: #7c2d12;
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+    .label-score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 18px;
+      min-width: 48px;
+      margin-left: 6px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: rgba(124, 45, 18, 0.1);
+      color: #9a3412;
+      font-size: 10px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+    }
+    .score-cell {
+      min-width: 96px;
+      vertical-align: top;
+    }
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 104px;
+      justify-content: center;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid #d8e2f0;
+      background: #f8fafc;
+      color: #334155;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+    }
+    .score-stars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 1px;
+      color: #f59e0b;
+      font-size: 15px;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .score-stars .star-step {
+      display: inline-block;
+      font-size: var(--star-size);
+      line-height: 1;
+    }
+    .score-stars .star-step-1 { --star-size: 0.72em; }
+    .score-stars .star-step-2 { --star-size: 0.84em; }
+    .score-stars .star-step-3 { --star-size: 0.96em; }
+    .score-stars .star-step-4 { --star-size: 1.1em; }
+    .score-stars .star-step-5 { --star-size: 1.24em; }
+    .score-stars.score-level-1 { font-size: 12px; color: #b45309; }
+    .score-stars.score-level-2 { font-size: 13px; color: #d97706; }
+    .score-stars.score-level-3 { font-size: 15px; color: #f59e0b; }
+    .score-stars.score-level-4 { font-size: 17px; color: #f97316; }
+    .score-stars.score-level-5 {
+      font-size: 19px;
+      color: #f59e0b;
+      text-shadow: 0 0 8px rgba(245, 158, 11, 0.32);
+    }
+    .score-stars .off {
+      color: #cbd5e1;
+    }
+    .score-pill strong { font-size: 12px; line-height: 1; }
+    .score-pill span { font-size: 11px; font-weight: 800; opacity: 0.78; }
+    .score-pill .score-stars {
+      font-weight: 900;
+      opacity: 1;
+    }
+    .score-pill .score-stars span,
+    .radar-mini .score-stars span,
+    .rank-item .score-stars span,
+    .focus-stat .score-stars span { opacity: 1; }
+    .score-pill .score-stars .star-step,
+    .radar-mini .score-stars .star-step,
+    .rank-item .score-stars .star-step,
+    .focus-stat .score-stars .star-step {
+      font-size: var(--star-size);
+    }
+    .radar-mini .score-stars,
+    .rank-item .score-stars,
+    .focus-stat .score-stars {
+      font-weight: 900;
+      opacity: 1;
+    }
+    .label-score.score-level-1 { color: #92400e; background: rgba(180, 83, 9, 0.12); }
+    .label-score.score-level-2 { color: #b45309; background: rgba(217, 119, 6, 0.14); }
+    .label-score.score-level-3 { color: #9a3412; background: rgba(245, 158, 11, 0.16); }
+    .label-score.score-level-4 {
+      min-width: 54px;
+      color: #9a3412;
+      background: rgba(249, 115, 22, 0.18);
+      font-size: 11px;
+    }
+    .label-score.score-level-5 {
+      min-width: 58px;
+      color: #78350f;
+      background: rgba(245, 158, 11, 0.24);
+      font-size: 12px;
+      box-shadow: inset 0 -2px 0 rgba(245, 158, 11, 0.18);
+    }
+    .score-pill.score-5 { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+    .score-pill.score-4 { color: #166534; background: #f0fdf4; border-color: #bbf7d0; }
+    .score-pill.score-3 { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+    .score-pill.score-2,
+    .score-pill.score-1 { color: #991b1b; background: #fef2f2; border-color: #fecaca; }
+    .score-note {
+      max-width: 180px;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+    .score-guide {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbff;
+      color: #334155;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .score-guide div {
+      display: grid;
+      gap: 2px;
+    }
+    .score-guide strong {
+      color: #111827;
+      font-size: 12px;
+    }
+    .reason { min-width: 170px; line-height: 1.45; }
+    .price {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      font-weight: 800;
+    }
+    .cards {
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      height: clamp(360px, 58vh, 680px);
+      max-height: none;
+      min-height: 360px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scrollbar-gutter: stable both-edges;
+    }
+    .signal-card {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+    }
+    .signal-card:hover {
+      transform: translateY(-2px);
+      border-color: #b9c6d8;
+      box-shadow: 0 14px 28px rgba(20, 31, 53, 0.1);
+    }
+    .signal-card.selected-row {
+      grid-column: 1 / -1;
+      border-color: #f7b955;
+      box-shadow: 0 14px 28px rgba(201, 130, 18, 0.18);
+    }
+    .jump-focus {
+      animation: jumpFocus 0.86s ease;
+    }
+    @keyframes jumpFocus {
+      0%, 100% { outline: 0 solid rgba(245, 158, 11, 0); }
+      35% { outline: 4px solid rgba(245, 158, 11, 0.56); outline-offset: 3px; }
+    }
+    .signal-card header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .signal-card h3 { margin: 0; font-size: 16px; }
+    .card-row {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      align-items: start;
+      gap: 12px;
+      padding: 7px 0;
+      border-top: 1px solid var(--soft);
+      font-size: 13px;
+    }
+    .card-row > span:first-child {
+      color: var(--muted);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .card-row > strong,
+    .card-row > .score-wrap {
+      justify-self: end;
+      text-align: right;
+    }
+    .card-row > .label-list {
+      min-width: 0;
+      justify-content: flex-end;
+    }
+    .card-expanded {
+      min-width: 0;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .signal-card.selected-row .kline-canvas {
+      height: 320px;
+    }
+
+    .side-body {
+      display: grid;
+      gap: 14px;
+      padding: 13px;
+      height: clamp(360px, 62vh, 720px);
+      max-height: none;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      scrollbar-gutter: stable;
+    }
+    .group-title {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .bar-list { display: grid; gap: 8px; }
+    .bar-item { display: grid; gap: 5px; }
+    .bar-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef6;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .focus-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fff, #fbfcfe);
+    }
+    .focus-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .focus-title h3 { margin: 0; font-size: 17px; }
+    .focus-reason {
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff7ed;
+      color: #7c2d12;
+      line-height: 1.5;
+      font-weight: 800;
+    }
+    .focus-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .kline-panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    .kline-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .kline-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+    .kline-canvas {
+      display: block;
+      width: 100%;
+      height: 260px;
+      background: #fbfcfe;
+      cursor: crosshair;
+    }
+    .kline-chart-wrap {
+      position: relative;
+    }
+    .kline-tooltip {
+      position: absolute;
+      z-index: 3;
+      min-width: 172px;
+      max-width: 220px;
+      padding: 8px 10px;
+      border: 1px solid rgba(15, 23, 42, .12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, .16);
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.45;
+      pointer-events: none;
+      display: none;
+    }
+    .kline-tooltip strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+    .focus-stat {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .focus-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .focus-stat strong { font-size: 15px; }
+    .report-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--blue);
+      background: #f8fbff;
+      text-decoration: none;
+      font-weight: 800;
+    }
+    .empty {
+      padding: 36px 16px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .error {
+      margin: 14px 20px 0;
+      padding: 12px 14px;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      background: #fff1f2;
+      color: #9f1239;
+      display: none;
+    }
+    .radar-section {
+      display: grid;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background:
+        linear-gradient(135deg, rgba(217, 45, 67, 0.045), rgba(15, 118, 110, 0.055)),
+        rgba(255, 255, 255, 0.72);
+    }
+    .radar-section .group-title {
+      margin-bottom: 0;
+      color: var(--ink);
+    }
+    .brief-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .brief-card, .radar-mini, .rank-item {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .brief-card {
+      padding: 9px;
+    }
+    .brief-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .brief-card strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .workflow-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .workflow-lane {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .workflow-lane h4 {
+      margin: 0;
+      padding: 8px 9px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .lane-body {
+      display: grid;
+      gap: 7px;
+      padding: 8px;
+    }
+    .radar-mini {
+      display: grid;
+      gap: 4px;
+      padding: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    .radar-mini:hover, .rank-item:hover {
+      border-color: #aebbd0;
+      box-shadow: 0 10px 22px rgba(15, 118, 110, 0.08);
+    }
+    .radar-mini strong, .rank-symbol strong {
+      display: block;
+      color: var(--ink);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .radar-mini span, .rank-symbol span {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rank-list {
+      display: grid;
+      gap: 8px;
+    }
+    .rank-item {
+      display: grid;
+      grid-template-columns: 30px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 9px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    .rank-no {
+      width: 26px;
+      height: 26px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #edf4ff;
+      color: #2457c5;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .radar-note {
+      padding-left: 10px;
+      border-left: 3px solid var(--teal);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .signal-card {
+      box-shadow: 0 10px 24px rgba(15, 118, 110, 0.07);
+    }
+    .signal-card .score-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .signal-card .score-note {
+      max-width: 220px;
+      margin-top: 0;
+    }
+    .signal-card .signal-label.reason {
+      color: #9a3412;
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+
+    :root[data-theme="dark"] .topbar {
+      border-color: rgba(45, 55, 71, 0.92);
+      background: rgba(17, 23, 32, 0.92);
+    }
+    :root[data-theme="dark"] .actions,
+    :root[data-theme="dark"] .sync-panel,
+    :root[data-theme="dark"] .site-footer,
+    :root[data-theme="dark"] .quick-chip,
+    :root[data-theme="dark"] .chip,
+    :root[data-theme="dark"] .metric,
+    :root[data-theme="dark"] .main-panel,
+    :root[data-theme="dark"] .side-panel,
+    :root[data-theme="dark"] .signal-card,
+    :root[data-theme="dark"] .focus-card,
+    :root[data-theme="dark"] .kline-panel,
+    :root[data-theme="dark"] .report-link,
+    :root[data-theme="dark"] .sync-stat,
+    :root[data-theme="dark"] .brief-card,
+    :root[data-theme="dark"] .workflow-lane,
+    :root[data-theme="dark"] .radar-mini,
+    :root[data-theme="dark"] .rank-item {
+      background: var(--panel);
+      border-color: var(--line);
+      color: var(--ink);
+    }
+    :root[data-theme="dark"] .control,
+    :root[data-theme="dark"] .icon-button,
+    :root[data-theme="dark"] .mode-button,
+    :root[data-theme="dark"] .file-button {
+      background: #111720;
+      border-color: var(--line);
+      color: var(--ink);
+      box-shadow: none;
+    }
+    :root[data-theme="dark"] .primary-button {
+      background: linear-gradient(135deg, #b91c2b, #0f8a62);
+    }
+    :root[data-theme="dark"] .theme-button {
+      background: rgba(122, 162, 255, 0.16);
+      border-color: rgba(122, 162, 255, 0.35);
+      color: #dbeafe;
+    }
+    :root[data-theme="dark"] .mode-button.active,
+    :root[data-theme="dark"] .quick-chip.active,
+    :root[data-theme="dark"] .chip.active {
+      color: #dbeafe;
+      background: rgba(122, 162, 255, 0.16);
+      border-color: rgba(122, 162, 255, 0.36);
+    }
+    :root[data-theme="dark"] .panel-head,
+    :root[data-theme="dark"] .workflow-lane h4,
+    :root[data-theme="dark"] th,
+    :root[data-theme="dark"] .inline-expand {
+      background: #111720;
+      border-color: var(--line);
+    }
+    :root[data-theme="dark"] tbody tr:hover,
+    :root[data-theme="dark"] .expand-row,
+    :root[data-theme="dark"] .expand-row:hover {
+      background: #111720;
+    }
+    :root[data-theme="dark"] tbody tr.selected-row,
+    :root[data-theme="dark"] .signal-card.selected-row {
+      background: rgba(242, 184, 75, 0.08);
+      border-color: rgba(242, 184, 75, 0.62);
+      box-shadow: 0 14px 28px rgba(242, 184, 75, 0.1);
+    }
+    :root[data-theme="dark"] .symbol strong,
+    :root[data-theme="dark"] .score-guide strong,
+    :root[data-theme="dark"] .focus-stat strong,
+    :root[data-theme="dark"] .card-row strong {
+      color: var(--ink);
+    }
+    :root[data-theme="dark"] .signal-label.reason {
+      color: #ffd166;
+      background: rgba(255, 209, 102, 0.1);
+      border-color: rgba(255, 209, 102, 0.3);
+    }
+    :root[data-theme="dark"] .score-stars {
+      color: #ffd166;
+      text-shadow: 0 0 7px rgba(255, 209, 102, 0.34);
+    }
+    :root[data-theme="dark"] .score-stars.score-level-1 { color: #fbbf24; }
+    :root[data-theme="dark"] .score-stars.score-level-2 { color: #facc15; }
+    :root[data-theme="dark"] .score-stars.score-level-3 { color: #ffd166; }
+    :root[data-theme="dark"] .score-stars.score-level-4 { color: #ffe08a; }
+    :root[data-theme="dark"] .score-stars.score-level-5 {
+      color: #fff0a8;
+      text-shadow:
+        0 0 2px rgba(17, 23, 32, 0.9),
+        0 0 10px rgba(255, 209, 102, 0.52);
+    }
+    :root[data-theme="dark"] .score-stars .off {
+      color: #5f6b7b;
+      text-shadow: none;
+    }
+    :root[data-theme="dark"] .score-pill.score-5,
+    :root[data-theme="dark"] .score-pill.score-4,
+    :root[data-theme="dark"] .score-pill.score-3,
+    :root[data-theme="dark"] .score-pill.score-2,
+    :root[data-theme="dark"] .score-pill.score-1 {
+      background: #111720;
+      border-color: #dbe4ef;
+      color: var(--ink);
+    }
+    :root[data-theme="dark"] .label-score {
+      color: #fff0a8;
+      border: 1px solid rgba(255, 209, 102, 0.3);
+      text-shadow: 0 0 6px rgba(255, 209, 102, 0.28);
+    }
+    :root[data-theme="dark"] .label-score.score-level-1 { background: rgba(251, 191, 36, 0.1); }
+    :root[data-theme="dark"] .label-score.score-level-2 { background: rgba(250, 204, 21, 0.12); }
+    :root[data-theme="dark"] .label-score.score-level-3 { background: rgba(255, 209, 102, 0.14); }
+    :root[data-theme="dark"] .label-score.score-level-4 { background: rgba(255, 224, 138, 0.16); }
+    :root[data-theme="dark"] .label-score.score-level-5 { background: rgba(255, 240, 168, 0.2); }
+    :root[data-theme="dark"] .score-guide,
+    :root[data-theme="dark"] .radar-section,
+    :root[data-theme="dark"] .focus-stat,
+    :root[data-theme="dark"] .sync-log div {
+      background: #111720;
+      border-color: var(--line);
+      color: var(--muted);
+    }
+    :root[data-theme="dark"] .progress-track,
+    :root[data-theme="dark"] .bar {
+      background: #222c3a;
+    }
+    :root[data-theme="dark"] .kline-canvas {
+      background: #111720;
+    }
+    :root[data-theme="dark"] .kline-tooltip {
+      background: rgba(17, 23, 32, 0.96);
+      border-color: rgba(148, 163, 184, 0.28);
+      color: var(--ink);
+    }
+    :root[data-theme="dark"] .error {
+      background: rgba(127, 29, 29, 0.25);
+      border-color: rgba(248, 113, 113, 0.45);
+      color: #fecaca;
+    }
+
+    .topbar,
+    .actions,
+    .sync-panel,
+    .site-footer,
+    .metric,
+    .main-panel,
+    .side-panel,
+    .signal-card,
+    .focus-card,
+    .kline-panel,
+    .radar-section,
+    .brief-card,
+    .workflow-lane,
+    .radar-mini,
+    .rank-item,
+    .score-guide,
+    .focus-stat,
+    .sync-stat,
+    .report-link,
+    .control,
+    .icon-button,
+    .mode-button,
+    .file-button,
+    .primary-button,
+    .quick-chip,
+    .chip,
+    .signal-label,
+    .score-pill {
+      border-radius: 2px;
+    }
+    .sync-panel,
+    .metric,
+    .main-panel,
+    .side-panel,
+    .signal-card,
+    .focus-card,
+    .radar-section,
+    .brief-card,
+    .workflow-lane,
+    .radar-mini,
+    .rank-item,
+    .score-guide {
+      border: 2px solid var(--ink);
+      box-shadow: 5px 5px 0 rgba(21, 32, 51, 0.16);
+    }
+    .topbar {
+      border-bottom: 2px solid var(--ink);
+      background:
+        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.12) 1.2px, transparent 1.8px) 0 0 / 12px 12px,
+        rgba(249, 252, 255, 0.96);
+      backdrop-filter: none;
+    }
+    .actions {
+      border: 2px solid var(--ink);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 4px 4px 0 rgba(21, 32, 51, 0.13);
+    }
+    .brand h1::before {
+      flex: 0 0 54px;
+      width: 54px;
+      height: 18px;
+      border-radius: 0;
+      background:
+        radial-gradient(circle at 9px 9px, #fff 0 3px, var(--red) 3.2px 9px, transparent 9.4px),
+        radial-gradient(circle at 27px 9px, #fff 0 3px, var(--teal) 3.2px 9px, transparent 9.4px),
+        radial-gradient(circle at 45px 9px, #fff 0 3px, var(--amber) 3.2px 9px, transparent 9.4px);
+      box-shadow: none;
+    }
+    .panel-head,
+    .sync-head,
+    th,
+    .workflow-lane h4 {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(21, 32, 51, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
+        #fffdf7;
+    }
+    .metric::after {
+      inset: auto 0 0;
+      height: 6px;
+      border-radius: 0;
+    }
+    .control,
+    .icon-button,
+    .mode-button,
+    .file-button,
+    .primary-button {
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 rgba(21, 32, 51, 0.14);
+    }
+    .primary-button {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 45%),
+        #174ea6;
+    }
+    .mode-button.active,
+    .quick-chip.active,
+    .chip.active {
+      border-color: var(--ink);
+      box-shadow: inset 0 -4px 0 rgba(37, 99, 235, 0.14), 3px 3px 0 rgba(21, 32, 51, 0.12);
+    }
+    .signal-card {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(201, 130, 18, 0.08) 1px, transparent 1.8px) 0 0 / 14px 14px,
+        #fff;
+    }
+    .signal-card:hover,
+    .radar-mini:hover,
+    .rank-item:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 7px 7px 0 rgba(15, 118, 110, 0.18);
+    }
+    .signal-card.selected-row {
+      border-color: var(--amber);
+      box-shadow: 7px 7px 0 rgba(201, 130, 18, 0.22);
+    }
+    .badge,
+    .signal-label,
+    .label-score,
+    .quick-chip,
+    .chip,
+    .rank-no {
+      border-radius: 999px;
+    }
+    .radar-section {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        #fffefb;
+    }
+    .kline-tooltip {
+      left: 10px;
+      top: 10px;
+      border: 2px solid var(--ink);
+      border-radius: 2px;
+      box-shadow: 4px 4px 0 rgba(21, 32, 51, 0.18);
+    }
+    :root[data-theme="dark"] .topbar {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.12) 1.2px, transparent 1.8px) 0 0 / 12px 12px,
+        rgba(17, 23, 32, 0.96);
+    }
+    :root[data-theme="dark"] .actions,
+    :root[data-theme="dark"] .signal-card,
+    :root[data-theme="dark"] .radar-section,
+    :root[data-theme="dark"] .panel-head,
+    :root[data-theme="dark"] .sync-head,
+    :root[data-theme="dark"] th,
+    :root[data-theme="dark"] .workflow-lane h4 {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
+        #111720;
+    }
+    :root[data-theme="dark"] .sync-panel,
+    :root[data-theme="dark"] .site-footer,
+    :root[data-theme="dark"] .metric,
+    :root[data-theme="dark"] .main-panel,
+    :root[data-theme="dark"] .side-panel,
+    :root[data-theme="dark"] .signal-card,
+    :root[data-theme="dark"] .focus-card,
+    :root[data-theme="dark"] .radar-section,
+    :root[data-theme="dark"] .brief-card,
+    :root[data-theme="dark"] .workflow-lane,
+    :root[data-theme="dark"] .radar-mini,
+    :root[data-theme="dark"] .rank-item,
+    :root[data-theme="dark"] .score-guide {
+      border-color: #dbe4ef;
+      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.42);
+    }
+    :root[data-theme="dark"] .control,
+    :root[data-theme="dark"] .icon-button,
+    :root[data-theme="dark"] .mode-button,
+    :root[data-theme="dark"] .file-button,
+    :root[data-theme="dark"] .primary-button,
+    :root[data-theme="dark"] .kline-tooltip {
+      border-color: #dbe4ef;
+    }
+    .kline-tooltip {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      box-shadow: none;
+      color: rgba(21, 32, 51, 0.82);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.38);
+      backdrop-filter: blur(1.5px);
+    }
+    :root[data-theme="dark"] .kline-tooltip {
+      background: rgba(17, 23, 32, 0.26);
+      border-color: rgba(219, 228, 239, 0.14);
+      color: rgba(248, 250, 252, 0.86);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.48);
+    }
+    .hidden { display: none !important; }
+
+    @media (max-width: 1120px) {
+      .topbar, .content, .sync-body { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+      .actions { justify-content: flex-start; }
+      .table-wrap, .cards {
+        height: clamp(380px, 62vh, 720px);
+        max-height: none;
+        overflow-y: scroll;
+      }
+      .side-body {
+        height: clamp(340px, 54vh, 640px);
+        max-height: none;
+        overflow-y: scroll;
+      }
+    }
+    @media (max-width: 760px) {
+      .topbar, .summary, .quickbar, .content, .sync-panel { margin-inline: 0; }
+      .content { width: 100%; }
+      .topbar {
+        position: static;
+        padding: 10px 12px 8px;
+        gap: 9px;
+      }
+      .brand h1 { font-size: 20px; }
+      .brand h1::before { flex-basis: 48px; width: 48px; height: 16px; }
+      .brand .meta { font-size: 12px; margin-top: 3px; }
+      .actions {
+        border: 0;
+        background: transparent;
+        padding: 0 0 4px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-gutter: stable;
+      }
+      .control, .search {
+        min-width: 0;
+        flex: 0 0 150px;
+      }
+      #reasonFilter { flex-basis: 170px; }
+      .primary-button { flex: 0 0 126px; }
+      .icon-button, .mode-button, .file-button { flex: 0 0 38px; }
+      .theme-button { flex-basis: 84px; }
+
+      .sync-panel { margin: 8px 12px; }
+      .sync-head {
+        min-height: 48px;
+        padding: 9px 10px;
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      .sync-title { gap: 4px; }
+      .sync-title strong { font-size: 14px; }
+      .sync-title span {
+        flex-basis: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sync-body {
+        display: block;
+        padding: 8px 10px 10px;
+      }
+      .sync-stats {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .sync-stat {
+        flex: 0 0 116px;
+        padding: 8px;
+      }
+      .sync-stat strong { font-size: 16px; }
+      .sync-log { display: none; }
+
+      .quickbar {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding: 4px 12px 0;
+        min-height: 38px;
+      }
+      .quick-label { flex: 0 0 auto; }
+      .quick-chip, .chip {
+        flex: 0 0 auto;
+        min-height: 30px;
+        padding: 0 10px;
+        white-space: nowrap;
+      }
+
+      .summary {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 8px 12px 0;
+      }
+      .metric {
+        flex: 0 0 148px;
+        padding: 10px 11px 12px;
+      }
+      .metric strong { font-size: 20px; }
+      .quickbar, .content { padding-inline: 12px; }
+      .table-wrap { display: none; }
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+        padding: 10px;
+      }
+      .signal-card { min-height: 132px; padding: 10px; }
+      .signal-card header { margin-bottom: 8px; }
+      .signal-card h3 { font-size: 14px; }
+      .card-row { padding: 5px 0; font-size: 12px; }
+      .side-body {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+      }
+      .workflow-board, .brief-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+    :root[data-static-site="true"] .sync-panel,
+    :root[data-static-site="true"] #syncButton {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>每日策略訊號</h1>
+        <div class="meta" id="dataMeta">讀取中</div>
+      </div>
+      <div class="actions" aria-label="工具列">
+        <button class="primary-button" id="syncButton" type="button">同步今日資料</button>
+        <input class="control search" id="searchInput" type="search" placeholder="搜尋股票、訊號">
+        <select class="control" id="marketFilter" aria-label="市場"></select>
+        <select class="control" id="strategyFilter" aria-label="策略" hidden></select>
+        <select class="control" id="reasonFilter" aria-label="訊號"></select>
+        <button class="mode-button theme-button" id="themeToggle" type="button" title="夜間模式" aria-label="切換夜間模式" aria-pressed="false">夜間</button>
+        <button class="icon-button" id="resetButton" type="button" title="清除篩選" aria-label="清除篩選">×</button>
+        <button class="mode-button" id="tableMode" type="button" title="表格檢視" aria-label="表格檢視">▦</button>
+        <button class="mode-button active" id="cardMode" type="button" title="卡片檢視" aria-label="卡片檢視">▤</button>
+        <button class="icon-button" id="reloadButton" type="button" title="重新讀取" aria-label="重新讀取">↻</button>
+        <label class="file-button" title="載入 JSON" aria-label="載入 JSON">⇧
+          <input id="fileInput" type="file" accept=".json,application/json">
+        </label>
+      </div>
+    </header>
+
+    <div class="error" id="errorBox"></div>
+
+    <section class="sync-panel" aria-label="同步進度">
+      <div class="sync-head">
+        <div class="sync-title">
+          <strong id="syncMessage">待命</strong>
+          <span id="syncCurrent">尚未開始同步</span>
+        </div>
+        <span class="count" id="syncPercent">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-bar" id="syncProgress"></div></div>
+      <div class="sync-body">
+        <div class="sync-stats">
+          <div class="sync-stat"><span>已處理</span><strong id="syncCompleted">0 / 0</strong></div>
+          <div class="sync-stat"><span>下載失敗</span><strong id="syncFailed">0</strong></div>
+          <div class="sync-stat"><span>即時命中</span><strong id="syncMatches">0</strong></div>
+          <div class="sync-stat"><span>最新命中</span><strong id="syncLastMatch">-</strong></div>
+        </div>
+        <div class="sync-log" id="syncLog"><div>同步時會在這裡顯示下載與掃描進度。</div></div>
+      </div>
+    </section>
+
+    <section class="quickbar" aria-label="快速篩選">
+      <span class="quick-label">快速篩選</span>
+      <div class="chips" id="quickChips"></div>
+    </section>
+
+    <section class="summary" aria-label="摘要">
+      <div class="metric"><span>符合筆數</span><strong id="metricTotal">0</strong></div>
+      <div class="metric"><span>股票檔數</span><strong id="metricStocks">0</strong></div>
+      <div class="metric"><span>訊號日期</span><strong id="metricDate">-</strong></div>
+      <div class="metric"><span>TWSE</span><strong id="metricTwse">0</strong></div>
+      <div class="metric"><span>TPEX</span><strong id="metricTpex">0</strong></div>
+    </section>
+
+    <main class="content">
+      <section class="main-panel">
+        <div class="panel-head">
+          <h2>訊號清單</h2>
+          <div class="count" id="visibleCount">0 / 0</div>
+        </div>
+        <div class="table-wrap" id="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="stock_no">股票</th>
+                <th class="sortable" data-sort="market">市場</th>
+                <th class="sortable" data-sort="reason">訊號</th>
+                <th class="sortable" data-sort="score">評分</th>
+                <th class="sortable" data-sort="close">收盤</th>
+                <th class="sortable" data-sort="volume">成交量</th>
+              </tr>
+            </thead>
+            <tbody id="signalTable"></tbody>
+          </table>
+        </div>
+        <div class="cards" id="signalCards"></div>
+        <div class="empty hidden" id="emptyState">沒有符合目前篩選的訊號。</div>
+      </section>
+
+      <aside class="side-panel">
+        <div class="panel-head">
+          <h2>分布與焦點</h2>
+          <span class="count" id="updateTime">-</span>
+        </div>
+        <div class="side-body">
+          <section>
+            <h3 class="group-title">焦點股票</h3>
+            <div id="focusPanel"></div>
+          </section>
+          <section class="radar-section">
+            <h3 class="group-title">今日雷達摘要</h3>
+            <div class="brief-grid" id="dailyBrief"></div>
+            <div class="radar-note" id="radarNote">依照評分、量能與訊號類型整理候選股，點擊清單可直接展開日 K 線。</div>
+          </section>
+          <section class="radar-section">
+            <h3 class="group-title">布局流程</h3>
+            <div class="workflow-board" id="workflowBoard"></div>
+          </section>
+          <section class="radar-section">
+            <h3 class="group-title">優先排行</h3>
+            <div class="rank-list" id="topRank"></div>
+          </section>
+          <section>
+            <h3 class="group-title">評分依據</h3>
+            <div class="score-guide">
+              <div><strong>★ 趨勢結構</strong><span>5/10/20/60MA 多頭排列，月線與季線同步上揚。</span></div>
+              <div><strong>★ 回測品質</strong><span>低點貼近關鍵均線，收盤守住，且偏向首次回測。</span></div>
+              <div><strong>★ K棒力道</strong><span>紅 K、收在相對高位，代表買盤有承接。</span></div>
+              <div><strong>★ 量能狀態</strong><span>量能接近或健康放大；過度爆量會提醒追高風險。</span></div>
+              <div><strong>扣分</strong><span>收盤離月線太遠，或量價型態偏追價時會降低分數。</span></div>
+            </div>
+          </section>
+          <section>
+            <h3 class="group-title">市場</h3>
+            <div class="bar-list" id="marketBars"></div>
+          </section>
+          <section>
+            <h3 class="group-title">常見訊號</h3>
+            <div class="chips" id="reasonChips"></div>
+          </section>
+        </div>
+      </aside>
+    </main>
+    <footer class="site-footer">
+      <strong>Created by Codex</strong> · Only for educational use. This dashboard is not financial advice; please make investment decisions independently and manage risk carefully.
+    </footer>
+  </div>
+
+  <script>
+    const DATA_URL = "reports/daily_signal_alert.json";
+    const DASHBOARD_API_ORIGIN = "http://localhost:8766";
+    const API_ORIGIN = location.port === "8766" ? "" : DASHBOARD_API_ORIGIN;
+    const IS_LOCAL_DASHBOARD = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (!IS_LOCAL_DASHBOARD || location.port !== "8766") {
+      document.documentElement.dataset.staticSite = "true";
+    }
+    const csvCache = new Map();
+    const chartState = new WeakMap();
+    let eventSource = null;
+    let statusPollTimer = null;
+    const state = {
+      rows: [],
+      filtered: [],
+      sortKey: "score",
+      sortDir: "desc",
+      view: "cards",
+      selectedId: null,
+      filters: { search: "", market: "all", strategy: "all", reason: "all" }
+    };
+
+    const el = {
+      dataMeta: document.getElementById("dataMeta"),
+      errorBox: document.getElementById("errorBox"),
+      syncButton: document.getElementById("syncButton"),
+      syncMessage: document.getElementById("syncMessage"),
+      syncCurrent: document.getElementById("syncCurrent"),
+      syncPercent: document.getElementById("syncPercent"),
+      syncProgress: document.getElementById("syncProgress"),
+      syncCompleted: document.getElementById("syncCompleted"),
+      syncFailed: document.getElementById("syncFailed"),
+      syncMatches: document.getElementById("syncMatches"),
+      syncLastMatch: document.getElementById("syncLastMatch"),
+      syncLog: document.getElementById("syncLog"),
+      searchInput: document.getElementById("searchInput"),
+      marketFilter: document.getElementById("marketFilter"),
+      strategyFilter: document.getElementById("strategyFilter"),
+      reasonFilter: document.getElementById("reasonFilter"),
+      themeToggle: document.getElementById("themeToggle"),
+      resetButton: document.getElementById("resetButton"),
+      reloadButton: document.getElementById("reloadButton"),
+      fileInput: document.getElementById("fileInput"),
+      tableMode: document.getElementById("tableMode"),
+      cardMode: document.getElementById("cardMode"),
+      tableWrap: document.getElementById("tableWrap"),
+      signalTable: document.getElementById("signalTable"),
+      signalCards: document.getElementById("signalCards"),
+      emptyState: document.getElementById("emptyState"),
+      visibleCount: document.getElementById("visibleCount"),
+      updateTime: document.getElementById("updateTime"),
+      metricTotal: document.getElementById("metricTotal"),
+      metricStocks: document.getElementById("metricStocks"),
+      metricDate: document.getElementById("metricDate"),
+      metricTwse: document.getElementById("metricTwse"),
+      metricTpex: document.getElementById("metricTpex"),
+      marketBars: document.getElementById("marketBars"),
+      strategyBars: document.getElementById("strategyBars"),
+      reasonChips: document.getElementById("reasonChips"),
+      quickChips: document.getElementById("quickChips"),
+      focusPanel: document.getElementById("focusPanel"),
+      dailyBrief: document.getElementById("dailyBrief"),
+      radarNote: document.getElementById("radarNote"),
+      workflowBoard: document.getElementById("workflowBoard"),
+      topRank: document.getElementById("topRank")
+    };
+
+    function cleanText(value) { return String(value ?? "").trim() || "-"; }
+    function escapeHtml(value) {
+      return cleanText(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+    function formatPrice(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "-";
+      return number.toLocaleString("zh-TW", { maximumFractionDigits: 2, minimumFractionDigits: number < 100 ? 2 : 0 });
+    }
+    function formatMa(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number.toFixed(2) : "-";
+    }
+    function formatVolumeLots(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return "-";
+      const lots = number / 1000;
+      if (lots >= 1) return `${Math.round(lots).toLocaleString("zh-TW")}張`;
+      return `${lots.toLocaleString("zh-TW", { maximumFractionDigits: 1 })}張`;
+    }
+    function csvLineToCells(line) {
+      const cells = [];
+      let current = "";
+      let quoted = false;
+      for (let i = 0; i < line.length; i += 1) {
+        const ch = line[i];
+        if (ch === '"' && line[i + 1] === '"') {
+          current += '"';
+          i += 1;
+        } else if (ch === '"') {
+          quoted = !quoted;
+        } else if (ch === "," && !quoted) {
+          cells.push(current);
+          current = "";
+        } else {
+          current += ch;
+        }
+      }
+      cells.push(current);
+      return cells;
+    }
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/).filter(Boolean);
+      const headers = csvLineToCells(lines.shift() || "");
+      return lines.map(line => {
+        const cells = csvLineToCells(line);
+        return Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ""]));
+      });
+    }
+    function toNumber(value) {
+      const number = Number(String(value ?? "").replaceAll(",", "").trim());
+      return Number.isFinite(number) ? number : null;
+    }
+    function parseScoreReasons(value) {
+      if (Array.isArray(value)) return value.map(cleanText).filter(item => item !== "-");
+      const text = cleanText(value);
+      if (text === "-") return [];
+      return text
+        .replace(/^\[|\]$/g, "")
+        .split(/[,;、]/)
+        .map(item => item.replace(/^['"\s]+|['"\s]+$/g, ""))
+        .filter(Boolean);
+    }
+    function normalizeScore(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.max(1, Math.min(5, Math.round(number))) : 1;
+    }
+    function starText(score) {
+      const normalized = normalizeScore(score);
+      return "★".repeat(normalized) + "☆".repeat(5 - normalized);
+    }
+    function starHtml(score) {
+      const normalized = normalizeScore(score);
+      return `<span class="score-stars score-level-${normalized}" aria-label="${normalized} out of 5">${Array.from({ length: 5 }, (_, index) =>
+        `<span class="star-step star-step-${index + 1} ${index < normalized ? "on" : "off"}">${index < normalized ? "★" : "☆"}</span>`
+      ).join("")}</span>`;
+    }
+    function movingAverageRows(rows, key, windowSize) {
+      let sum = 0;
+      return rows.map((row, index) => {
+        sum += row[key];
+        if (index >= windowSize) sum -= rows[index - windowSize][key];
+        return index >= windowSize - 1 ? sum / windowSize : null;
+      });
+    }
+    function setError(message) {
+      el.errorBox.textContent = message;
+      el.errorBox.style.display = message ? "block" : "none";
+    }
+    function normalizeRow(row, index) {
+      return {
+        id: String(index),
+        market: cleanText(row.market).toUpperCase(),
+        stock_no: cleanText(row.stock_no),
+        stock_name: cleanText(row.stock_name),
+        date: cleanText(row.date),
+        strategy: cleanText(row.strategy),
+        reason: cleanText(row.reason),
+        score: normalizeScore(row.score),
+        score_label: cleanText(row.score_label) === "-" ? `${normalizeScore(row.score)}/5` : cleanText(row.score_label),
+        score_reasons: parseScoreReasons(row.score_reasons),
+        close: Number(row.close),
+        volume: Number(row.volume),
+        ma5: Number(row.ma5),
+        ma10: Number(row.ma10),
+        ma20: Number(row.ma20),
+        ma60: Number(row.ma60),
+        source: cleanText(row.source)
+      };
+    }
+    function uniqueList(values) {
+      return [...new Set(values.filter(value => value && value !== "-"))].sort((a, b) => String(a).localeCompare(String(b), "zh-Hant", { numeric: true }));
+    }
+    function groupRows(rows) {
+      const groups = new Map();
+      rows.forEach((row, index) => {
+        const normalized = normalizeRow(row, index);
+        if (normalized.stock_no === "-") return;
+        const key = `${normalized.market}:${normalized.stock_no}:${normalized.date}`;
+        const existing = groups.get(key);
+        if (!existing) {
+          groups.set(key, {
+            ...normalized,
+            id: key,
+            strategies: [normalized.strategy],
+            reasons: [normalized.reason],
+            reasonDetails: [{ reason: normalized.reason, score: normalized.score, score_reasons: normalized.score_reasons }],
+            signals: [normalized],
+            score: normalized.score,
+            score_label: normalized.score_label,
+            score_reasons: [...normalized.score_reasons],
+          });
+          return;
+        }
+        existing.signals.push(normalized);
+        existing.strategies = uniqueList([...existing.strategies, normalized.strategy]);
+        existing.reasons = uniqueList([...existing.reasons, normalized.reason]);
+        const detail = existing.reasonDetails.find(item => item.reason === normalized.reason);
+        if (!detail) {
+          existing.reasonDetails.push({ reason: normalized.reason, score: normalized.score, score_reasons: normalized.score_reasons });
+        } else if (normalized.score > detail.score) {
+          detail.score = normalized.score;
+          detail.score_reasons = normalized.score_reasons;
+        }
+        if (normalized.score > existing.score) {
+          existing.score = normalized.score;
+          existing.score_label = normalized.score_label;
+        }
+        existing.score_reasons = uniqueList([...existing.score_reasons, ...normalized.score_reasons]);
+        existing.close = Number.isFinite(normalized.close) ? normalized.close : existing.close;
+        existing.volume = Number.isFinite(normalized.volume) ? normalized.volume : existing.volume;
+        existing.ma5 = Number.isFinite(normalized.ma5) ? normalized.ma5 : existing.ma5;
+        existing.ma10 = Number.isFinite(normalized.ma10) ? normalized.ma10 : existing.ma10;
+        existing.ma20 = Number.isFinite(normalized.ma20) ? normalized.ma20 : existing.ma20;
+        existing.ma60 = Number.isFinite(normalized.ma60) ? normalized.ma60 : existing.ma60;
+        existing.source = normalized.source !== "-" ? normalized.source : existing.source;
+      });
+      return [...groups.values()].map(row => ({
+        ...row,
+        strategy: row.strategies.join(" / "),
+        reason: row.reasons.join(" / "),
+      }));
+    }
+    function listValues(row, key) {
+      if (key === "strategy") return row.strategies || [row.strategy].filter(Boolean);
+      if (key === "reason") return row.reasons || [row.reason].filter(Boolean);
+      const value = row[key];
+      return Array.isArray(value) ? value : [value].filter(Boolean);
+    }
+    function uniqueValues(rows, key) {
+      return uniqueList(rows.flatMap(row => listValues(row, key)));
+    }
+    function fillSelect(select, label, values) {
+      const current = select.value || "all";
+      select.innerHTML = `<option value="all">${label}</option>` + values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
+      select.value = values.includes(current) ? current : "all";
+    }
+    function countBy(rows, key) {
+      return rows.reduce((acc, row) => {
+        const values = listValues(row, key);
+        (values.length ? values : ["-"]).forEach(value => {
+          acc[value] = (acc[value] || 0) + 1;
+        });
+        return acc;
+      }, {});
+    }
+    function isFilterClear() {
+      return !state.filters.search && state.filters.market === "all" && state.filters.strategy === "all" && state.filters.reason === "all";
+    }
+    function resetFilters() {
+      state.filters = { search: "", market: "all", strategy: "all", reason: "all" };
+      el.searchInput.value = "";
+      el.marketFilter.value = "all";
+      el.strategyFilter.value = "all";
+      el.reasonFilter.value = "all";
+      applyFilters();
+    }
+
+    function renderBars(target, counts, filterKey) {
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(1, ...entries.map(entry => entry[1]));
+      target.innerHTML = entries.map(([name, count]) => {
+        const pct = Math.round((count / max) * 100);
+        return `<div class="bar-item" data-name="${escapeHtml(name)}">
+          <div class="bar-line"><span>${escapeHtml(name)}</span><strong>${count}</strong></div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+        </div>`;
+      }).join("") || `<div class="subtle">-</div>`;
+      if (filterKey === "strategy") {
+        [...target.querySelectorAll(".bar-item")].forEach(node => {
+          node.style.cursor = "pointer";
+          node.addEventListener("click", () => {
+            state.filters.strategy = node.dataset.name;
+            el.strategyFilter.value = state.filters.strategy;
+            applyFilters();
+          });
+        });
+      }
+    }
+    function renderReasonChips(rows) {
+      const entries = Object.entries(countBy(rows, "reason")).sort((a, b) => b[1] - a[1]).slice(0, 10);
+      el.reasonChips.innerHTML = entries.map(([reason, count]) =>
+        `<button class="chip ${state.filters.reason === reason ? "active" : ""}" type="button" data-reason="${escapeHtml(reason)}">${escapeHtml(reason)} ${count}</button>`
+      ).join("") || `<span class="subtle">-</span>`;
+      [...el.reasonChips.querySelectorAll(".chip")].forEach(chip => {
+        chip.addEventListener("click", () => {
+          state.filters.reason = chip.dataset.reason;
+          el.reasonFilter.value = state.filters.reason;
+          applyFilters();
+        });
+      });
+    }
+    function renderQuickChips(rows) {
+      const markets = Object.entries(countBy(rows, "market")).sort((a, b) => b[1] - a[1]);
+      const reasons = Object.entries(countBy(rows, "reason")).sort((a, b) => b[1] - a[1]);
+      const chips = [
+        { label: `全部 ${state.rows.length}`, type: "all", value: "all", active: isFilterClear() },
+        ...markets.map(([market, count]) => ({ label: `${market} ${count}`, type: "market", value: market, active: state.filters.market === market })),
+        ...reasons.map(([reason, count]) => ({ label: `${reason} ${count}`, type: "reason", value: reason, active: state.filters.reason === reason }))
+      ];
+      el.quickChips.innerHTML = chips.map(chip =>
+        `<button class="quick-chip ${chip.active ? "active" : ""}" type="button" data-type="${escapeHtml(chip.type)}" data-value="${escapeHtml(chip.value)}">${escapeHtml(chip.label)}</button>`
+      ).join("");
+      [...el.quickChips.querySelectorAll(".quick-chip")].forEach(chip => {
+        chip.addEventListener("click", () => {
+          if (chip.dataset.type === "all") return resetFilters();
+          if (chip.dataset.type === "market") {
+            state.filters.market = chip.dataset.value;
+            el.marketFilter.value = state.filters.market;
+          }
+          if (chip.dataset.type === "reason") {
+            state.filters.reason = chip.dataset.value;
+            el.reasonFilter.value = state.filters.reason;
+          }
+          applyFilters();
+        });
+      });
+    }
+    function rankedRows(rows, limit = 5) {
+      return [...rows]
+        .sort((a, b) => (b.score - a.score) || (b.volume - a.volume) || String(a.stock_no).localeCompare(String(b.stock_no), "zh-Hant", { numeric: true }))
+        .slice(0, limit);
+    }
+    function radarMiniHtml(row) {
+      return `<button class="radar-mini" type="button" data-radar-id="${escapeHtml(row.id)}">
+        <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong>
+        <span>${starHtml(row.score)} · ${formatVolumeLots(row.volume)}</span>
+      </button>`;
+    }
+    function renderWorkflowLane(title, rows) {
+      return `<section class="workflow-lane">
+        <h4>${escapeHtml(title)}</h4>
+        <div class="lane-body">${rows.length ? rows.map(radarMiniHtml).join("") : `<span class="subtle">目前無符合</span>`}</div>
+      </section>`;
+    }
+    function selectRow(rowId, options = {}) {
+      if (options.forceCards) {
+        state.view = "cards";
+        el.tableMode.classList.toggle("active", false);
+        el.cardMode.classList.toggle("active", true);
+      }
+      state.selectedId = options.forceOpen ? rowId : (state.selectedId === rowId ? null : rowId);
+      renderTable(sortRows(state.filtered));
+      requestAnimationFrame(() => {
+        const visibleTargets = [
+          ...document.querySelectorAll(".cards:not(.hidden) [data-row-id], .table-wrap:not(.hidden) [data-row-id]")
+        ];
+        const target = visibleTargets.find(node => node.dataset.rowId === state.selectedId);
+        target?.scrollIntoView({ block: "center", behavior: "smooth" });
+        target?.classList.add("jump-focus");
+        if (target) setTimeout(() => target.classList.remove("jump-focus"), 900);
+      });
+    }
+    function bindRadarClicks() {
+      [...document.querySelectorAll("[data-radar-id]")].forEach(node => {
+        node.addEventListener("click", event => {
+          event.stopPropagation();
+          selectRow(node.dataset.radarId, { forceCards: true, forceOpen: true });
+        });
+      });
+    }
+    function renderRadarPanels(rows) {
+      if (!el.dailyBrief || !el.workflowBoard || !el.topRank) return;
+      const stockCount = new Set(rows.map(row => `${row.market}:${row.stock_no}`)).size;
+      const scoreFive = rows.filter(row => normalizeScore(row.score) >= 5).length;
+      const highVolume = rows.filter(row => Number(row.volume) >= 3000000).length;
+      const pullback = rows.filter(row => /回測|支撐|季線|月線|10MA/i.test(row.reason));
+      const volumeBreak = rows.filter(row => /帶量|紅K|跳空/i.test(row.reason) || Number(row.volume) >= 3000000);
+      el.dailyBrief.innerHTML = [
+        ["候選檔數", stockCount.toLocaleString("zh-TW")],
+        ["5 星訊號", scoreFive.toLocaleString("zh-TW")],
+        ["量能確認", highVolume.toLocaleString("zh-TW")],
+        ["目前顯示", rows.length.toLocaleString("zh-TW")]
+      ].map(([label, value]) => `<div class="brief-card"><span>${label}</span><strong>${value}</strong></div>`).join("");
+      if (el.radarNote) {
+        el.radarNote.textContent = rows.length
+          ? "優先看高分且成交量放大的標的，再點開日 K 線確認是否仍在可布局位置。"
+          : "目前篩選條件下沒有符合訊號，請調整快速篩選或重新同步今日資料。";
+      }
+      el.workflowBoard.innerHTML = [
+        renderWorkflowLane("高分優先", rankedRows(rows.filter(row => normalizeScore(row.score) >= 5), 3)),
+        renderWorkflowLane("量能確認", rankedRows(volumeBreak, 3)),
+        renderWorkflowLane("回測支撐", rankedRows(pullback, 3)),
+        renderWorkflowLane("觀察名單", rankedRows(rows.filter(row => normalizeScore(row.score) >= 4), 3))
+      ].join("");
+      el.topRank.innerHTML = rankedRows(rows, 5).map((row, index) =>
+        `<button class="rank-item" type="button" data-radar-id="${escapeHtml(row.id)}">
+          <span class="rank-no">${index + 1}</span>
+          <span class="rank-symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span>${escapeHtml(row.reason)}</span></span>
+          ${starHtml(row.score)}
+        </button>`
+      ).join("") || `<span class="subtle">-</span>`;
+      bindRadarClicks();
+    }
+    function sortRows(rows) {
+      const key = state.sortKey;
+      const dir = state.sortDir === "asc" ? 1 : -1;
+      return [...rows].sort((a, b) => {
+        if (typeof a[key] === "number" && typeof b[key] === "number") return (a[key] - b[key]) * dir;
+        return String(a[key]).localeCompare(String(b[key]), "zh-Hant", { numeric: true }) * dir;
+      });
+    }
+    function labelHtml(values, type) {
+      return `<div class="label-list">${uniqueList(values).map(value => `<span class="signal-label ${type}">${escapeHtml(value)}</span>`).join("")}</div>`;
+    }
+    function reasonLabelHtml(row) {
+      const details = row.reasonDetails?.length
+        ? row.reasonDetails
+        : (row.reasons || [row.reason]).map(reason => ({ reason, score: row.score || 1, score_reasons: row.score_reasons || [] }));
+      return `<div class="label-list">${details.map(item => {
+        const title = (item.score_reasons || []).slice(0, 4).join(" / ");
+        const score = normalizeScore(item.score);
+        return `<span class="signal-label reason" title="${escapeHtml(title)}">${escapeHtml(item.reason)}<span class="label-score score-level-${score}">${starText(score)}</span></span>`;
+      }).join("")}</div>`;
+    }
+    function scoreHtml(row) {
+      const score = normalizeScore(row.score);
+      const reasons = (row.score_reasons || []).slice(0, 2).join("、");
+      return `<div class="score-wrap">
+        <span class="score-pill score-${score}">${starHtml(score)}<strong>${score}/5</strong></span>
+        ${reasons ? `<div class="score-note">${escapeHtml(reasons)}</div>` : ""}
+      </div>`;
+    }
+    function focusHtml(row) {
+      if (!row) return `<div class="empty">點擊訊號清單中的股票，會在該列展開日 K 線。</div>`;
+      const marketClass = row.market === "TWSE" ? "twse" : "tpex";
+      return `<div class="focus-card">
+        <div class="focus-title">
+          <div><h3>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</h3><div class="subtle">${escapeHtml(row.date)} · ${row.signals.length} 筆訊號合併</div></div>
+          <span class="badge ${marketClass}">${escapeHtml(row.market)}</span>
+        </div>
+        ${reasonLabelHtml(row)}
+        <div class="focus-grid">
+          <div class="focus-stat"><span>評分</span><strong>${starHtml(row.score)} ${normalizeScore(row.score)}/5</strong></div>
+          <div class="focus-stat"><span>收盤</span><strong>${formatPrice(row.close)}</strong></div>
+          <div class="focus-stat"><span>成交量</span><strong>${formatVolumeLots(row.volume)}</strong></div>
+          <div class="focus-stat"><span>20MA</span><strong>${formatMa(row.ma20)}</strong></div>
+          <div class="focus-stat"><span>60MA</span><strong>${formatMa(row.ma60)}</strong></div>
+        </div>
+      </div>`;
+    }
+    function klinePanelHtml(row) {
+      return `<div class="inline-expand">
+        <div class="expand-summary">
+          <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)} 日 K 線</strong>
+          <div class="expand-stats">
+            <span>${escapeHtml(row.date)}</span>
+            <span>收盤 ${formatPrice(row.close)}</span>
+            <span>量 ${formatVolumeLots(row.volume)}</span>
+            <span>${row.signals.length} 筆訊號</span>
+          </div>
+        </div>
+        <div class="kline-panel">
+          <div class="kline-head">
+            <span>日 K 線</span>
+            <span class="kline-legend">
+              <span class="legend-item" style="color:#2563eb"><span class="legend-dot"></span>5MA</span>
+              <span class="legend-item" style="color:#f59e0b"><span class="legend-dot"></span>10MA</span>
+              <span class="legend-item" style="color:#0f766e"><span class="legend-dot"></span>20MA</span>
+              <span class="legend-item" style="color:#7c3aed"><span class="legend-dot"></span>60MA</span>
+            </span>
+          </div>
+          <div class="kline-chart-wrap">
+            <canvas class="kline-canvas" width="640" height="320"></canvas>
+            <div class="kline-tooltip"></div>
+          </div>
+        </div>
+      </div>`;
+    }
+    function rowHtml(row) {
+      const marketClass = row.market === "TWSE" ? "twse" : "tpex";
+      const selected = state.selectedId === row.id;
+      const mainRow = `<tr data-row-id="${escapeHtml(row.id)}" class="${selected ? "selected-row" : ""}">
+        <td><div class="symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span class="subtle">${escapeHtml(row.date)}</span></div></td>
+        <td><span class="badge ${marketClass}">${escapeHtml(row.market)}</span></td>
+        <td class="reason">${reasonLabelHtml(row)}</td>
+        <td class="score-cell">${scoreHtml(row)}</td>
+        <td class="price">${formatPrice(row.close)}</td>
+        <td>${formatVolumeLots(row.volume)}</td>
+      </tr>`;
+      return selected ? `${mainRow}<tr class="expand-row"><td colspan="6">${klinePanelHtml(row)}</td></tr>` : mainRow;
+    }
+    function cardHtml(row) {
+      const marketClass = row.market === "TWSE" ? "twse" : "tpex";
+      const selected = state.selectedId === row.id;
+      return `<article class="signal-card ${selected ? "selected-row" : ""}" data-row-id="${escapeHtml(row.id)}">
+        <header><div><h3>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</h3><div class="subtle">${escapeHtml(row.date)}</div></div><span class="badge ${marketClass}">${escapeHtml(row.market)}</span></header>
+        <div class="card-row"><span>訊號</span>${reasonLabelHtml(row)}</div>
+        <div class="card-row"><span>評分</span>${scoreHtml(row)}</div>
+        <div class="card-row"><span>收盤</span><strong>${formatPrice(row.close)}</strong></div>
+        <div class="card-row"><span>成交量</span><strong>${formatVolumeLots(row.volume)}</strong></div>
+        ${selected ? `<div class="card-expanded">${klinePanelHtml(row)}</div>` : ""}
+      </article>`;
+    }
+    function activeKlineCanvas() {
+      return document.querySelector(".table-wrap:not(.hidden) .kline-canvas, .cards:not(.hidden) .kline-canvas");
+    }
+    function bindKlineInteractions(canvas) {
+      if (canvas.dataset.bound === "true") return;
+      canvas.dataset.bound = "true";
+      canvas.addEventListener("mousemove", event => {
+        const state = chartState.get(canvas);
+        if (!state || !state.candleRows.length) return;
+        const rect = canvas.getBoundingClientRect();
+        const localX = event.clientX - rect.left;
+        const rawIndex = Math.round((localX - state.pad.left - state.xStep / 2) / state.xStep);
+        const hoverIndex = Math.max(0, Math.min(state.candleRows.length - 1, rawIndex));
+        drawKline(state.sourceRows, hoverIndex);
+      });
+      canvas.addEventListener("mouseleave", () => {
+        const state = chartState.get(canvas);
+        if (!state) return;
+        const tooltip = canvas.parentElement?.querySelector(".kline-tooltip");
+        if (tooltip) tooltip.style.display = "none";
+        drawKline(state.sourceRows, null);
+      });
+    }
+    function chartPalette() {
+      const dark = document.documentElement.dataset.theme === "dark";
+      return dark
+        ? { bg: "#111720", grid: "#2d3747", text: "#9aa7b8", cross: "rgba(203, 213, 225, .42)" }
+        : { bg: "#fbfcfe", grid: "#e5ebf4", text: "#66758c", cross: "rgba(15, 23, 42, .38)" };
+    }
+    function drawEmptyChart(message) {
+      const canvas = activeKlineCanvas();
+      if (!canvas) return;
+      bindKlineInteractions(canvas);
+      chartState.delete(canvas);
+      const tooltip = canvas.parentElement?.querySelector(".kline-tooltip");
+      if (tooltip) tooltip.style.display = "none";
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      const palette = chartPalette();
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      ctx.fillStyle = palette.text;
+      ctx.font = "13px Microsoft JhengHei, Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(message, rect.width / 2, rect.height / 2);
+    }
+    function parseChartDate(value) {
+      const text = String(value ?? "").trim();
+      const match = text.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+      const parsed = new Date(text);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+    function recentMonthRows(rows, months = 3) {
+      const latest = [...rows].reverse().map(row => parseChartDate(row.date)).find(Boolean);
+      if (!latest) return rows.slice(-63);
+      const cutoff = new Date(latest);
+      cutoff.setMonth(cutoff.getMonth() - months);
+      const filtered = rows.filter(row => {
+        const date = parseChartDate(row.date);
+        return date && date >= cutoff && date <= latest;
+      });
+      return filtered.length ? filtered : rows.slice(-63);
+    }
+    function drawKline(rows, hoverIndex = null) {
+      const canvas = activeKlineCanvas();
+      if (!canvas) return;
+      bindKlineInteractions(canvas);
+      if (!rows.length) {
+        drawEmptyChart("沒有 K 線資料");
+        return;
+      }
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const width = rect.width;
+      const height = rect.height;
+      const pad = { top: 16, right: 42, bottom: 28, left: 42 };
+      const volumeHeight = Math.max(44, Math.min(64, height * 0.22));
+      const sectionGap = 14;
+      const volumeBottom = height - pad.bottom;
+      const volumeTop = volumeBottom - volumeHeight;
+      const priceBottom = volumeTop - sectionGap;
+      const plotWidth = width - pad.left - pad.right;
+      const candleRows = recentMonthRows(rows, 3);
+      const palette = chartPalette();
+      const safeHoverIndex = hoverIndex === null ? null : Math.max(0, Math.min(candleRows.length - 1, hoverIndex));
+      const highs = candleRows.map(row => row.high);
+      const lows = candleRows.map(row => row.low);
+      const maxPrice = Math.max(...highs);
+      const minPrice = Math.min(...lows);
+      const priceRange = Math.max(1, maxPrice - minPrice);
+      const maxVolume = Math.max(1, ...candleRows.map(row => row.volume));
+      const xStep = plotWidth / candleRows.length;
+      const candleWidth = Math.max(2, Math.min(8, xStep * 0.58));
+      const priceY = value => pad.top + ((maxPrice - value) / priceRange) * (priceBottom - pad.top);
+      const volumeY = value => volumeBottom - (value / maxVolume) * volumeHeight;
+      chartState.set(canvas, { sourceRows: rows, candleRows, pad, xStep });
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = palette.grid;
+      ctx.lineWidth = 1;
+      ctx.fillStyle = palette.text;
+      ctx.font = "11px Microsoft JhengHei, Arial";
+      ctx.textAlign = "right";
+      for (let i = 0; i <= 4; i += 1) {
+        const y = pad.top + (i / 4) * (priceBottom - pad.top);
+        const price = maxPrice - (i / 4) * priceRange;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(width - pad.right, y);
+        ctx.stroke();
+        ctx.fillText(formatPrice(price), width - 6, y + 4);
+      }
+      candleRows.forEach((row, index) => {
+        const x = pad.left + index * xStep + xStep / 2;
+        const up = row.close >= row.open;
+        const color = up ? "#d92d43" : "#0f8a62";
+        const yOpen = priceY(row.open);
+        const yClose = priceY(row.close);
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(x, priceY(row.high));
+        ctx.lineTo(x, priceY(row.low));
+        ctx.stroke();
+        ctx.fillRect(x - candleWidth / 2, Math.min(yOpen, yClose), candleWidth, Math.max(2, Math.abs(yClose - yOpen)));
+        ctx.globalAlpha = 0.22;
+        const vy = volumeY(row.volume);
+        ctx.fillRect(x - candleWidth / 2, vy, candleWidth, Math.max(1, volumeBottom - vy));
+        ctx.globalAlpha = 1;
+      });
+      ctx.strokeStyle = palette.grid;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, volumeTop);
+      ctx.lineTo(width - pad.right, volumeTop);
+      ctx.moveTo(pad.left, volumeBottom);
+      ctx.lineTo(width - pad.right, volumeBottom);
+      ctx.stroke();
+      ctx.fillStyle = palette.text;
+      ctx.textAlign = "right";
+      ctx.fillText(`量 ${formatVolumeLots(maxVolume)}`, width - 6, volumeTop + 4);
+      const maConfig = [
+        ["ma5", "#2563eb"],
+        ["ma10", "#f59e0b"],
+        ["ma20", "#0f766e"],
+        ["ma60", "#7c3aed"],
+      ];
+      maConfig.forEach(([key, color]) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        let started = false;
+        candleRows.forEach((row, index) => {
+          const value = row[key];
+          if (value === null) return;
+          const x = pad.left + index * xStep + xStep / 2;
+          const y = priceY(value);
+          if (!started) {
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+      });
+      ctx.fillStyle = palette.text;
+      ctx.textAlign = "left";
+      const firstDate = candleRows[0]?.date ?? "";
+      const lastDate = candleRows[candleRows.length - 1]?.date ?? "";
+      ctx.fillText(firstDate, pad.left, height - 12);
+      ctx.textAlign = "right";
+      ctx.fillText(lastDate, width - pad.right, height - 12);
+      const tooltip = canvas.parentElement?.querySelector(".kline-tooltip");
+      const infoIndex = safeHoverIndex !== null ? safeHoverIndex : candleRows.length - 1;
+      if (candleRows[infoIndex]) {
+        const row = candleRows[infoIndex];
+        const x = pad.left + infoIndex * xStep + xStep / 2;
+        const y = priceY(row.close);
+        if (safeHoverIndex !== null) {
+          ctx.save();
+          ctx.strokeStyle = palette.cross;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(x, pad.top);
+          ctx.lineTo(x, volumeBottom);
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(width - pad.right, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = row.close >= row.open ? "#d92d43" : "#0f8a62";
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        if (tooltip) {
+          tooltip.innerHTML = `<strong>${escapeHtml(row.date)}</strong>
+            開 ${formatPrice(row.open)} 高 ${formatPrice(row.high)} 低 ${formatPrice(row.low)} 收 ${formatPrice(row.close)}<br>
+            量 ${formatVolumeLots(row.volume)}<br>
+            5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)}<br>
+            20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}`;
+          tooltip.style.display = "block";
+          tooltip.style.left = "10px";
+          tooltip.style.top = "10px";
+        }
+      } else if (tooltip) {
+        tooltip.style.display = "none";
+      }
+    }
+    async function renderSelectedChart(row) {
+      if (!row) return;
+      drawEmptyChart("讀取 K 線中");
+      try {
+        const csvPath = row.source.replaceAll("\\", "/");
+        let parsed = csvCache.get(csvPath);
+        if (!parsed) {
+          const response = await fetch(encodeURI(csvPath), { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          parsed = parseCsv(await response.text()).map(item => ({
+            date: item.date,
+            open: toNumber(item.open),
+            high: toNumber(item.high),
+            low: toNumber(item.low),
+            close: toNumber(item.close),
+            volume: toNumber(item.volume_shares) ?? 0,
+          })).filter(item => item.open !== null && item.high !== null && item.low !== null && item.close !== null);
+          parsed.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+          const ma5 = movingAverageRows(parsed, "close", 5);
+          const ma10 = movingAverageRows(parsed, "close", 10);
+          const ma20 = movingAverageRows(parsed, "close", 20);
+          const ma60 = movingAverageRows(parsed, "close", 60);
+          parsed = parsed.map((item, index) => ({ ...item, ma5: ma5[index], ma10: ma10[index], ma20: ma20[index], ma60: ma60[index] }));
+          csvCache.set(csvPath, parsed);
+        }
+        drawKline(parsed);
+      } catch (error) {
+        drawEmptyChart("K 線資料讀取失敗");
+      }
+    }
+    function renderTable(rows) {
+      if (!rows.length || !rows.some(row => row.id === state.selectedId)) state.selectedId = null;
+      const forceCards = window.matchMedia("(max-width: 760px)").matches;
+      el.signalTable.innerHTML = rows.map(rowHtml).join("");
+      el.signalCards.innerHTML = rows.map(cardHtml).join("");
+      el.emptyState.classList.toggle("hidden", rows.length > 0);
+      el.tableWrap.classList.toggle("hidden", rows.length === 0 || state.view !== "table" || forceCards);
+      el.signalCards.classList.toggle("hidden", rows.length === 0 || (state.view !== "cards" && !forceCards));
+      el.signalCards.style.display = rows.length > 0 && (state.view === "cards" || forceCards) ? "grid" : "";
+      const selectedRow = rows.find(row => row.id === state.selectedId);
+      el.focusPanel.innerHTML = focusHtml(selectedRow);
+      if (selectedRow) renderSelectedChart(selectedRow);
+      [...document.querySelectorAll("[data-row-id]")].forEach(node => {
+        node.addEventListener("click", event => {
+          if (event.target.closest(".card-expanded")) return;
+          state.selectedId = state.selectedId === node.dataset.rowId ? null : node.dataset.rowId;
+          renderTable(rows);
+        });
+      });
+    }
+    function renderSummary(rows, allRows) {
+      const stockCount = new Set(rows.map(row => `${row.market}:${row.stock_no}`)).size;
+      const dates = uniqueValues(rows, "date");
+      const marketCounts = countBy(rows, "market");
+      el.metricTotal.textContent = rows.length.toLocaleString("zh-TW");
+      el.metricStocks.textContent = stockCount.toLocaleString("zh-TW");
+      el.metricDate.textContent = dates.length === 1 ? dates[0] : (dates.length ? `${dates.length} 日` : "-");
+      el.metricTwse.textContent = String(marketCounts.TWSE || 0);
+      el.metricTpex.textContent = String(marketCounts.TPEX || 0);
+      el.visibleCount.textContent = `${rows.length.toLocaleString("zh-TW")} / ${allRows.length.toLocaleString("zh-TW")}`;
+      renderBars(el.marketBars, marketCounts, "market");
+      if (el.strategyBars) renderBars(el.strategyBars, countBy(rows, "strategy"), "strategy");
+      renderReasonChips(rows);
+      renderQuickChips(state.rows);
+      renderRadarPanels(rows);
+    }
+    function applyFilters() {
+      const search = state.filters.search.toLowerCase();
+      state.filtered = state.rows.filter(row => {
+        const text = `${row.market} ${row.stock_no} ${row.stock_name} ${row.strategy} ${row.reason} ${row.date} ${row.score} ${row.score_reasons.join(" ")}`.toLowerCase();
+        return (!search || text.includes(search))
+          && (state.filters.market === "all" || row.market === state.filters.market)
+          && (state.filters.strategy === "all" || row.strategies.includes(state.filters.strategy))
+          && (state.filters.reason === "all" || row.reasons.includes(state.filters.reason));
+      });
+      const sorted = sortRows(state.filtered);
+      renderSummary(sorted, state.rows);
+      renderTable(sorted);
+    }
+    function loadRows(rows, sourceLabel) {
+      state.rows = groupRows(rows);
+      state.selectedId = null;
+      state.filters = { search: el.searchInput.value.trim(), market: "all", strategy: "all", reason: "all" };
+      fillSelect(el.marketFilter, "全部市場", uniqueValues(state.rows, "market"));
+      fillSelect(el.strategyFilter, "全部策略", uniqueValues(state.rows, "strategy"));
+      fillSelect(el.reasonFilter, "全部訊號", uniqueValues(state.rows, "reason"));
+      el.marketFilter.value = "all";
+      el.strategyFilter.value = "all";
+      el.reasonFilter.value = "all";
+      const latestDate = uniqueValues(state.rows, "date").slice(-1)[0] || "-";
+      el.dataMeta.textContent = `${sourceLabel} · ${state.rows.length.toLocaleString("zh-TW")} 筆 · 最新 ${latestDate}`;
+      el.updateTime.textContent = new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+      setError("");
+      applyFilters();
+    }
+    async function loadDefaultData() {
+      try {
+        const response = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const rows = await response.json();
+        if (!Array.isArray(rows)) throw new Error("JSON root is not an array");
+        loadRows(rows, DATA_URL);
+      } catch (error) {
+        setError(`無法讀取 ${DATA_URL}。請先執行 alert_signals.py，或用右上角載入 JSON。`);
+        el.dataMeta.textContent = "尚未載入資料";
+        loadRows([], "未載入");
+      }
+    }
+    function setView(view) {
+      state.view = view;
+      el.tableMode.classList.toggle("active", view === "table");
+      el.cardMode.classList.toggle("active", view === "cards");
+      applyFilters();
+    }
+    function applyTheme(theme) {
+      const nextTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem("signalDashboardTheme", nextTheme);
+      if (el.themeToggle) {
+        const isDark = nextTheme === "dark";
+        el.themeToggle.textContent = isDark ? "日間" : "夜間";
+        el.themeToggle.setAttribute("aria-pressed", String(isDark));
+        el.themeToggle.title = isDark ? "切換日間模式" : "切換夜間模式";
+      }
+      if (state.filtered.length) renderTable(sortRows(state.filtered));
+    }
+    function initTheme() {
+      const stored = localStorage.getItem("signalDashboardTheme");
+      const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+      applyTheme(stored || (prefersDark ? "dark" : "light"));
+    }
+    function toggleTheme() {
+      applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    }
+
+    function updateSyncUi(status) {
+      const total = Number(status.total || 0);
+      const completed = Number(status.completed || 0);
+      const percent = total ? Math.min(100, Math.max(0, Number(status.percent || 0))) : 0;
+      el.syncMessage.textContent = status.message || "待命";
+      el.syncCurrent.textContent = status.current ? `目前處理：${status.current}` : "尚未開始同步";
+      el.syncPercent.textContent = `${percent.toFixed(1)}%`;
+      el.syncProgress.style.width = `${percent}%`;
+      el.syncCompleted.textContent = `${completed.toLocaleString("zh-TW")} / ${total.toLocaleString("zh-TW")}`;
+      el.syncFailed.textContent = Number(status.failed || 0).toLocaleString("zh-TW");
+      el.syncMatches.textContent = Number(status.matches || 0).toLocaleString("zh-TW");
+      const last = status.last_match;
+      el.syncLastMatch.textContent = last ? `${last.stock_no} ${last.stock_name}` : "-";
+      el.syncButton.disabled = Boolean(status.running);
+      el.syncButton.textContent = status.running ? "同步中" : "同步今日資料";
+      const log = Array.isArray(status.log) ? status.log.slice(-8).reverse() : [];
+      el.syncLog.innerHTML = log.length
+        ? log.map(item => `<div><strong>${escapeHtml(item.time)}</strong> ${escapeHtml(item.message)}</div>`).join("")
+        : "<div>同步時會在這裡顯示下載與掃描進度。</div>";
+    }
+    async function pollStatus() {
+      try {
+        const response = await fetch(`${API_ORIGIN}/api/status`, { cache: "no-store" });
+        if (!response.ok) return null;
+        const status = await response.json();
+        updateSyncUi(status);
+        return status;
+      } catch (error) {
+        // Static http.server mode: leave sync UI idle and let sync button explain the missing API.
+        return null;
+      }
+    }
+    function stopStatusPolling() {
+      if (!statusPollTimer) return;
+      clearInterval(statusPollTimer);
+      statusPollTimer = null;
+    }
+    function startStatusPolling() {
+      if (statusPollTimer) return;
+      statusPollTimer = setInterval(async () => {
+        const status = await pollStatus();
+        if (status && !status.running) {
+          stopStatusPolling();
+          await loadDefaultData();
+        }
+      }, 1200);
+    }
+    function subscribeSyncEvents() {
+      if (eventSource) eventSource.close();
+      eventSource = new EventSource(`${API_ORIGIN}/api/events`);
+      eventSource.onmessage = async event => {
+        const status = JSON.parse(event.data);
+        updateSyncUi(status);
+        if (!status.running) {
+          eventSource.close();
+          eventSource = null;
+          stopStatusPolling();
+          await loadDefaultData();
+        }
+      };
+      eventSource.onerror = () => {
+        if (eventSource) eventSource.close();
+        eventSource = null;
+        startStatusPolling();
+      };
+    }
+    async function startSync() {
+      setError("");
+      el.syncButton.disabled = true;
+      el.syncButton.textContent = "同步中";
+      el.syncMessage.textContent = "同步準備中";
+      el.syncCurrent.textContent = "正在連線同步 API";
+      try {
+        const response = await fetch(`${API_ORIGIN}/api/sync`, { method: "POST" });
+        if (response.status === 409) {
+          el.syncMessage.textContent = "同步已在進行，正在接上目前進度";
+          subscribeSyncEvents();
+          startStatusPolling();
+          await pollStatus();
+          return;
+        }
+        if (!response.ok) {
+          const text = await response.text();
+          setError(`同步啟動失敗：${text || `HTTP ${response.status}`}`);
+          await pollStatus();
+          return;
+        }
+        subscribeSyncEvents();
+        startStatusPolling();
+        await pollStatus();
+      } catch (error) {
+        el.syncButton.disabled = false;
+        el.syncButton.textContent = "同步今日資料";
+        setError("同步 API 無法使用。請用 dashboard_server.py 啟動看板，而不是 python -m http.server。");
+      }
+    }
+
+    document.querySelectorAll("th.sortable").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sort;
+        if (state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        else {
+          state.sortKey = key;
+          state.sortDir = key === "close" || key === "volume" || key === "score" ? "desc" : "asc";
+        }
+        applyFilters();
+      });
+    });
+    el.searchInput.addEventListener("input", () => { state.filters.search = el.searchInput.value.trim(); applyFilters(); });
+    el.marketFilter.addEventListener("change", () => { state.filters.market = el.marketFilter.value; applyFilters(); });
+    el.strategyFilter.addEventListener("change", () => { state.filters.strategy = el.strategyFilter.value; applyFilters(); });
+    el.reasonFilter.addEventListener("change", () => { state.filters.reason = el.reasonFilter.value; applyFilters(); });
+    el.resetButton.addEventListener("click", resetFilters);
+    el.reloadButton.addEventListener("click", loadDefaultData);
+    el.tableMode.addEventListener("click", () => setView("table"));
+    el.cardMode.addEventListener("click", () => setView("cards"));
+    el.themeToggle?.addEventListener("click", toggleTheme);
+    el.syncButton.addEventListener("click", startSync);
+    window.addEventListener("resize", () => renderTable(sortRows(state.filtered)));
+    el.fileInput.addEventListener("change", async () => {
+      const file = el.fileInput.files[0];
+      if (!file) return;
+      try {
+        const rows = JSON.parse(await file.text());
+        if (!Array.isArray(rows)) throw new Error("JSON root is not an array");
+        loadRows(rows, file.name);
+      } catch (error) {
+        setError("JSON 載入失敗。");
+      }
+    });
+
+    initTheme();
+    loadDefaultData();
+    pollStatus();
+  </script>
+</body>
+</html>
