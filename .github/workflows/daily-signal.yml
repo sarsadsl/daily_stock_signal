@@ -87,4 +87,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name daily-stock-signal
+          command: pages deploy site --project-name daily_stock_signal
