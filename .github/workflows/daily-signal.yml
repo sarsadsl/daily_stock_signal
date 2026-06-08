@@ -30,12 +30,18 @@ jobs:
       - name: Sync market data
         run: python sync_today.py --workers 6 --mode auto
 
-      - name: Build reports and send Telegram
+      - name: Build signal reports
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALERT_MAX_ITEMS: "30"
-        run: python alert_signals.py --channel telegram --chart-items 4 --max-items 30 --send-empty
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            python alert_signals.py --channel telegram --chart-items 4 --max-items 30 --send-empty
+          else
+            echo "Telegram secrets are not configured; building reports without sending a notification."
+            python alert_signals.py --dry-run --chart-items 4 --max-items 30
+          fi
 
       - name: Build static site
         shell: pwsh
