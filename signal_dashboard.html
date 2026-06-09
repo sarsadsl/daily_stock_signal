@@ -984,22 +984,26 @@
     .kline-tooltip {
       position: absolute;
       z-index: 3;
-      min-width: 172px;
-      max-width: 220px;
-      padding: 8px 10px;
+      min-width: 260px;
+      max-width: 310px;
+      padding: 6px 8px;
       border: 1px solid rgba(15, 23, 42, .12);
       border-radius: 8px;
       background: rgba(255, 255, 255, .96);
       box-shadow: 0 14px 32px rgba(15, 23, 42, .16);
       color: var(--ink);
       font-size: 12px;
-      line-height: 1.45;
+      line-height: 1.28;
       pointer-events: none;
       display: none;
     }
     .kline-tooltip strong {
       display: block;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+    }
+    .kline-tooltip .tooltip-line {
+      display: block;
+      white-space: nowrap;
     }
     .focus-stat {
       padding: 9px;
@@ -1894,11 +1898,11 @@
         height: 230px;
       }
       .kline-tooltip {
-        min-width: 0;
-        max-width: 152px;
+        min-width: 184px;
+        max-width: 210px;
         padding: 5px 7px;
         font-size: 10.5px;
-        line-height: 1.28;
+        line-height: 1.22;
         background: rgba(255, 255, 255, 0.76);
       }
       .side-body {
@@ -2068,7 +2072,7 @@
     }
     const csvCache = new Map();
     const chartState = new WeakMap();
-    const CARD_PAGE_SIZE = 5;
+    const CARD_PAGE_SIZE = 6;
     let eventSource = null;
     let statusPollTimer = null;
     const state = {
@@ -2607,15 +2611,13 @@
     function klineTooltipHtml(row, changePercent) {
       if (isMobileLayout()) {
         return `<strong>${escapeHtml(row.date)}</strong>
-          C ${formatPrice(row.close)} · ${escapeHtml(changePercent)}<br>
-          H ${formatPrice(row.high)} / L ${formatPrice(row.low)}`;
+          <span class="tooltip-line">收 ${formatPrice(row.close)} · 漲幅 ${escapeHtml(changePercent)}</span>
+          <span class="tooltip-line">高 ${formatPrice(row.high)} / 低 ${formatPrice(row.low)} · vol ${formatVolumeLots(row.volume)}</span>`;
       }
       return `<strong>${escapeHtml(row.date)}</strong>
-        O ${formatPrice(row.open)} H ${formatPrice(row.high)} L ${formatPrice(row.low)} C ${formatPrice(row.close)}<br>
-        Change ${escapeHtml(changePercent)}<br>
-        Vol ${formatVolumeLots(row.volume)}<br>
-        5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)}<br>
-        20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}`;
+        <span class="tooltip-line">開 ${formatPrice(row.open)} · 高 ${formatPrice(row.high)} · 低 ${formatPrice(row.low)} · 收 ${formatPrice(row.close)}</span>
+        <span class="tooltip-line">漲幅 ${escapeHtml(changePercent)} · vol ${formatVolumeLots(row.volume)}</span>
+        <span class="tooltip-line">5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)} · 20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}</span>`;
     }
     function hoverKlineAtClientX(canvas, clientX) {
       const currentState = chartState.get(canvas);
