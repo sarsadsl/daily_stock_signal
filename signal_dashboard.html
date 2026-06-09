@@ -914,6 +914,16 @@
       background: var(--panel);
       box-shadow: none;
     }
+    .quick-filter-panel::after {
+      content: "";
+      position: absolute;
+      left: -2px;
+      right: -2px;
+      bottom: -16px;
+      height: 16px;
+      background: #fffefb;
+      pointer-events: none;
+    }
     .focus-card {
       display: grid;
       gap: 10px;
@@ -1554,6 +1564,9 @@
       background: var(--panel);
       box-shadow: none;
     }
+    :root[data-theme="dark"] .quick-filter-panel::after {
+      background: #111720;
+    }
     :root[data-theme="dark"] .brief-card,
     :root[data-theme="dark"] .radar-mini,
     :root[data-theme="dark"] .rank-item {
@@ -1757,6 +1770,12 @@
         radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
         #fffefb;
     }
+    .side-body > .quick-filter-panel {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
+        #fffefb;
+      box-shadow: none;
+    }
     .kline-tooltip {
       left: 10px;
       top: 10px;
@@ -1779,6 +1798,12 @@
       background:
         radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
         #111720;
+    }
+    :root[data-theme="dark"] .side-body > .quick-filter-panel {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
+        #111720;
+      box-shadow: none;
     }
     :root[data-theme="dark"] .sync-panel,
     :root[data-theme="dark"] .site-footer,
