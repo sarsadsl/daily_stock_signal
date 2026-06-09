@@ -332,7 +332,7 @@
 
     .summary {
       display: grid;
-      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
       gap: 10px;
       padding: 14px 20px 0;
     }
@@ -358,8 +358,6 @@
     .metric:nth-child(1) { --accent: var(--red); }
     .metric:nth-child(2) { --accent: var(--teal); }
     .metric:nth-child(3) { --accent: var(--amber); }
-    .metric:nth-child(4) { --accent: var(--blue); }
-    .metric:nth-child(5) { --accent: var(--green); }
     .metric span {
       display: block;
       color: var(--muted);
@@ -2012,17 +2010,16 @@
       }
 
       .summary {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.85fr) minmax(132px, 1.3fr);
         gap: 8px;
-        overflow-x: auto;
+        overflow-x: hidden;
         max-width: 100%;
-        overscroll-behavior-x: contain;
-        touch-action: pan-x pan-y;
-        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
         padding: 8px 12px 0;
       }
       .metric {
-        flex: 0 0 148px;
+        min-width: 0;
         padding: 10px 11px 12px;
       }
       .metric strong { font-size: 20px; }
@@ -2150,8 +2147,6 @@
       <div class="metric"><span>符合筆數</span><strong id="metricTotal">0</strong></div>
       <div class="metric"><span>股票檔數</span><strong id="metricStocks">0</strong></div>
       <div class="metric"><span>訊號日期</span><strong id="metricDate">-</strong></div>
-      <div class="metric"><span>TWSE</span><strong id="metricTwse">0</strong></div>
-      <div class="metric"><span>TPEX</span><strong id="metricTpex">0</strong></div>
     </section>
 
     <main class="content">
@@ -2304,8 +2299,6 @@
       metricTotal: document.getElementById("metricTotal"),
       metricStocks: document.getElementById("metricStocks"),
       metricDate: document.getElementById("metricDate"),
-      metricTwse: document.getElementById("metricTwse"),
-      metricTpex: document.getElementById("metricTpex"),
       marketBars: document.getElementById("marketBars"),
       strategyBars: document.getElementById("strategyBars"),
       reasonChips: document.getElementById("reasonChips"),
@@ -3310,8 +3303,6 @@
       el.metricTotal.textContent = rows.length.toLocaleString("zh-TW");
       el.metricStocks.textContent = stockCount.toLocaleString("zh-TW");
       el.metricDate.textContent = dates.length === 1 ? dates[0] : (dates.length ? `${dates.length} 日` : "-");
-      el.metricTwse.textContent = String(marketCounts.TWSE || 0);
-      el.metricTpex.textContent = String(marketCounts.TPEX || 0);
       el.visibleCount.textContent = `${rows.length.toLocaleString("zh-TW")} / ${allRows.length.toLocaleString("zh-TW")}`;
       renderBars(el.marketBars, marketCounts, "market");
       if (el.strategyBars) renderBars(el.strategyBars, countBy(rows, "strategy"), "strategy");
