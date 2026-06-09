@@ -1262,31 +1262,47 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 46px;
-      min-height: 26px;
-      padding: 3px 8px;
-      border: 1px solid color-mix(in srgb, var(--tone-main) 36%, var(--line));
-      border-radius: 999px;
-      background: var(--tone-bg);
+      width: 34px;
+      height: 32px;
+      padding: 0;
+      border: 2px solid var(--ink);
+      border-radius: 2px;
+      background:
+        radial-gradient(circle at 3px 3px, rgba(255, 255, 255, 0.42) 1px, transparent 1.6px) 0 0 / 7px 7px,
+        var(--tone-bg);
       color: var(--tone-ink);
-      font-size: 11px;
+      box-shadow: 3px 3px 0 rgba(21, 32, 51, 0.18);
+      font-size: 13px;
       font-weight: 900;
       white-space: nowrap;
     }
     .rank-medal.gold {
       color: #92400e;
-      background: linear-gradient(180deg, #fff7cc, #facc15);
+      background:
+        radial-gradient(circle at 3px 3px, rgba(255, 255, 255, 0.5) 1px, transparent 1.6px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #fff7cc, #facc15);
       border-color: #f59e0b;
     }
     .rank-medal.silver {
       color: #334155;
-      background: linear-gradient(180deg, #f8fafc, #cbd5e1);
+      background:
+        radial-gradient(circle at 3px 3px, rgba(255, 255, 255, 0.52) 1px, transparent 1.6px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #f8fafc, #cbd5e1);
       border-color: #94a3b8;
     }
     .rank-medal.bronze {
       color: #7c2d12;
-      background: linear-gradient(180deg, #ffedd5, #fb923c);
+      background:
+        radial-gradient(circle at 3px 3px, rgba(255, 255, 255, 0.42) 1px, transparent 1.6px) 0 0 / 7px 7px,
+        linear-gradient(180deg, #ffedd5, #fb923c);
       border-color: #ea580c;
+    }
+    .rank-medal.plain {
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 3px 3px, rgba(255, 255, 255, 0.38) 1px, transparent 1.6px) 0 0 / 7px 7px,
+        #f8fbff;
+      border-color: var(--line);
     }
     .rank-item {
       display: grid;
@@ -2560,14 +2576,14 @@
     }
     function rankItemHtml(row, index, weightedScore = null) {
       const medalLabels = [
-        { text: "金牌", className: "gold" },
-        { text: "銀牌", className: "silver" },
-        { text: "銅牌", className: "bronze" },
+        { text: "金", title: "金牌", className: "gold" },
+        { text: "銀", title: "銀牌", className: "silver" },
+        { text: "銅", title: "銅牌", className: "bronze" },
       ];
-      const medal = medalLabels[index] || { text: `第${index + 1}`, className: "plain" };
+      const medal = medalLabels[index] || { text: String(index + 1), title: `第${index + 1}名`, className: "plain" };
       const scoreText = weightedScore === null
         ? starHtml(row.score)
-        : `<span class="rank-medal ${medal.className}">${medal.text}</span>`;
+        : `<span class="rank-medal ${medal.className}" title="${escapeHtml(medal.title)}">${escapeHtml(medal.text)}</span>`;
       return `<button class="rank-item" type="button" data-radar-id="${escapeHtml(row.id)}">
         <span class="rank-no">${index + 1}</span>
         <span class="rank-symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span>${escapeHtml(row.reason)}</span></span>
