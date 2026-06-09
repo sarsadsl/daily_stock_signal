@@ -72,11 +72,15 @@ $dashboardSource = Join-Path $rootPath "signal_dashboard.html"
 $dashboardTarget = Join-Path $sitePath "index.html"
 Copy-FileIfExists -Source $dashboardSource -Destination $dashboardTarget
 
+$rankingsSource = Join-Path $rootPath "top_signal_rankings.html"
+$rankingsTarget = Join-Path $sitePath "rankings.html"
+Copy-FileIfExists -Source $rankingsSource -Destination $rankingsTarget
+
 $reportsSource = Join-Path $rootPath "reports"
 if (Test-Path -LiteralPath $reportsSource) {
     $reportsTarget = Join-Path $sitePath "reports"
     New-Item -ItemType Directory -Path $reportsTarget -Force | Out-Null
-    foreach ($name in @("daily_signal_alert.json", "daily_signal_alert.csv", "daily_signal_alert.txt")) {
+    foreach ($name in @("daily_signal_alert.json", "daily_signal_alert.csv", "daily_signal_alert.txt", "daily_signal_top_lists.json")) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
 }

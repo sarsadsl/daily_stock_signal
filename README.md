@@ -177,6 +177,12 @@ Telegram：
 [Environment]::SetEnvironmentVariable("TELEGRAM_CHAT_ID", "你的 chat id", "User")
 ```
 
+Telegram 可直接上傳本機 K 線圖，不需要公開 HTTPS 圖床：
+
+```powershell
+& "$env:USERPROFILE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" alert_signals.py --channel telegram --chart-items 4 --max-items 4
+```
+
 Discord 或其他 webhook：
 
 ```powershell

@@ -13,6 +13,7 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from plot_kline import plot_chart
 from run_market_backtest import STRATEGIES, csv_files, prepare, read_rows, value_at
@@ -24,6 +25,8 @@ DEFAULT_REPORT_PATH = REPORT_DIR / "daily_signal_alert.txt"
 DEFAULT_JSON_PATH = REPORT_DIR / "daily_signal_alert.json"
 DEFAULT_CHART_DIR = Path("charts/daily_alert")
 MIN_SIGNAL_VOLUME_SHARES = 1_000_000
+PULLBACK_KEYWORDS = ("回測", "支撐")
+BREAKOUT_KEYWORDS = ("突破", "帶量紅K")
 
 
 def parse_multi_values(values: list[str] | None) -> set[str]:
@@ -147,6 +150,83 @@ def group_matches_for_display(matches: list[dict[str, Any]]) -> list[dict[str, A
     return sorted(grouped.values(), key=lambda item: (item["market"], item["stock_no"]))
 
 
+def grouped_signal_rank_key(item: dict[str, Any]) -> tuple[float, float, float, int]:
+    return (
+        float(item.get("score") or 0),
+        float(item.get("volume_ratio") or 0),
+        float(item.get("ma20_slope_pct") or 0) + float(item.get("ma60_slope_pct") or 0),
+        int(item.get("volume") or 0),
+    )
+
+
+def signal_has_keyword(item: dict[str, Any], keywords: tuple[str, ...]) -> bool:
+    text = " ".join(str(reason) for reason in item.get("reasons") or [item.get("reason", "")])
+    return any(keyword in text for keyword in keywords)
+
+
+def strongest_signal_lists(matches: list[dict[str, Any]], count: int = 5) -> dict[str, list[dict[str, Any]]]:
+    grouped = group_matches_for_display(matches)
+    pullbacks = [item for item in grouped if signal_has_keyword(item, PULLBACK_KEYWORDS)]
+    breakouts = [item for item in grouped if signal_has_keyword(item, BREAKOUT_KEYWORDS)]
+    pullbacks.sort(key=grouped_signal_rank_key, reverse=True)
+    breakouts.sort(key=grouped_signal_rank_key, reverse=True)
+    return {
+        "pullback": pullbacks[:count],
+        "breakout": breakouts[:count],
+    }
+
+
+def chart_sources_for_top_lists(top_lists: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for list_items in top_lists.values():
+        for item in list_items:
+            selected.append(item)
+    return selected
+
+
+def build_ranked_signal_text(title: str, rank: int, item: dict[str, Any]) -> str:
+    lines = [
+        f"{title} 第{rank}名",
+        f"{item['stock_no']} {item['stock_name']} ({item['market']})",
+        f"訊號: {'、'.join(item['reasons'])}",
+        f"評分: {item.get('score_label', '-')}",
+    ]
+    if item.get("score_reasons"):
+        lines.append(f"依據: {'、'.join(item['score_reasons'][:3])}")
+    lines.extend(
+        [
+            f"收盤: {format_price(item['close'])} 量: {format_volume_lots(int(item['volume']))}",
+            (
+                "均線: "
+                f"5MA {format_price(item['ma5'])}, "
+                f"10MA {format_price(item['ma10'])}, "
+                f"20MA {format_price(item['ma20'])}, "
+                f"60MA {format_price(item['ma60'])}"
+            ),
+        ]
+    )
+    if item.get("volume_ratio"):
+        lines.append(f"量能: 20日均量 {float(item['volume_ratio']):.2f}x")
+    if item.get("chart_path"):
+        lines.append(f"K線圖: {item['chart_path']}")
+    return "\n".join(lines)
+
+
+def build_top_lists_message(top_lists: dict[str, list[dict[str, Any]]], signal_date: str) -> str:
+    now_text = datetime.now().strftime("%Y-%m-%d %H:%M")
+    pullback_count = len(top_lists["pullback"])
+    breakout_count = len(top_lists["breakout"])
+    return "\n".join(
+        [
+            f"每日策略警示 {now_text}",
+            f"訊號日期: {signal_date}",
+            f"本次只推送回檔最強前{pullback_count}名、突破最強前{breakout_count}名。",
+            "每一名會各自附上一張 K 線圖。",
+            "提醒: 這是策略篩選結果，進場前仍請搭配風險控管與部位規劃。",
+        ]
+    )
+
+
 def build_message(matches: list[dict[str, Any]], max_items: int = 30) -> str:
     now_text = datetime.now().strftime("%Y-%m-%d %H:%M")
     if not matches:
@@ -199,6 +279,47 @@ def post_json(url: str, payload: dict[str, Any], headers: dict[str, str] | None 
         response.read()
 
 
+def post_multipart(url: str, fields: dict[str, str], files: dict[str, Path]) -> None:
+    boundary = f"----stock-alert-{uuid4().hex}"
+    body_parts: list[bytes] = []
+
+    for name, value in fields.items():
+        body_parts.extend(
+            [
+                f"--{boundary}\r\n".encode("utf-8"),
+                f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode("utf-8"),
+                str(value).encode("utf-8"),
+                b"\r\n",
+            ]
+        )
+
+    for name, path in files.items():
+        filename = path.name
+        body_parts.extend(
+            [
+                f"--{boundary}\r\n".encode("utf-8"),
+                (
+                    f'Content-Disposition: form-data; name="{name}"; '
+                    f'filename="{filename}"\r\n'
+                ).encode("utf-8"),
+                b"Content-Type: image/png\r\n\r\n",
+                path.read_bytes(),
+                b"\r\n",
+            ]
+        )
+
+    body_parts.append(f"--{boundary}--\r\n".encode("utf-8"))
+    body = b"".join(body_parts)
+    request = urllib.request.Request(
+        url,
+        data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        response.read()
+
+
 def line_image_url(path: Path, base_url: str) -> str:
     return f"{base_url.rstrip('/')}/{path.name}"
 
@@ -225,7 +346,7 @@ def send_line_message(message: str, image_urls: list[str] | None = None) -> bool
     return True
 
 
-def send_telegram_message(message: str) -> bool:
+def send_telegram_message(message: str, image_paths: list[Path] | None = None) -> bool:
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not token or not chat_id:
@@ -234,6 +355,44 @@ def send_telegram_message(message: str) -> bool:
         f"https://api.telegram.org/bot{token}/sendMessage",
         {"chat_id": chat_id, "text": message},
     )
+    for image_path in image_paths or []:
+        if not image_path.exists():
+            continue
+        post_multipart(
+            f"https://api.telegram.org/bot{token}/sendPhoto",
+            {
+                "chat_id": chat_id,
+                "caption": image_path.stem,
+            },
+            {"photo": image_path},
+        )
+    return True
+
+
+def send_telegram_ranked_messages(top_lists: dict[str, list[dict[str, Any]]]) -> bool:
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
+
+    for title, key in (("回檔最強", "pullback"), ("突破最強", "breakout")):
+        for rank, item in enumerate(top_lists[key], start=1):
+            text = build_ranked_signal_text(title, rank, item)
+            chart_path = Path(str(item["chart_path"])) if item.get("chart_path") else None
+            if chart_path and chart_path.exists():
+                post_multipart(
+                    f"https://api.telegram.org/bot{token}/sendPhoto",
+                    {
+                        "chat_id": chat_id,
+                        "caption": text[:1024],
+                    },
+                    {"photo": chart_path},
+                )
+            else:
+                post_json(
+                    f"https://api.telegram.org/bot{token}/sendMessage",
+                    {"chat_id": chat_id, "text": text},
+                )
     return True
 
 
@@ -245,7 +404,12 @@ def send_webhook_message(message: str) -> bool:
     return True
 
 
-def send_message(message: str, channels: set[str] | None = None, image_urls: list[str] | None = None) -> list[str]:
+def send_message(
+    message: str,
+    channels: set[str] | None = None,
+    image_urls: list[str] | None = None,
+    image_paths: list[Path] | None = None,
+) -> list[str]:
     enabled_channels = {channel.casefold() for channel in channels or set()}
 
     def channel_enabled(name: str) -> bool:
@@ -254,7 +418,7 @@ def send_message(message: str, channels: set[str] | None = None, image_urls: lis
     sent: list[str] = []
     if channel_enabled("line") and send_line_message(message, image_urls=image_urls):
         sent.append("line")
-    if channel_enabled("telegram") and send_telegram_message(message):
+    if channel_enabled("telegram") and send_telegram_message(message, image_paths=image_paths):
         sent.append("telegram")
     if channel_enabled("webhook") and send_webhook_message(message):
         sent.append("webhook")
@@ -321,12 +485,23 @@ def write_reports(matches: list[dict[str, Any]], message: str) -> None:
             writer.writerow(row)
 
 
+def write_top_list_reports(top_lists: dict[str, list[dict[str, Any]]]) -> None:
+    REPORT_DIR.mkdir(exist_ok=True)
+    output = {
+        "pullback": top_lists["pullback"],
+        "breakout": top_lists["breakout"],
+    }
+    (REPORT_DIR / "daily_signal_top_lists.json").write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Scan latest TWSE/TPEx CSV data and send strategy alerts.")
     parser.add_argument("--all-dates", action="store_true", help="Scan each file's own latest date instead of one global latest date.")
     parser.add_argument("--dry-run", action="store_true", help="Write reports and print the message without sending notifications.")
     parser.add_argument("--max-items", type=int, default=int(os.getenv("ALERT_MAX_ITEMS", "30")), help="Maximum matching rows to include in the pushed text message.")
     parser.add_argument("--send-empty", action="store_true", help="Send a notification even when no stocks match.")
+    parser.add_argument("--top-lists", action="store_true", help="Send only strongest pullback and breakout lists.")
+    parser.add_argument("--top-count", type=int, default=int(os.getenv("ALERT_TOP_COUNT", "5")), help="Number of ranked items per top list.")
     parser.add_argument(
         "--chart-items",
         type=int,
@@ -374,7 +549,16 @@ def main() -> int:
         reason_contains=args.reason_contains,
     )
     chart_paths = generate_signal_charts(matches, limit=args.chart_items, output_dir=args.chart_output_dir)
-    message = build_message(matches, max_items=args.max_items)
+    top_lists: dict[str, list[dict[str, Any]]] | None = None
+    if args.top_lists:
+        top_lists = strongest_signal_lists(matches, count=args.top_count)
+        chart_targets = chart_sources_for_top_lists(top_lists)
+        chart_paths = generate_signal_charts(chart_targets, limit=len(chart_targets), output_dir=args.chart_output_dir)
+        signal_date = matches[0]["date"] if matches else "-"
+        message = build_top_lists_message(top_lists, signal_date)
+        write_top_list_reports(top_lists)
+    else:
+        message = build_message(matches, max_items=args.max_items)
     write_reports(matches, message)
     print(message)
 
@@ -387,7 +571,11 @@ def main() -> int:
     try:
         image_base_url = os.getenv("ALERT_IMAGE_BASE_URL", "").strip()
         image_urls = [line_image_url(path, image_base_url) for path in chart_paths] if image_base_url else []
-        sent = send_message(message, channels=channels, image_urls=image_urls)
+        sent = send_message(message, channels=channels, image_urls=image_urls, image_paths=[] if args.top_lists else chart_paths)
+        if top_lists and ("telegram" in {channel.casefold() for channel in channels} or not channels):
+            if send_telegram_ranked_messages(top_lists):
+                if "telegram" not in sent:
+                    sent.append("telegram")
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         print(f"Notification failed: {exc}", file=sys.stderr)
         return 2
