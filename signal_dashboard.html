@@ -64,12 +64,16 @@
     html {
       min-height: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
+      max-width: 100%;
       scrollbar-gutter: stable;
     }
     body {
       margin: 0;
       min-height: 100vh;
       overflow-y: auto;
+      overflow-x: hidden;
+      max-width: 100%;
       background:
         radial-gradient(circle at 1px 1px, rgba(21, 32, 51, 0.13) 1px, transparent 1.7px) 0 0 / 18px 18px,
         linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(15, 118, 110, 0.08) 42%, rgba(217, 45, 67, 0.08)),
@@ -89,6 +93,8 @@
     .app {
       min-height: 100vh;
       display: block;
+      width: 100%;
+      overflow-x: clip;
       padding-bottom: 24px;
     }
 
@@ -405,9 +411,42 @@
       margin: 0;
       font-size: 16px;
     }
+    .panel-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
     .count, .subtle {
       color: var(--muted);
       font-size: 12px;
+    }
+    .signal-pager {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pager-button {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 2px 2px 0 rgba(21, 32, 51, 0.12);
+      cursor: pointer;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .pager-button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
     .table-wrap {
@@ -937,6 +976,7 @@
       height: 260px;
       background: #fbfcfe;
       cursor: crosshair;
+      touch-action: pan-y;
     }
     .kline-chart-wrap {
       position: relative;
@@ -1616,9 +1656,15 @@
     :root[data-theme="dark"] .icon-button,
     :root[data-theme="dark"] .mode-button,
     :root[data-theme="dark"] .file-button,
+    :root[data-theme="dark"] .pager-button,
     :root[data-theme="dark"] .primary-button,
     :root[data-theme="dark"] .kline-tooltip {
       border-color: #dbe4ef;
+    }
+    :root[data-theme="dark"] .pager-button {
+      background: #111720;
+      color: var(--ink);
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
     }
     .kline-tooltip {
       background: rgba(255, 255, 255, 0.18);
@@ -1816,6 +1862,17 @@
       .metric strong { font-size: 20px; }
       .content { padding-inline: 12px; }
       .main-panel, .side-panel { height: auto; }
+      .panel-head {
+        align-items: flex-start;
+      }
+      .panel-tools {
+        justify-content: flex-start;
+        gap: 6px;
+      }
+      .signal-pager {
+        width: 100%;
+        justify-content: flex-end;
+      }
       .table-wrap { display: none; }
       .cards {
         display: grid;
@@ -1832,6 +1889,18 @@
       .card-row { padding: 5px 0; font-size: 12px; }
       .expand-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .expand-detail-head { align-items: flex-start; }
+      .kline-canvas,
+      .signal-card.selected-row .kline-canvas {
+        height: 230px;
+      }
+      .kline-tooltip {
+        min-width: 0;
+        max-width: 152px;
+        padding: 5px 7px;
+        font-size: 10.5px;
+        line-height: 1.28;
+        background: rgba(255, 255, 255, 0.76);
+      }
       .side-body {
         height: auto;
         min-height: 0;
@@ -1843,6 +1912,10 @@
     @media (max-width: 560px) {
       .cards { grid-template-columns: 1fr; }
       .expand-detail-grid { grid-template-columns: 1fr; }
+      .kline-canvas,
+      .signal-card.selected-row .kline-canvas {
+        height: 210px;
+      }
     }
     :root[data-static-site="true"] .sync-panel,
     :root[data-static-site="true"] #syncButton {
@@ -1908,7 +1981,14 @@
       <section class="main-panel">
         <div class="panel-head">
           <h2>訊號清單</h2>
-          <div class="count" id="visibleCount">0 / 0</div>
+          <div class="panel-tools">
+            <div class="count" id="visibleCount">0 / 0</div>
+            <div class="signal-pager hidden" id="signalPager" aria-label="Signal card pages">
+              <button class="pager-button" id="prevCards" type="button" aria-label="Previous page">&lt;</button>
+              <span class="count" id="cardPageInfo">0 / 0</span>
+              <button class="pager-button" id="nextCards" type="button" aria-label="Next page">&gt;</button>
+            </div>
+          </div>
         </div>
         <div class="table-wrap" id="tableWrap">
           <table>
@@ -1988,6 +2068,7 @@
     }
     const csvCache = new Map();
     const chartState = new WeakMap();
+    const CARD_PAGE_SIZE = 5;
     let eventSource = null;
     let statusPollTimer = null;
     const state = {
@@ -1997,6 +2078,7 @@
       sortDir: "desc",
       view: "cards",
       selectedId: null,
+      cardPage: 0,
       filters: { search: "", market: "all", strategy: "all", reason: "all" }
     };
 
@@ -2028,6 +2110,10 @@
       signalCards: document.getElementById("signalCards"),
       emptyState: document.getElementById("emptyState"),
       visibleCount: document.getElementById("visibleCount"),
+      signalPager: document.getElementById("signalPager"),
+      prevCards: document.getElementById("prevCards"),
+      nextCards: document.getElementById("nextCards"),
+      cardPageInfo: document.getElementById("cardPageInfo"),
       updateTime: document.getElementById("updateTime"),
       metricTotal: document.getElementById("metricTotal"),
       metricStocks: document.getElementById("metricStocks"),
@@ -2515,24 +2601,57 @@
     function activeKlineCanvas() {
       return document.querySelector(".table-wrap:not(.hidden) .kline-canvas, .cards:not(.hidden) .kline-canvas");
     }
+    function isMobileLayout() {
+      return window.matchMedia("(max-width: 760px)").matches;
+    }
+    function klineTooltipHtml(row, changePercent) {
+      if (isMobileLayout()) {
+        return `<strong>${escapeHtml(row.date)}</strong>
+          C ${formatPrice(row.close)} · ${escapeHtml(changePercent)}<br>
+          H ${formatPrice(row.high)} / L ${formatPrice(row.low)}`;
+      }
+      return `<strong>${escapeHtml(row.date)}</strong>
+        O ${formatPrice(row.open)} H ${formatPrice(row.high)} L ${formatPrice(row.low)} C ${formatPrice(row.close)}<br>
+        Change ${escapeHtml(changePercent)}<br>
+        Vol ${formatVolumeLots(row.volume)}<br>
+        5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)}<br>
+        20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}`;
+    }
+    function hoverKlineAtClientX(canvas, clientX) {
+      const currentState = chartState.get(canvas);
+      if (!currentState || !currentState.candleRows.length) return;
+      const rect = canvas.getBoundingClientRect();
+      const localX = clientX - rect.left;
+      const rawIndex = Math.round((localX - currentState.pad.left - currentState.xStep / 2) / currentState.xStep);
+      const hoverIndex = Math.max(0, Math.min(currentState.candleRows.length - 1, rawIndex));
+      drawKline(currentState.sourceRows, hoverIndex);
+    }
     function bindKlineInteractions(canvas) {
       if (canvas.dataset.bound === "true") return;
       canvas.dataset.bound = "true";
       canvas.addEventListener("mousemove", event => {
-        const state = chartState.get(canvas);
-        if (!state || !state.candleRows.length) return;
-        const rect = canvas.getBoundingClientRect();
-        const localX = event.clientX - rect.left;
-        const rawIndex = Math.round((localX - state.pad.left - state.xStep / 2) / state.xStep);
-        const hoverIndex = Math.max(0, Math.min(state.candleRows.length - 1, rawIndex));
-        drawKline(state.sourceRows, hoverIndex);
+        hoverKlineAtClientX(canvas, event.clientX);
+      });
+      canvas.addEventListener("pointerdown", event => {
+        canvas.setPointerCapture?.(event.pointerId);
+        hoverKlineAtClientX(canvas, event.clientX);
+      });
+      canvas.addEventListener("pointermove", event => {
+        if (event.pointerType === "mouse" && event.buttons !== 1) return;
+        hoverKlineAtClientX(canvas, event.clientX);
+      });
+      canvas.addEventListener("pointerup", event => {
+        canvas.releasePointerCapture?.(event.pointerId);
+      });
+      canvas.addEventListener("pointercancel", event => {
+        canvas.releasePointerCapture?.(event.pointerId);
       });
       canvas.addEventListener("mouseleave", () => {
-        const state = chartState.get(canvas);
-        if (!state) return;
+        const currentState = chartState.get(canvas);
+        if (!currentState) return;
         const tooltip = canvas.parentElement?.querySelector(".kline-tooltip");
         if (tooltip) tooltip.style.display = "none";
-        drawKline(state.sourceRows, null);
+        drawKline(currentState.sourceRows, null);
       });
     }
     function chartPalette() {
@@ -2721,12 +2840,7 @@
           ctx.restore();
         }
         if (tooltip) {
-          tooltip.innerHTML = `<strong>${escapeHtml(row.date)}</strong>
-            開 ${formatPrice(row.open)} 高 ${formatPrice(row.high)} 低 ${formatPrice(row.low)} 收 ${formatPrice(row.close)}<br>
-            漲幅 ${escapeHtml(changePercent)}<br>
-            量 ${formatVolumeLots(row.volume)}<br>
-            5MA ${formatMa(row.ma5)} / 10MA ${formatMa(row.ma10)}<br>
-            20MA ${formatMa(row.ma20)} / 60MA ${formatMa(row.ma60)}`;
+          tooltip.innerHTML = klineTooltipHtml(row, changePercent);
           tooltip.style.display = "block";
           tooltip.style.left = "10px";
           tooltip.style.top = "10px";
@@ -2765,15 +2879,57 @@
         drawEmptyChart("K 線資料讀取失敗");
       }
     }
+    function cardPageCount(rows) {
+      return Math.max(1, Math.ceil(rows.length / CARD_PAGE_SIZE));
+    }
+    function clampCardPage(rows) {
+      const maxPage = cardPageCount(rows) - 1;
+      state.cardPage = Math.max(0, Math.min(state.cardPage || 0, maxPage));
+    }
+    function ensureSelectedCardPage(rows) {
+      if (!state.selectedId) return;
+      const selectedIndex = rows.findIndex(row => row.id === state.selectedId);
+      if (selectedIndex >= 0) state.cardPage = Math.floor(selectedIndex / CARD_PAGE_SIZE);
+    }
+    function visibleCardRows(rows) {
+      clampCardPage(rows);
+      const start = state.cardPage * CARD_PAGE_SIZE;
+      return rows.slice(start, start + CARD_PAGE_SIZE);
+    }
+    function updateCardPager(rows, cardsActive) {
+      if (!el.signalPager || !el.cardPageInfo) return;
+      const total = rows.length;
+      const pageCount = cardPageCount(rows);
+      const start = total ? state.cardPage * CARD_PAGE_SIZE + 1 : 0;
+      const end = Math.min(total, (state.cardPage + 1) * CARD_PAGE_SIZE);
+      el.signalPager.classList.toggle("hidden", !cardsActive || total <= CARD_PAGE_SIZE);
+      el.cardPageInfo.textContent = total ? `${start}-${end} / ${total}` : "0 / 0";
+      if (el.prevCards) el.prevCards.disabled = state.cardPage <= 0;
+      if (el.nextCards) el.nextCards.disabled = state.cardPage >= pageCount - 1;
+    }
+    function setCardPage(nextPage) {
+      const rows = sortRows(state.filtered);
+      const maxPage = cardPageCount(rows) - 1;
+      state.cardPage = Math.max(0, Math.min(nextPage, maxPage));
+      state.selectedId = null;
+      renderSummary(rows, state.rows);
+      renderTable(rows);
+      visibleSignalContainer()?.scrollTo({ top: 0, behavior: "smooth" });
+    }
     function renderTable(rows) {
       if (!rows.length || !rows.some(row => row.id === state.selectedId)) state.selectedId = null;
       const forceCards = window.matchMedia("(max-width: 760px)").matches;
+      const cardsActive = rows.length > 0 && (state.view === "cards" || forceCards);
+      ensureSelectedCardPage(rows);
+      clampCardPage(rows);
+      const cardRows = cardsActive ? visibleCardRows(rows) : rows;
       el.signalTable.innerHTML = rows.map(rowHtml).join("");
-      el.signalCards.innerHTML = rows.map(cardHtml).join("");
+      el.signalCards.innerHTML = cardRows.map(cardHtml).join("");
       el.emptyState.classList.toggle("hidden", rows.length > 0);
       el.tableWrap.classList.toggle("hidden", rows.length === 0 || state.view !== "table" || forceCards);
       el.signalCards.classList.toggle("hidden", rows.length === 0 || (state.view !== "cards" && !forceCards));
-      el.signalCards.style.display = rows.length > 0 && (state.view === "cards" || forceCards) ? "grid" : "";
+      el.signalCards.style.display = cardsActive ? "grid" : "";
+      updateCardPager(rows, cardsActive);
       const selectedRow = rows.find(row => row.id === state.selectedId);
       if (selectedRow) renderSelectedChart(selectedRow);
       [...document.querySelectorAll("[data-row-id]")].forEach(node => {
@@ -2802,6 +2958,7 @@
       renderRadarPanels(rows);
     }
     function applyFilters() {
+      state.cardPage = 0;
       const search = state.filters.search.toLowerCase();
       state.filtered = state.rows.filter(row => {
         const text = `${row.market} ${row.stock_no} ${row.stock_name} ${row.strategy} ${row.reason} ${row.date} ${row.score} ${row.score_reasons.join(" ")}`.toLowerCase();
@@ -2988,6 +3145,32 @@
     el.cardMode.addEventListener("click", () => setView("cards"));
     el.themeToggle?.addEventListener("click", toggleTheme);
     el.syncButton.addEventListener("click", startSync);
+    el.prevCards?.addEventListener("click", () => setCardPage(state.cardPage - 1));
+    el.nextCards?.addEventListener("click", () => setCardPage(state.cardPage + 1));
+    let cardSwipeStart = null;
+    el.signalCards?.addEventListener("touchstart", event => {
+      if (event.target.closest(".kline-chart-wrap")) {
+        cardSwipeStart = null;
+        return;
+      }
+      const touch = event.touches[0];
+      if (!touch) return;
+      cardSwipeStart = { x: touch.clientX, y: touch.clientY };
+    }, { passive: true });
+    el.signalCards?.addEventListener("touchend", event => {
+      if (!cardSwipeStart) return;
+      const touch = event.changedTouches[0];
+      if (!touch) {
+        cardSwipeStart = null;
+        return;
+      }
+      const dx = touch.clientX - cardSwipeStart.x;
+      const dy = touch.clientY - cardSwipeStart.y;
+      cardSwipeStart = null;
+      if (Math.abs(dx) < 54 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
+      if (dx < 0) setCardPage(state.cardPage + 1);
+      else setCardPage(state.cardPage - 1);
+    }, { passive: true });
     window.addEventListener("resize", () => renderTable(sortRows(state.filtered)));
     el.fileInput.addEventListener("change", async () => {
       const file = el.fileInput.files[0];
