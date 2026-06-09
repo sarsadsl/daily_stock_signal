@@ -1,9 +1,6 @@
 name: Daily Stock Signal
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     # 18:00 Asia/Taipei, Monday-Friday.
     - cron: "0 10 * * 1-5"
