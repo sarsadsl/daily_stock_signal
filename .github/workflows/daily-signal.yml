@@ -2,8 +2,8 @@ name: Daily Stock Signal
 
 on:
   schedule:
-    # 18:00 Asia/Taipei, Monday-Friday.
-    - cron: "0 10 * * 1-5"
+    # 17:23 Asia/Taipei, Monday-Friday.
+    - cron: "23 9 * * 1-5"
   workflow_dispatch:
 
 concurrency:
