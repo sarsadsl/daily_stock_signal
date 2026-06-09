@@ -843,12 +843,21 @@
 
     .side-body {
       flex: 1 1 auto;
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 14px;
       padding: 13px;
       height: auto;
       max-height: none;
       min-height: 0;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+    .side-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      gap: 14px;
       overflow-y: scroll;
       overflow-x: hidden;
       scrollbar-gutter: stable;
@@ -907,22 +916,8 @@
     }
     .quick-filter-panel {
       order: -20;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      align-self: start;
       background: var(--panel);
       box-shadow: none;
-    }
-    .quick-filter-panel::after {
-      content: "";
-      position: absolute;
-      left: -2px;
-      right: -2px;
-      bottom: -16px;
-      height: 16px;
-      background: #fffefb;
-      pointer-events: none;
     }
     .focus-card {
       display: grid;
@@ -1121,17 +1116,20 @@
         linear-gradient(90deg, rgba(37, 99, 235, 0.14), rgba(8, 145, 178, 0.12), rgba(15, 118, 110, 0.14)),
         #fffdf7;
     }
-    .side-body > .radar-section:nth-child(2) {
+    .side-body > .radar-section:nth-child(2),
+    .side-scroll > .radar-section:nth-child(1) {
       background:
         radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.11) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(239, 246, 255, 0.94), rgba(236, 254, 255, 0.72));
     }
-    .side-body > .radar-section:nth-child(3) {
+    .side-body > .radar-section:nth-child(3),
+    .side-scroll > .radar-section:nth-child(2) {
       background:
         radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.13) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(236, 253, 245, 0.94), rgba(255, 251, 235, 0.76));
     }
-    .side-body > .radar-section:nth-child(4) {
+    .side-body > .radar-section:nth-child(4),
+    .side-scroll > .radar-section:nth-child(3) {
       background:
         radial-gradient(circle at 2px 2px, rgba(124, 58, 237, 0.12) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(245, 243, 255, 0.92), rgba(236, 254, 255, 0.78));
@@ -1564,9 +1562,6 @@
       background: var(--panel);
       box-shadow: none;
     }
-    :root[data-theme="dark"] .quick-filter-panel::after {
-      background: #111720;
-    }
     :root[data-theme="dark"] .brief-card,
     :root[data-theme="dark"] .radar-mini,
     :root[data-theme="dark"] .rank-item {
@@ -1597,19 +1592,22 @@
       background: color-mix(in srgb, var(--tone-main) 16%, #111720);
       border-color: color-mix(in srgb, var(--tone-main) 42%, #2d3747);
     }
-    :root[data-theme="dark"] .side-body > .radar-section:nth-child(2) {
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(2),
+    :root[data-theme="dark"] .side-scroll > .radar-section:nth-child(1) {
       background:
         radial-gradient(circle at 2px 2px, rgba(96, 165, 250, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(8, 145, 178, 0.08)),
         #111720;
     }
-    :root[data-theme="dark"] .side-body > .radar-section:nth-child(3) {
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(3),
+    :root[data-theme="dark"] .side-scroll > .radar-section:nth-child(2) {
       background:
         radial-gradient(circle at 2px 2px, rgba(45, 212, 191, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(15, 118, 110, 0.13), rgba(201, 130, 18, 0.08)),
         #111720;
     }
-    :root[data-theme="dark"] .side-body > .radar-section:nth-child(4) {
+    :root[data-theme="dark"] .side-body > .radar-section:nth-child(4),
+    :root[data-theme="dark"] .side-scroll > .radar-section:nth-child(3) {
       background:
         radial-gradient(circle at 2px 2px, rgba(167, 139, 250, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
         linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(8, 145, 178, 0.08)),
@@ -1770,12 +1768,6 @@
         radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
         #fffefb;
     }
-    .side-body > .quick-filter-panel {
-      background:
-        radial-gradient(circle at 2px 2px, rgba(15, 118, 110, 0.1) 1px, transparent 1.8px) 0 0 / 12px 12px,
-        #fffefb;
-      box-shadow: none;
-    }
     .kline-tooltip {
       left: 10px;
       top: 10px;
@@ -1798,12 +1790,6 @@
       background:
         radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
         #111720;
-    }
-    :root[data-theme="dark"] .side-body > .quick-filter-panel {
-      background:
-        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.08) 1px, transparent 1.7px) 0 0 / 10px 10px,
-        #111720;
-      box-shadow: none;
     }
     :root[data-theme="dark"] .sync-panel,
     :root[data-theme="dark"] .site-footer,
@@ -1943,6 +1929,12 @@
         overflow-y: scroll;
       }
       .side-body {
+        height: auto;
+        max-height: none;
+        min-height: 0;
+        overflow-y: hidden;
+      }
+      .side-scroll {
         height: auto;
         max-height: none;
         min-height: 0;
@@ -2116,6 +2108,12 @@
         max-height: none;
         overflow: visible;
       }
+      .side-scroll {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+      }
       .workflow-board, .brief-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
@@ -2226,6 +2224,7 @@
             <h3 class="group-title">快速篩選</h3>
             <div class="chips" id="quickChips"></div>
           </section>
+          <div class="side-scroll">
           <section class="radar-section">
             <h3 class="group-title">今日雷達摘要</h3>
             <div class="brief-grid" id="dailyBrief"></div>
@@ -2266,6 +2265,7 @@
             <h3 class="group-title">常見訊號</h3>
             <div class="chips" id="reasonChips"></div>
           </section>
+          </div>
         </div>
       </aside>
     </main>
