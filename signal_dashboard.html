@@ -3031,7 +3031,7 @@
         reset.disabled = range.start === defaultRange.start && range.end === defaultRange.end;
       }
     }
-    function zoomKline(canvas, factor, centerVisibleIndex = null) {
+    function zoomKline(canvas, factor, centerVisibleIndex = null, options = {}) {
       const currentState = chartState.get(canvas);
       if (!currentState?.sourceRows?.length) return;
       const rows = currentState.sourceRows;
@@ -3039,8 +3039,13 @@
       const currentSize = currentState.viewEnd - currentState.viewStart + 1;
       const minBars = Math.min(30, totalRows);
       const nextSize = Math.max(minBars, Math.min(totalRows, Math.round(currentSize * factor)));
-      const center = currentState.viewStart + (centerVisibleIndex ?? Math.round((currentSize - 1) / 2));
-      let start = Math.round(center - nextSize / 2);
+      let start;
+      if (options.alignEnd) {
+        start = totalRows - nextSize;
+      } else {
+        const center = currentState.viewStart + (centerVisibleIndex ?? Math.round((currentSize - 1) / 2));
+        start = Math.round(center - nextSize / 2);
+      }
       start = Math.max(0, Math.min(start, totalRows - nextSize));
       setKlineRange(canvas, rows, start, start + nextSize - 1);
       drawKline(rows, null);
@@ -3507,8 +3512,8 @@
       const canvas = panel?.querySelector(".kline-canvas");
       if (!canvas) return;
       const action = button.dataset.klineAction;
-      if (action === "zoom-in") zoomKline(canvas, 0.72);
-      if (action === "zoom-out") zoomKline(canvas, 1.35);
+      if (action === "zoom-in") zoomKline(canvas, 0.72, null, { alignEnd: true });
+      if (action === "zoom-out") zoomKline(canvas, 1.35, null, { alignEnd: true });
       if (action === "reset") resetKlineView(canvas);
     });
     let cardSwipeStart = null;
