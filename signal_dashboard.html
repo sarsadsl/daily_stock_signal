@@ -1785,6 +1785,28 @@
       }
     }
     @media (max-width: 760px) {
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        overscroll-behavior-x: none;
+      }
+      body,
+      .app {
+        touch-action: pan-y;
+      }
+      .app,
+      .topbar,
+      .summary,
+      .content,
+      .sync-panel,
+      .site-footer {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: clip;
+      }
       .topbar, .summary, .content, .sync-panel { margin-inline: 0; }
       .content { width: 100%; }
       .topbar {
@@ -1802,6 +1824,10 @@
         flex-wrap: nowrap;
         justify-content: flex-start;
         overflow-x: auto;
+        max-width: 100%;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x pan-y;
+        -webkit-overflow-scrolling: touch;
         scrollbar-gutter: stable;
       }
       .control, .search {
@@ -1857,6 +1883,10 @@
         display: flex;
         gap: 8px;
         overflow-x: auto;
+        max-width: 100%;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x pan-y;
+        -webkit-overflow-scrolling: touch;
         padding: 8px 12px 0;
       }
       .metric {
