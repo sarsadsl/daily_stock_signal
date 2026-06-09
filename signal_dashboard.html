@@ -2483,32 +2483,26 @@
         .sort((a, b) => (b.score - a.score) || (b.volume - a.volume) || String(a.stock_no).localeCompare(String(b.stock_no), "zh-Hant", { numeric: true }))
         .slice(0, limit);
     }
-    const PULLBACK_PATTERN = /回檔|回測|拉回|支撐|月線|季線|10MA|20MA|均線/i;
-    const BREAKOUT_PATTERN = /突破|帶量|紅K|跳空|多頭|攻擊|創高|站上/i;
-    function rowSignalText(row) {
-      return [
-        row.reason,
-        ...(row.reasons || []),
-        ...(row.score_reasons || []),
-        ...(row.reasonDetails || []).flatMap(item => [item.reason, ...(item.score_reasons || [])])
-      ].filter(Boolean).join(" ");
-    }
+    const PULLBACK_PATTERN = /回檔|回測|拉回|支撐/i;
+    const BREAKOUT_PATTERN = /突破|帶量|紅K|跳空|站回|站上|創高|攻擊/i;
     function isPullbackSignal(row) {
-      return PULLBACK_PATTERN.test(rowSignalText(row));
+      return matchingReasonDetails(row, PULLBACK_PATTERN).length > 0;
     }
     function isBreakoutSignal(row) {
-      return BREAKOUT_PATTERN.test(rowSignalText(row));
+      return matchingReasonDetails(row, BREAKOUT_PATTERN).length > 0;
     }
-    function categorySignalCount(row, pattern) {
+    function matchingReasonDetails(row, pattern) {
       const details = row.reasonDetails?.length ? row.reasonDetails : (row.reasons || []).map(reason => ({ reason }));
-      return details.filter(item => pattern.test([item.reason, ...(item.score_reasons || [])].filter(Boolean).join(" "))).length;
+      return details.filter(item => pattern.test(item.reason || ""));
     }
     function weightedFocusScore(row, pattern) {
-      const scorePart = normalizeScore(row.score) * 20;
+      const matchedDetails = matchingReasonDetails(row, pattern);
+      const categoryScore = Math.max(...matchedDetails.map(item => normalizeScore(item.score || row.score)), normalizeScore(row.score));
+      const scorePart = categoryScore * 20;
       const volumeLots = Math.max(1, Number(row.volume || 0) / 1000);
       const volumePart = Math.min(20, Math.log10(volumeLots) * 5);
-      const signalPart = Math.min(12, Math.max(0, (row.reasons?.length || 1) - 1) * 4);
-      const categoryPart = Math.min(12, Math.max(1, categorySignalCount(row, pattern)) * 4);
+      const signalPart = Math.min(12, Math.max(0, (matchedDetails.length || 1) - 1) * 4);
+      const categoryPart = Math.min(12, Math.max(1, matchedDetails.length) * 4);
       return scorePart + volumePart + signalPart + categoryPart;
     }
     function weightedRankedRows(rows, matcher, pattern, limit = 5) {
