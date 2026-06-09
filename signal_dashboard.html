@@ -2338,6 +2338,7 @@
       strategyBars: document.getElementById("strategyBars"),
       reasonChips: document.getElementById("reasonChips"),
       quickChips: document.getElementById("quickChips"),
+      sideScroll: document.querySelector(".side-scroll"),
       dailyBrief: document.getElementById("dailyBrief"),
       radarNote: document.getElementById("radarNote"),
       workflowBoard: document.getElementById("workflowBoard"),
@@ -2548,6 +2549,9 @@
     function isFilterClear() {
       return !state.filters.search && state.filters.market === "all" && state.filters.strategy === "all" && state.filters.reason === "all";
     }
+    function scrollFocusPanelToTop() {
+      el.sideScroll?.scrollTo({ top: 0, behavior: "smooth" });
+    }
     function resetFilters() {
       state.filters = { search: "", market: "all", strategy: "all", reason: "all" };
       el.searchInput.value = "";
@@ -2604,7 +2608,11 @@
       ).join("");
       [...el.quickChips.querySelectorAll(".quick-chip")].forEach(chip => {
         chip.addEventListener("click", () => {
-          if (chip.dataset.type === "all") return resetFilters();
+          if (chip.dataset.type === "all") {
+            resetFilters();
+            scrollFocusPanelToTop();
+            return;
+          }
           if (chip.dataset.type === "market") {
             state.filters.market = chip.dataset.value;
             el.marketFilter.value = state.filters.market;
@@ -2614,6 +2622,7 @@
             el.reasonFilter.value = state.filters.reason;
           }
           applyFilters();
+          scrollFocusPanelToTop();
         });
       });
     }
