@@ -1227,6 +1227,25 @@
       gap: 8px;
       margin-bottom: 12px;
     }
+    .focus-rank-section {
+      order: -10;
+    }
+    .focus-rank-block .rank-list {
+      gap: 10px;
+    }
+    .focus-rank-block .rank-item {
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      min-height: 58px;
+      padding: 12px;
+    }
+    .focus-rank-block .rank-no {
+      width: 32px;
+      height: 32px;
+      font-size: 13px;
+    }
+    .focus-rank-block .rank-symbol strong {
+      font-size: 15px;
+    }
     .focus-rank-title {
       display: flex;
       align-items: center;
@@ -1239,13 +1258,13 @@
     .focus-rank-title span {
       color: var(--ink);
     }
-    .rank-score {
+    .rank-medal {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 52px;
-      min-height: 24px;
-      padding: 2px 7px;
+      min-width: 46px;
+      min-height: 26px;
+      padding: 3px 8px;
       border: 1px solid color-mix(in srgb, var(--tone-main) 36%, var(--line));
       border-radius: 999px;
       background: var(--tone-bg);
@@ -1253,6 +1272,21 @@
       font-size: 11px;
       font-weight: 900;
       white-space: nowrap;
+    }
+    .rank-medal.gold {
+      color: #92400e;
+      background: linear-gradient(180deg, #fff7cc, #facc15);
+      border-color: #f59e0b;
+    }
+    .rank-medal.silver {
+      color: #334155;
+      background: linear-gradient(180deg, #f8fafc, #cbd5e1);
+      border-color: #94a3b8;
+    }
+    .rank-medal.bronze {
+      color: #7c2d12;
+      background: linear-gradient(180deg, #ffedd5, #fb923c);
+      border-color: #ea580c;
     }
     .rank-item {
       display: grid;
@@ -2094,7 +2128,7 @@
             <h3 class="group-title">布局流程</h3>
             <div class="workflow-board" id="workflowBoard"></div>
           </section>
-          <section class="radar-section">
+          <section class="radar-section focus-rank-section">
             <h3 class="group-title">優先排行</h3>
             <div class="focus-rank-block">
               <div class="focus-rank-title"><span>回檔最強</span><small>總加權 Top 5</small></div>
@@ -2525,7 +2559,15 @@
       </button>`;
     }
     function rankItemHtml(row, index, weightedScore = null) {
-      const scoreText = weightedScore === null ? starHtml(row.score) : `<span class="rank-score">${weightedScore.toFixed(1)}</span>`;
+      const medalLabels = [
+        { text: "金牌", className: "gold" },
+        { text: "銀牌", className: "silver" },
+        { text: "銅牌", className: "bronze" },
+      ];
+      const medal = medalLabels[index] || { text: `第${index + 1}`, className: "plain" };
+      const scoreText = weightedScore === null
+        ? starHtml(row.score)
+        : `<span class="rank-medal ${medal.className}">${medal.text}</span>`;
       return `<button class="rank-item" type="button" data-radar-id="${escapeHtml(row.id)}">
         <span class="rank-no">${index + 1}</span>
         <span class="rank-symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span>${escapeHtml(row.reason)}</span></span>
