@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -25,8 +27,8 @@ DEFAULT_REPORT_PATH = REPORT_DIR / "daily_signal_alert.txt"
 DEFAULT_JSON_PATH = REPORT_DIR / "daily_signal_alert.json"
 DEFAULT_CHART_DIR = Path("charts/daily_alert")
 MIN_SIGNAL_VOLUME_SHARES = 1_000_000
-PULLBACK_KEYWORDS = ("回測", "支撐")
-BREAKOUT_KEYWORDS = ("突破", "帶量紅K")
+PULLBACK_PATTERN = re.compile(r"回檔|回測|拉回|支撐", re.IGNORECASE)
+BREAKOUT_PATTERN = re.compile(r"突破|帶量|紅K|跳空|站回|站上|創高|攻擊", re.IGNORECASE)
 
 
 def parse_multi_values(values: list[str] | None) -> set[str]:
@@ -136,11 +138,19 @@ def group_matches_for_display(matches: list[dict[str, Any]]) -> list[dict[str, A
         if current is None:
             current = dict(item)
             current["reasons"] = []
+            current["reason_details"] = []
             current["score_reasons"] = []
             grouped[key] = current
         reason = str(item["reason"])
         if reason not in current["reasons"]:
             current["reasons"].append(reason)
+            current["reason_details"].append(
+                {
+                    "reason": reason,
+                    "score": item.get("score"),
+                    "score_reasons": item.get("score_reasons") or [],
+                }
+            )
         if int(item.get("score") or 0) > int(current.get("score") or 0):
             current["score"] = item.get("score")
             current["score_label"] = item.get("score_label")
@@ -150,26 +160,59 @@ def group_matches_for_display(matches: list[dict[str, Any]]) -> list[dict[str, A
     return sorted(grouped.values(), key=lambda item: (item["market"], item["stock_no"]))
 
 
-def grouped_signal_rank_key(item: dict[str, Any]) -> tuple[float, float, float, int]:
-    return (
-        float(item.get("score") or 0),
-        float(item.get("volume_ratio") or 0),
-        float(item.get("ma20_slope_pct") or 0) + float(item.get("ma60_slope_pct") or 0),
-        int(item.get("volume") or 0),
-    )
+def normalize_score(value: Any) -> int:
+    try:
+        score = int(float(value))
+    except (TypeError, ValueError):
+        score = 1
+    return max(1, min(5, score))
 
 
-def signal_has_keyword(item: dict[str, Any], keywords: tuple[str, ...]) -> bool:
-    text = " ".join(str(reason) for reason in item.get("reasons") or [item.get("reason", "")])
-    return any(keyword in text for keyword in keywords)
+def matching_reason_details(item: dict[str, Any], pattern: re.Pattern[str]) -> list[dict[str, Any]]:
+    details = item.get("reason_details") or [
+        {"reason": reason, "score": item.get("score"), "score_reasons": item.get("score_reasons") or []}
+        for reason in item.get("reasons", [])
+    ]
+    return [detail for detail in details if pattern.search(str(detail.get("reason") or ""))]
+
+
+def weighted_focus_score(item: dict[str, Any], pattern: re.Pattern[str]) -> float:
+    matched_details = matching_reason_details(item, pattern)
+    detail_scores = [normalize_score(detail.get("score") or item.get("score")) for detail in matched_details]
+    category_score = max([*detail_scores, normalize_score(item.get("score"))])
+    score_part = category_score * 20
+    volume_lots = max(1.0, float(item.get("volume") or 0) / 1000)
+    volume_part = min(20.0, math.log10(volume_lots) * 5)
+    signal_part = min(12, max(0, (len(matched_details) or 1) - 1) * 4)
+    category_part = min(12, max(1, len(matched_details)) * 4)
+    return round(score_part + volume_part + signal_part + category_part, 6)
+
+
+def stock_sort_key(value: Any) -> tuple[int, str]:
+    text = str(value)
+    return (int(text), text) if text.isdigit() else (10**9, text)
 
 
 def strongest_signal_lists(matches: list[dict[str, Any]], count: int = 5) -> dict[str, list[dict[str, Any]]]:
     grouped = group_matches_for_display(matches)
-    pullbacks = [item for item in grouped if signal_has_keyword(item, PULLBACK_KEYWORDS)]
-    breakouts = [item for item in grouped if signal_has_keyword(item, BREAKOUT_KEYWORDS)]
-    pullbacks.sort(key=grouped_signal_rank_key, reverse=True)
-    breakouts.sort(key=grouped_signal_rank_key, reverse=True)
+    pullbacks = [item for item in grouped if matching_reason_details(item, PULLBACK_PATTERN)]
+    breakouts = [item for item in grouped if matching_reason_details(item, BREAKOUT_PATTERN)]
+
+    for item in pullbacks:
+        item["weighted_score"] = weighted_focus_score(item, PULLBACK_PATTERN)
+    for item in breakouts:
+        item["weighted_score"] = weighted_focus_score(item, BREAKOUT_PATTERN)
+
+    def rank_key(item: dict[str, Any]) -> tuple[float, int, int, tuple[int, str]]:
+        return (
+            float(item.get("weighted_score") or 0),
+            normalize_score(item.get("score")),
+            int(item.get("volume") or 0),
+            tuple(-part if isinstance(part, int) else part for part in stock_sort_key(item.get("stock_no"))),
+        )
+
+    pullbacks.sort(key=rank_key, reverse=True)
+    breakouts.sort(key=rank_key, reverse=True)
     return {
         "pullback": pullbacks[:count],
         "breakout": breakouts[:count],
@@ -207,6 +250,8 @@ def build_ranked_signal_text(title: str, rank: int, item: dict[str, Any]) -> str
     )
     if item.get("volume_ratio"):
         lines.append(f"量能: 20日均量 {float(item['volume_ratio']):.2f}x")
+    if item.get("weighted_score"):
+        lines.append(f"看板加權分: {float(item['weighted_score']):.2f}")
     if item.get("chart_path"):
         lines.append(f"K線圖: {item['chart_path']}")
     return "\n".join(lines)
