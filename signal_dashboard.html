@@ -1222,6 +1222,38 @@
       display: grid;
       gap: 8px;
     }
+    .focus-rank-block {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .focus-rank-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .focus-rank-title span {
+      color: var(--ink);
+    }
+    .rank-score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 52px;
+      min-height: 24px;
+      padding: 2px 7px;
+      border: 1px solid color-mix(in srgb, var(--tone-main) 36%, var(--line));
+      border-radius: 999px;
+      background: var(--tone-bg);
+      color: var(--tone-ink);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
     .rank-item {
       display: grid;
       grid-template-columns: 30px minmax(0, 1fr) auto;
@@ -2064,6 +2096,15 @@
           </section>
           <section class="radar-section">
             <h3 class="group-title">優先排行</h3>
+            <div class="focus-rank-block">
+              <div class="focus-rank-title"><span>回檔最強</span><small>總加權 Top 5</small></div>
+              <div class="rank-list" id="pullbackRank"></div>
+            </div>
+            <div class="focus-rank-block">
+              <div class="focus-rank-title"><span>突破最強</span><small>總加權 Top 5</small></div>
+              <div class="rank-list" id="breakoutRank"></div>
+            </div>
+            <div class="focus-rank-title"><span>綜合強度</span><small>Top 5</small></div>
             <div class="rank-list" id="topRank"></div>
           </section>
           <section>
@@ -2161,6 +2202,8 @@
       dailyBrief: document.getElementById("dailyBrief"),
       radarNote: document.getElementById("radarNote"),
       workflowBoard: document.getElementById("workflowBoard"),
+      pullbackRank: document.getElementById("pullbackRank"),
+      breakoutRank: document.getElementById("breakoutRank"),
       topRank: document.getElementById("topRank")
     };
 
@@ -2440,12 +2483,66 @@
         .sort((a, b) => (b.score - a.score) || (b.volume - a.volume) || String(a.stock_no).localeCompare(String(b.stock_no), "zh-Hant", { numeric: true }))
         .slice(0, limit);
     }
+    const PULLBACK_PATTERN = /回檔|回測|拉回|支撐|月線|季線|10MA|20MA|均線/i;
+    const BREAKOUT_PATTERN = /突破|帶量|紅K|跳空|多頭|攻擊|創高|站上/i;
+    function rowSignalText(row) {
+      return [
+        row.reason,
+        ...(row.reasons || []),
+        ...(row.score_reasons || []),
+        ...(row.reasonDetails || []).flatMap(item => [item.reason, ...(item.score_reasons || [])])
+      ].filter(Boolean).join(" ");
+    }
+    function isPullbackSignal(row) {
+      return PULLBACK_PATTERN.test(rowSignalText(row));
+    }
+    function isBreakoutSignal(row) {
+      return BREAKOUT_PATTERN.test(rowSignalText(row));
+    }
+    function categorySignalCount(row, pattern) {
+      const details = row.reasonDetails?.length ? row.reasonDetails : (row.reasons || []).map(reason => ({ reason }));
+      return details.filter(item => pattern.test([item.reason, ...(item.score_reasons || [])].filter(Boolean).join(" "))).length;
+    }
+    function weightedFocusScore(row, pattern) {
+      const scorePart = normalizeScore(row.score) * 20;
+      const volumeLots = Math.max(1, Number(row.volume || 0) / 1000);
+      const volumePart = Math.min(20, Math.log10(volumeLots) * 5);
+      const signalPart = Math.min(12, Math.max(0, (row.reasons?.length || 1) - 1) * 4);
+      const categoryPart = Math.min(12, Math.max(1, categorySignalCount(row, pattern)) * 4);
+      return scorePart + volumePart + signalPart + categoryPart;
+    }
+    function weightedRankedRows(rows, matcher, pattern, limit = 5) {
+      return rows
+        .filter(matcher)
+        .map(row => ({ row, weightedScore: weightedFocusScore(row, pattern) }))
+        .sort((a, b) =>
+          (b.weightedScore - a.weightedScore)
+          || (b.row.score - a.row.score)
+          || (b.row.volume - a.row.volume)
+          || String(a.row.stock_no).localeCompare(String(b.row.stock_no), "zh-Hant", { numeric: true })
+        )
+        .slice(0, limit);
+    }
     function radarMiniHtml(row) {
       const scoreTone = Math.max(0, Math.min(5, 5 - normalizeScore(row.score)));
       return `<button class="radar-mini tone-${scoreTone}" type="button" data-radar-id="${escapeHtml(row.id)}">
         <strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong>
         <span>${starHtml(row.score)}</span>
       </button>`;
+    }
+    function rankItemHtml(row, index, weightedScore = null) {
+      const scoreText = weightedScore === null ? starHtml(row.score) : `<span class="rank-score">${weightedScore.toFixed(1)}</span>`;
+      return `<button class="rank-item" type="button" data-radar-id="${escapeHtml(row.id)}">
+        <span class="rank-no">${index + 1}</span>
+        <span class="rank-symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span>${escapeHtml(row.reason)}</span></span>
+        ${scoreText}
+      </button>`;
+    }
+    function renderWeightedRank(target, entries) {
+      if (!target) return;
+      target.innerHTML = entries.length
+        ? entries.map((entry, index) => rankItemHtml(entry.row, index, entry.weightedScore)).join("")
+        : `<span class="subtle">-</span>`;
     }
     function renderWorkflowLane(title, rows, tone = 0) {
       return `<section class="workflow-lane tone-${tone % 6}">
@@ -2506,8 +2603,10 @@
       const stockCount = new Set(rows.map(row => `${row.market}:${row.stock_no}`)).size;
       const scoreFive = rows.filter(row => normalizeScore(row.score) >= 5).length;
       const highVolume = rows.filter(row => Number(row.volume) >= 3000000).length;
-      const pullback = rows.filter(row => /回測|支撐|季線|月線|10MA/i.test(row.reason));
-      const volumeBreak = rows.filter(row => /帶量|紅K|跳空/i.test(row.reason) || Number(row.volume) >= 3000000);
+      const pullback = rows.filter(isPullbackSignal);
+      const volumeBreak = rows.filter(row => isBreakoutSignal(row) || Number(row.volume) >= 3000000);
+      const pullbackTop = weightedRankedRows(rows, isPullbackSignal, PULLBACK_PATTERN, 5);
+      const breakoutTop = weightedRankedRows(rows, isBreakoutSignal, BREAKOUT_PATTERN, 5);
       el.dailyBrief.innerHTML = [
         ["候選檔數", stockCount.toLocaleString("zh-TW")],
         ["5 星訊號", scoreFive.toLocaleString("zh-TW")],
@@ -2525,13 +2624,9 @@
         renderWorkflowLane("回測支撐", rankedRows(pullback, 3)),
         renderWorkflowLane("觀察名單", rankedRows(rows.filter(row => normalizeScore(row.score) >= 4), 3))
       ].join("");
-      el.topRank.innerHTML = rankedRows(rows, 5).map((row, index) =>
-        `<button class="rank-item" type="button" data-radar-id="${escapeHtml(row.id)}">
-          <span class="rank-no">${index + 1}</span>
-          <span class="rank-symbol"><strong>${escapeHtml(row.stock_no)} ${escapeHtml(row.stock_name)}</strong><span>${escapeHtml(row.reason)}</span></span>
-          ${starHtml(row.score)}
-        </button>`
-      ).join("") || `<span class="subtle">-</span>`;
+      renderWeightedRank(el.pullbackRank, pullbackTop);
+      renderWeightedRank(el.breakoutRank, breakoutTop);
+      el.topRank.innerHTML = rankedRows(rows, 5).map((row, index) => rankItemHtml(row, index)).join("") || `<span class="subtle">-</span>`;
       bindRadarClicks();
     }
     function sortRows(rows) {
