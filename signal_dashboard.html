@@ -959,6 +959,42 @@
       font-size: 11px;
       font-weight: 700;
     }
+    .kline-tools {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .kline-window {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .kline-control {
+      min-width: 28px;
+      height: 26px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0 8px;
+      border: 2px solid var(--ink);
+      border-radius: 2px;
+      background:
+        radial-gradient(circle at 2px 2px, rgba(37, 99, 235, 0.08) 1px, transparent 1.6px) 0 0 / 8px 8px,
+        #fff;
+      color: var(--ink);
+      box-shadow: 2px 2px 0 rgba(21, 32, 51, 0.14);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .kline-control:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
     .legend-item {
       display: inline-flex;
       align-items: center;
@@ -977,6 +1013,9 @@
       background: #fbfcfe;
       cursor: crosshair;
       touch-action: pan-y;
+    }
+    .kline-canvas.is-panning {
+      cursor: grabbing;
     }
     .kline-chart-wrap {
       position: relative;
@@ -1555,6 +1594,14 @@
     :root[data-theme="dark"] .kline-canvas {
       background: #111720;
     }
+    :root[data-theme="dark"] .kline-control {
+      background:
+        radial-gradient(circle at 2px 2px, rgba(232, 238, 246, 0.12) 1px, transparent 1.6px) 0 0 / 8px 8px,
+        #111720;
+      color: var(--ink);
+      border-color: #dbe4ef;
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.42);
+    }
     :root[data-theme="dark"] .kline-tooltip {
       background: rgba(17, 23, 32, 0.96);
       border-color: rgba(148, 163, 184, 0.28);
@@ -2005,6 +2052,17 @@
       .card-row { padding: 5px 0; font-size: 12px; }
       .expand-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .expand-detail-head { align-items: flex-start; }
+      .kline-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .kline-tools {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .kline-legend {
+        flex-basis: 100%;
+      }
       .kline-canvas,
       .signal-card.selected-row .kline-canvas {
         height: 230px;
@@ -2736,11 +2794,17 @@
         <div class="kline-panel">
           <div class="kline-head">
             <span>日 K 線</span>
-            <span class="kline-legend">
-              <span class="legend-item" style="color:#2563eb"><span class="legend-dot"></span>5MA</span>
-              <span class="legend-item" style="color:#f59e0b"><span class="legend-dot"></span>10MA</span>
-              <span class="legend-item" style="color:#0f766e"><span class="legend-dot"></span>20MA</span>
-              <span class="legend-item" style="color:#7c3aed"><span class="legend-dot"></span>60MA</span>
+            <span class="kline-tools">
+              <span class="kline-window" data-kline-window>近3月</span>
+              <button class="kline-control" type="button" data-kline-action="zoom-out" title="縮小" aria-label="縮小">-</button>
+              <button class="kline-control" type="button" data-kline-action="zoom-in" title="放大" aria-label="放大">+</button>
+              <button class="kline-control" type="button" data-kline-action="reset" title="重設近3月" aria-label="重設近3月">重設</button>
+              <span class="kline-legend">
+                <span class="legend-item" style="color:#2563eb"><span class="legend-dot"></span>5MA</span>
+                <span class="legend-item" style="color:#f59e0b"><span class="legend-dot"></span>10MA</span>
+                <span class="legend-item" style="color:#0f766e"><span class="legend-dot"></span>20MA</span>
+                <span class="legend-item" style="color:#7c3aed"><span class="legend-dot"></span>60MA</span>
+              </span>
             </span>
           </div>
           <div class="kline-chart-wrap">
@@ -2808,30 +2872,76 @@
     function bindKlineInteractions(canvas) {
       if (canvas.dataset.bound === "true") return;
       canvas.dataset.bound = "true";
+      let dragState = null;
       canvas.addEventListener("mousemove", event => {
+        if (dragState) return;
         hoverKlineAtClientX(canvas, event.clientX);
       });
       canvas.addEventListener("pointerdown", event => {
         canvas.setPointerCapture?.(event.pointerId);
+        if (event.pointerType === "mouse") {
+          const currentState = chartState.get(canvas);
+          if (currentState?.sourceRows?.length) {
+            dragState = {
+              x: event.clientX,
+              viewStart: currentState.viewStart,
+              viewEnd: currentState.viewEnd,
+              moved: false,
+            };
+            canvas.classList.add("is-panning");
+          }
+        }
         hoverKlineAtClientX(canvas, event.clientX);
       });
       canvas.addEventListener("pointermove", event => {
+        if (event.pointerType === "mouse" && dragState && event.buttons === 1) {
+          const currentState = chartState.get(canvas);
+          if (!currentState?.sourceRows?.length) return;
+          const span = dragState.viewEnd - dragState.viewStart + 1;
+          const deltaBars = Math.round((dragState.x - event.clientX) / Math.max(1, currentState.xStep));
+          let start = dragState.viewStart + deltaBars;
+          start = Math.max(0, Math.min(start, currentState.sourceRows.length - span));
+          if (start !== currentState.viewStart) {
+            dragState.moved = true;
+            setKlineRange(canvas, currentState.sourceRows, start, start + span - 1);
+            drawKline(currentState.sourceRows, null);
+          }
+          return;
+        }
         if (event.pointerType === "mouse" && event.buttons !== 1) return;
         hoverKlineAtClientX(canvas, event.clientX);
       });
       canvas.addEventListener("pointerup", event => {
         canvas.releasePointerCapture?.(event.pointerId);
+        if (dragState) {
+          if (!dragState.moved) hoverKlineAtClientX(canvas, event.clientX);
+          dragState = null;
+          canvas.classList.remove("is-panning");
+        }
       });
       canvas.addEventListener("pointercancel", event => {
         canvas.releasePointerCapture?.(event.pointerId);
+        dragState = null;
+        canvas.classList.remove("is-panning");
       });
       canvas.addEventListener("mouseleave", () => {
         const currentState = chartState.get(canvas);
+        if (dragState) return;
         if (!currentState) return;
         const tooltip = canvas.parentElement?.querySelector(".kline-tooltip");
         if (tooltip) tooltip.style.display = "none";
         drawKline(currentState.sourceRows, null);
       });
+      canvas.addEventListener("wheel", event => {
+        const currentState = chartState.get(canvas);
+        if (!currentState?.sourceRows?.length) return;
+        event.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const localX = event.clientX - rect.left;
+        const rawIndex = Math.round((localX - currentState.pad.left - currentState.xStep / 2) / currentState.xStep);
+        const centerIndex = Math.max(0, Math.min(currentState.candleRows.length - 1, rawIndex));
+        zoomKline(canvas, event.deltaY > 0 ? 1.18 : 0.84, centerIndex);
+      }, { passive: false });
     }
     function chartPalette() {
       const dark = document.documentElement.dataset.theme === "dark";
@@ -2879,7 +2989,75 @@
       });
       return filtered.length ? filtered : rows.slice(-63);
     }
-    function drawKline(rows, hoverIndex = null) {
+    function defaultKlineRange(rows, months = 3) {
+      if (!rows.length) return { start: 0, end: 0 };
+      const recentRows = recentMonthRows(rows, months);
+      const firstRecent = recentRows[0];
+      const startIndex = firstRecent ? rows.findIndex(row => row.date === firstRecent.date) : -1;
+      return {
+        start: Math.max(0, startIndex >= 0 ? startIndex : rows.length - recentRows.length),
+        end: rows.length - 1,
+      };
+    }
+    function clampKlineRange(range, totalRows) {
+      if (!totalRows) return { start: 0, end: 0 };
+      const start = Math.max(0, Math.min(range.start, totalRows - 1));
+      const end = Math.max(start, Math.min(range.end, totalRows - 1));
+      return { start, end };
+    }
+    function currentKlineRange(canvas, rows, resetView = false) {
+      const currentState = chartState.get(canvas);
+      if (!resetView && currentState?.sourceRows === rows && Number.isInteger(currentState.viewStart) && Number.isInteger(currentState.viewEnd)) {
+        return clampKlineRange({ start: currentState.viewStart, end: currentState.viewEnd }, rows.length);
+      }
+      return clampKlineRange(defaultKlineRange(rows, 3), rows.length);
+    }
+    function setKlineRange(canvas, rows, start, end) {
+      const range = clampKlineRange({ start, end }, rows.length);
+      const currentState = chartState.get(canvas) || {};
+      chartState.set(canvas, { ...currentState, sourceRows: rows, viewStart: range.start, viewEnd: range.end });
+      return range;
+    }
+    function updateKlineControls(canvas, rows, range, visibleCount) {
+      const panel = canvas.closest(".kline-panel");
+      if (!panel) return;
+      const minBars = Math.min(30, rows.length);
+      const windowLabel = panel.querySelector("[data-kline-window]");
+      if (windowLabel) windowLabel.textContent = visibleCount >= rows.length ? `全部 ${visibleCount} 日` : `${visibleCount} 日`;
+      const zoomIn = panel.querySelector('[data-kline-action="zoom-in"]');
+      const zoomOut = panel.querySelector('[data-kline-action="zoom-out"]');
+      const reset = panel.querySelector('[data-kline-action="reset"]');
+      const currentSize = range.end - range.start + 1;
+      if (zoomIn) zoomIn.disabled = currentSize <= minBars;
+      if (zoomOut) zoomOut.disabled = currentSize >= rows.length;
+      if (reset) {
+        const defaultRange = defaultKlineRange(rows, 3);
+        reset.disabled = range.start === defaultRange.start && range.end === defaultRange.end;
+      }
+    }
+    function zoomKline(canvas, factor, centerVisibleIndex = null) {
+      const currentState = chartState.get(canvas);
+      if (!currentState?.sourceRows?.length) return;
+      const rows = currentState.sourceRows;
+      const totalRows = rows.length;
+      const currentSize = currentState.viewEnd - currentState.viewStart + 1;
+      const minBars = Math.min(30, totalRows);
+      const nextSize = Math.max(minBars, Math.min(totalRows, Math.round(currentSize * factor)));
+      const center = currentState.viewStart + (centerVisibleIndex ?? Math.round((currentSize - 1) / 2));
+      let start = Math.round(center - nextSize / 2);
+      start = Math.max(0, Math.min(start, totalRows - nextSize));
+      setKlineRange(canvas, rows, start, start + nextSize - 1);
+      drawKline(rows, null);
+    }
+    function resetKlineView(canvas) {
+      const currentState = chartState.get(canvas);
+      if (!currentState?.sourceRows?.length) return;
+      const rows = currentState.sourceRows;
+      const range = defaultKlineRange(rows, 3);
+      setKlineRange(canvas, rows, range.start, range.end);
+      drawKline(rows, null);
+    }
+    function drawKline(rows, hoverIndex = null, options = {}) {
       const canvas = activeKlineCanvas();
       if (!canvas) return;
       bindKlineInteractions(canvas);
@@ -2902,7 +3080,8 @@
       const volumeTop = volumeBottom - volumeHeight;
       const priceBottom = volumeTop - sectionGap;
       const plotWidth = width - pad.left - pad.right;
-      const candleRows = recentMonthRows(rows, 3);
+      const range = currentKlineRange(canvas, rows, Boolean(options.resetView));
+      const candleRows = rows.slice(range.start, range.end + 1);
       const palette = chartPalette();
       const safeHoverIndex = hoverIndex === null ? null : Math.max(0, Math.min(candleRows.length - 1, hoverIndex));
       const highs = candleRows.map(row => row.high);
@@ -2915,7 +3094,8 @@
       const candleWidth = Math.max(2, Math.min(8, xStep * 0.58));
       const priceY = value => pad.top + ((maxPrice - value) / priceRange) * (priceBottom - pad.top);
       const volumeY = value => volumeBottom - (value / maxVolume) * volumeHeight;
-      chartState.set(canvas, { sourceRows: rows, candleRows, pad, xStep });
+      chartState.set(canvas, { sourceRows: rows, candleRows, pad, xStep, viewStart: range.start, viewEnd: range.end });
+      updateKlineControls(canvas, rows, range, candleRows.length);
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = palette.bg;
       ctx.fillRect(0, 0, width, height);
@@ -3053,7 +3233,7 @@
           parsed = parsed.map((item, index) => ({ ...item, ma5: ma5[index], ma10: ma10[index], ma20: ma20[index], ma60: ma60[index] }));
           csvCache.set(csvPath, parsed);
         }
-        drawKline(parsed);
+        drawKline(parsed, null, { resetView: true });
       } catch (error) {
         drawEmptyChart("K 線資料讀取失敗");
       }
@@ -3326,6 +3506,17 @@
     el.syncButton.addEventListener("click", startSync);
     el.prevCards?.addEventListener("click", () => setCardPage(state.cardPage - 1));
     el.nextCards?.addEventListener("click", () => setCardPage(state.cardPage + 1));
+    document.addEventListener("click", event => {
+      const button = event.target.closest("[data-kline-action]");
+      if (!button) return;
+      const panel = button.closest(".kline-panel");
+      const canvas = panel?.querySelector(".kline-canvas");
+      if (!canvas) return;
+      const action = button.dataset.klineAction;
+      if (action === "zoom-in") zoomKline(canvas, 0.72);
+      if (action === "zoom-out") zoomKline(canvas, 1.35);
+      if (action === "reset") resetKlineView(canvas);
+    });
     let cardSwipeStart = null;
     el.signalCards?.addEventListener("touchstart", event => {
       if (event.target.closest(".kline-chart-wrap")) {
