@@ -96,3 +96,10 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=daily-stock-signal --branch=main
