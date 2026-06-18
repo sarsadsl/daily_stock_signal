@@ -2,8 +2,8 @@ name: Daily Stock Signal
 
 on:
   schedule:
-    # 17:23 Asia/Taipei, Monday-Friday.
-    - cron: "23 9 * * 1-5"
+    # 23:30 Asia/Taipei, Monday-Friday.
+    - cron: "30 15 * * 1-5"
   workflow_dispatch:
 
 concurrency:
@@ -53,6 +53,39 @@ jobs:
             echo "Telegram secrets are not configured; building reports without sending a notification."
             python alert_signals.py --dry-run --top-lists --top-count 5
           fi
+
+      - name: Verify report freshness
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          now = datetime.now(ZoneInfo("Asia/Taipei"))
+          today = now.date().isoformat()
+          if now.weekday() >= 5:
+              print(f"Weekend in Asia/Taipei; skipping freshness check for {today}.")
+              raise SystemExit(0)
+
+          report = Path("reports/daily_signal_alert.csv")
+          if not report.exists():
+              raise SystemExit("reports/daily_signal_alert.csv was not generated.")
+
+          with report.open("r", encoding="utf-8-sig", newline="") as csvfile:
+              reader = csv.DictReader(csvfile)
+              signal_dates = sorted({row.get("date", "") for row in reader if row.get("date")})
+
+          latest_signal_date = signal_dates[-1] if signal_dates else ""
+          print(f"Asia/Taipei today: {today}")
+          print(f"Latest signal date: {latest_signal_date}")
+          if latest_signal_date != today:
+              raise SystemExit(
+                  f"Stale report: expected {today}, got {latest_signal_date}. "
+                  "Market data may not be published yet; skipping deployment."
+              )
+          PY
 
       - name: Build static site
         shell: pwsh
