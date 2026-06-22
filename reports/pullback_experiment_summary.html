@@ -200,7 +200,7 @@
     .detail-table-wrapper table {
       border: 0;
       border-radius: 0;
-      min-width: 1280px;
+      min-width: 1120px;
     }
     .detail-table-wrapper thead th {
       position: sticky;
@@ -251,6 +251,43 @@
       white-space: nowrap;
     }
     .chart-button:hover { background: #dbeafe; }
+    .stock-cell {
+      min-width: 148px;
+    }
+    .stock-actions {
+      margin-top: 6px;
+    }
+    .inline-chart-row td {
+      background: #f8fafc;
+      text-align: left;
+      padding: 14px;
+    }
+    .inline-chart-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px;
+    }
+    .inline-chart-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .inline-chart-canvas {
+      width: 100%;
+      height: 460px;
+      display: block;
+    }
+    .no-max-note {
+      margin-top: 14px;
+      border-left: 4px solid var(--purple);
+      background: #f5f3ff;
+      color: #4c1d95;
+      padding: 12px 14px;
+      border-radius: 12px;
+    }
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -561,6 +598,7 @@
         <p><strong>2. V3 證明移動停利有作用，但不足以讓所有 pullback 穩定。</strong> 移動停利觸發 1,143 筆，但所有 pullback 的中位數仍約 0。</p>
         <p><strong>3. V4 是目前比較合理的研究基準。</strong> 隔日開低 2% 避免追高，swing exit 提升平均與中位數，但勝率仍未達 60%。</p>
         <p><strong>4. V5 告訴我們不要再硬調同一年資料。</strong> 強勢股過濾器在 validation 好看，但 holdout test 不穩，且樣本過小。</p>
+        <p class="no-max-note"><strong>拿掉 max hold 的測試：</strong>PB-V4 從 20 日上限改成不設最長持有後，平均報酬由 4.94% 升至 6.04%，但勝率由 52.91% 小降至 52.47%，中位數仍是 2.00%。而且有 3 筆持有到資料最後一天才估值，這不是完整已實現出場，所以只能當研究，不建議直接把 max hold 拿掉後部署。</p>
       </div>
     </section>
 
@@ -592,10 +630,10 @@
         <table id="tradeTable">
           <thead>
             <tr>
+              <th class="left"><button class="sort-button" data-sort="stockNo">股票 / K線</button></th>
               <th class="left"><button class="sort-button" data-sort="source">來源</button></th>
               <th class="left"><button class="sort-button" data-sort="status">狀態</button></th>
               <th><button class="sort-button" data-sort="signalDate">訊號日</button></th>
-              <th class="left"><button class="sort-button" data-sort="stockNo">股票</button></th>
               <th><button class="sort-button" data-sort="signalClose">訊號收盤</button></th>
               <th><button class="sort-button" data-sort="entryDate">買進日</button></th>
               <th><button class="sort-button" data-sort="entryPrice">買進價</button></th>
@@ -605,12 +643,11 @@
               <th><button class="sort-button" data-sort="returnPct">報酬</button></th>
               <th><button class="sort-button" data-sort="pnl">損益</button></th>
               <th class="left"><button class="sort-button" data-sort="exitReason">出場原因</button></th>
-              <th class="left">K線</th>
               <th class="left">訊號原因</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="15" class="left muted">讀取明細中...</td></tr>
+            <tr><td colspan="14" class="left muted">讀取明細中...</td></tr>
           </tbody>
         </table>
       </div>
@@ -651,6 +688,7 @@
     let allTradeRows = [];
     let stockManifest = new Map();
     let currentSort = { key: 'signalDate', direction: 'desc' };
+    let expandedChartId = null;
     const numericSortKeys = new Set(['signalClose', 'entryPrice', 'exitPrice', 'holdingDays', 'returnPct', 'pnl']);
     const dateSortKeys = new Set(['signalDate', 'entryDate', 'exitDate']);
 
@@ -767,25 +805,37 @@
       updateSortButtons();
       document.getElementById('tradeCount').textContent = `顯示 ${fmt.format(filtered.length)} / ${fmt.format(allTradeRows.length)} 筆`;
       const tbody = document.querySelector('#tradeTable tbody');
-      tbody.innerHTML = filtered.map(row => `
-        <tr>
-          <td class="left">${esc(row.source)}</td>
-          <td class="left"><span class="status-chip ${row.statusClass}">${esc(row.status)}</span></td>
-          <td>${esc(row.signalDate)}</td>
-          <td class="left"><strong>${esc(row.stockNo)}</strong> ${esc(row.stockName)} <span class="muted">${esc(row.market)}</span></td>
-          <td>${price(row.signalClose)}</td>
-          <td>${esc(row.entryDate)}</td>
-          <td>${price(row.entryPrice)}</td>
-          <td>${esc(row.exitDate)}</td>
-          <td>${price(row.exitPrice)}</td>
-          <td>${esc(row.holdingDays)}</td>
-          <td class="${Number(row.returnPct) >= 0 ? 'num-pos' : 'num-neg'}">${pct(row.returnPct)}</td>
-          <td class="${Number(row.pnl) >= 0 ? 'num-pos' : 'num-neg'}">${money(row.pnl)}</td>
-          <td class="left">${esc(row.exitReason)}</td>
-          <td class="left"><button class="chart-button" type="button" data-chart-id="${row._id}">K線圖</button></td>
-          <td class="left">${esc(row.reasons)}</td>
-        </tr>
-      `).join('') || '<tr><td colspan="15" class="left muted">沒有符合條件的資料</td></tr>';
+      tbody.innerHTML = filtered.map(row => {
+        const mainRow = `
+          <tr>
+            <td class="left stock-cell"><strong>${esc(row.stockNo)}</strong> ${esc(row.stockName)} <span class="muted">${esc(row.market)}</span><div class="stock-actions"><button class="chart-button" type="button" data-chart-id="${row._id}">${expandedChartId === row._id ? '收合K線' : '展開K線'}</button></div></td>
+            <td class="left">${esc(row.source)}</td>
+            <td class="left"><span class="status-chip ${row.statusClass}">${esc(row.status)}</span></td>
+            <td>${esc(row.signalDate)}</td>
+            <td>${price(row.signalClose)}</td>
+            <td>${esc(row.entryDate)}</td>
+            <td>${price(row.entryPrice)}</td>
+            <td>${esc(row.exitDate)}</td>
+            <td>${price(row.exitPrice)}</td>
+            <td>${esc(row.holdingDays)}</td>
+            <td class="${Number(row.returnPct) >= 0 ? 'num-pos' : 'num-neg'}">${pct(row.returnPct)}</td>
+            <td class="${Number(row.pnl) >= 0 ? 'num-pos' : 'num-neg'}">${money(row.pnl)}</td>
+            <td class="left">${esc(row.exitReason)}</td>
+            <td class="left">${esc(row.reasons)}</td>
+          </tr>`;
+        const chartRow = expandedChartId === row._id ? `
+          <tr class="inline-chart-row">
+            <td colspan="14">
+              <div class="inline-chart-panel" id="inline-chart-${row._id}">
+                <div class="inline-chart-head"><strong>${esc(row.stockNo)} ${esc(row.stockName)} K線圖</strong><span class="muted">訊號 ${esc(row.signalDate)}｜買進 ${esc(row.entryDate)}｜賣出/估值 ${esc(row.exitDate)}</span></div>
+                <canvas class="inline-chart-canvas" id="canvas-${row._id}" width="1100" height="460"></canvas>
+                <div class="chart-legend"><span><span class="legend-dot" style="background:#2563eb"></span>訊號日</span><span><span class="legend-dot" style="background:#16a34a"></span>買進日</span><span><span class="legend-dot" style="background:#dc2626"></span>賣出 / 估值日</span><span>灰線：MA20 / MA60；下方柱：成交量</span></div>
+              </div>
+            </td>
+          </tr>` : '';
+        return mainRow + chartRow;
+      }).join('') || '<tr><td colspan="14" class="left muted">沒有符合條件的資料</td></tr>';
+      if (expandedChartId) renderInlineChart(expandedChartId);
     }
 
     function parseCsvLine(line) {
@@ -951,23 +1001,15 @@
       });
     }
 
-    async function openChart(rowId) {
+    async function renderInlineChart(rowId) {
       const trade = allTradeRows.find(row => row._id === rowId);
-      if (!trade) return;
-      const modal = document.getElementById('chartModal');
-      document.getElementById('chartTitle').textContent = `${trade.stockNo} ${trade.stockName} K線圖`;
-      document.getElementById('chartSubtitle').textContent = `${trade.source}｜${trade.status}｜訊號日 ${trade.signalDate}`;
-      document.getElementById('chartMeta').innerHTML = `
-        <span class="pill gray">買進：${esc(trade.entryDate)} @ ${price(trade.entryPrice)}</span>
-        <span class="pill gray">賣出/估值：${esc(trade.exitDate)} @ ${price(trade.exitPrice)}</span>
-        <span class="pill ${Number(trade.returnPct) >= 0 ? 'green' : 'red'}">報酬：${pct(trade.returnPct)}</span>
-        <span class="pill orange">出場：${esc(trade.exitReason)}</span>
-      `;
-      modal.classList.add('open');
+      const panel = document.getElementById(`inline-chart-${rowId}`);
+      const canvas = document.getElementById(`canvas-${rowId}`);
+      if (!trade || !panel || !canvas) return;
       const key = `${String(trade.market || '').toUpperCase()}:${trade.stockNo}`;
       const manifest = stockManifest.get(key);
       if (!manifest) {
-        document.getElementById('chartSubtitle').textContent += '｜找不到股票資料 manifest';
+        panel.insertAdjacentHTML('beforeend', '<p class="num-neg">找不到這檔股票的 K 線資料路徑。</p>');
         return;
       }
       try {
@@ -977,9 +1019,9 @@
         });
         const allRows = parseCsv(csvText);
         const visibleRows = chartWindow(allRows, trade);
-        drawKline(document.getElementById('klineCanvas'), visibleRows, trade);
+        drawKline(canvas, visibleRows, trade);
       } catch (error) {
-        document.getElementById('chartSubtitle').textContent += `｜K線讀取失敗：${error.message}`;
+        panel.insertAdjacentHTML('beforeend', `<p class="num-neg">K線讀取失敗：${esc(error.message)}</p>`);
       }
     }
 
@@ -1018,14 +1060,16 @@
         return;
       }
       const chartButton = event.target.closest?.('[data-chart-id]');
-      if (chartButton) openChart(chartButton.dataset.chartId);
-    });
-    document.getElementById('chartClose').addEventListener('click', () => document.getElementById('chartModal').classList.remove('open'));
-    document.getElementById('chartModal').addEventListener('click', event => {
-      if (event.target.id === 'chartModal') event.currentTarget.classList.remove('open');
+      if (chartButton) {
+        expandedChartId = expandedChartId === chartButton.dataset.chartId ? null : chartButton.dataset.chartId;
+        renderTrades();
+      }
     });
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') document.getElementById('chartModal').classList.remove('open');
+      if (event.key === 'Escape') {
+        expandedChartId = null;
+        renderTrades();
+      }
     });
     loadTradeDetails();
   </script>
