@@ -99,7 +99,8 @@ if (Test-Path -LiteralPath $reportsSource) {
         "daily_signal_top_lists.json",
         "recent_all_signal_backtest_smart.json",
         "pullback_pb_v4_0_1y_discount2_swing.json",
-        "pullback_pb_v6_trend_review_variants.json"
+        "pullback_pb_v6_trend_review_variants.json",
+        "pullback_pb_v6e_holdout.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
@@ -109,7 +110,9 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_pb_v4_0_1y_discount2_swing.html",
         "pullback_pb_v5_0_strong_filter_holdout.html",
         "pullback_pb_v6_trend_review_variants.html",
-        "pullback_pb_v6_trend_review_variants.md"
+        "pullback_pb_v6_trend_review_variants.md",
+        "pullback_pb_v6e_holdout.html",
+        "pullback_pb_v6e_holdout.md"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }

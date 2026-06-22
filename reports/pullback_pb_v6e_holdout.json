@@ -1,0 +1,491 @@
+{
+  "version": "PB-V6E-holdout",
+  "variant_id": "V6E_ma20_review_no_trailing_after20",
+  "variant_name": "第20日站上MA20續抱；第20日後改用跌破MA20出場，不再用移動停利",
+  "methodology": {
+    "baseline": "PB-V4 max-20 swing exit",
+    "variant": "第20日站上MA20續抱；第20日後改用跌破MA20出場，不再用移動停利",
+    "split": "chronological 60/20/20 by sorted trade signal_date"
+  },
+  "overall": {
+    "trades": 223,
+    "pb_v4": {
+      "trades": 223,
+      "win_rate_pct": 52.91,
+      "avg_return_pct": 4.94,
+      "median_return_pct": 2.0,
+      "total_pnl": 1102430,
+      "capital_used": 22300000,
+      "capital_return_pct": 4.94,
+      "best_return_pct": 74.39,
+      "worst_return_pct": -7.0
+    },
+    "v6e": {
+      "trades": 223,
+      "win_rate_pct": 52.47,
+      "avg_return_pct": 6.08,
+      "median_return_pct": 2.0,
+      "total_pnl": 1356880,
+      "capital_used": 22300000,
+      "capital_return_pct": 6.08,
+      "best_return_pct": 137.2,
+      "worst_return_pct": -7.0
+    },
+    "delta_avg_return_pct": 1.14,
+    "delta_median_return_pct": 0.0,
+    "delta_win_rate_pct": -0.44,
+    "delta_total_pnl": 254450,
+    "v6e_exit_reasons": {
+      "trailing_stop": 98,
+      "hard_stop": 104,
+      "trend_review_close": 19,
+      "latest_close_after_review": 2
+    },
+    "v6e_latest_close_unresolved": 2
+  },
+  "chronological_60_20_20": {
+    "split_dates": {
+      "validation_start": "2026-03-20",
+      "test_start": "2026-03-27"
+    },
+    "splits": {
+      "train": {
+        "trades": 133,
+        "pb_v4": {
+          "trades": 133,
+          "win_rate_pct": 54.14,
+          "avg_return_pct": 4.51,
+          "median_return_pct": 2.0,
+          "total_pnl": 600080,
+          "capital_used": 13300000,
+          "capital_return_pct": 4.51,
+          "best_return_pct": 74.39,
+          "worst_return_pct": -7.0
+        },
+        "v6e": {
+          "trades": 133,
+          "win_rate_pct": 53.38,
+          "avg_return_pct": 6.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 810800,
+          "capital_used": 13300000,
+          "capital_return_pct": 6.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -7.0
+        },
+        "delta_avg_return_pct": 1.59,
+        "delta_median_return_pct": 0.0,
+        "delta_win_rate_pct": -0.76,
+        "delta_total_pnl": 210720,
+        "v6e_exit_reasons": {
+          "trailing_stop": 62,
+          "hard_stop": 60,
+          "trend_review_close": 11
+        },
+        "v6e_latest_close_unresolved": 0
+      },
+      "validation": {
+        "trades": 45,
+        "pb_v4": {
+          "trades": 45,
+          "win_rate_pct": 46.67,
+          "avg_return_pct": 5.01,
+          "median_return_pct": -7.0,
+          "total_pnl": 225360,
+          "capital_used": 4500000,
+          "capital_return_pct": 5.01,
+          "best_return_pct": 74.31,
+          "worst_return_pct": -7.0
+        },
+        "v6e": {
+          "trades": 45,
+          "win_rate_pct": 46.67,
+          "avg_return_pct": 6.28,
+          "median_return_pct": -7.0,
+          "total_pnl": 282700,
+          "capital_used": 4500000,
+          "capital_return_pct": 6.28,
+          "best_return_pct": 102.14,
+          "worst_return_pct": -7.0
+        },
+        "delta_avg_return_pct": 1.27,
+        "delta_median_return_pct": 0.0,
+        "delta_win_rate_pct": 0.0,
+        "delta_total_pnl": 57340,
+        "v6e_exit_reasons": {
+          "trailing_stop": 16,
+          "hard_stop": 24,
+          "trend_review_close": 4,
+          "latest_close_after_review": 1
+        },
+        "v6e_latest_close_unresolved": 1
+      },
+      "test": {
+        "trades": 45,
+        "pb_v4": {
+          "trades": 45,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 6.16,
+          "median_return_pct": 2.72,
+          "total_pnl": 276990,
+          "capital_used": 4500000,
+          "capital_return_pct": 6.16,
+          "best_return_pct": 51.64,
+          "worst_return_pct": -7.0
+        },
+        "v6e": {
+          "trades": 45,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 5.85,
+          "median_return_pct": 2.0,
+          "total_pnl": 263380,
+          "capital_used": 4500000,
+          "capital_return_pct": 5.85,
+          "best_return_pct": 36.72,
+          "worst_return_pct": -7.0
+        },
+        "delta_avg_return_pct": -0.31,
+        "delta_median_return_pct": -0.72,
+        "delta_win_rate_pct": 0.0,
+        "delta_total_pnl": -13610,
+        "v6e_exit_reasons": {
+          "trailing_stop": 20,
+          "hard_stop": 20,
+          "trend_review_close": 4,
+          "latest_close_after_review": 1
+        },
+        "v6e_latest_close_unresolved": 1
+      }
+    }
+  },
+  "monthly_walk_forward": [
+    {
+      "month": "2025-09",
+      "trades": 2,
+      "pb_v4": {
+        "trades": 2,
+        "win_rate_pct": 100.0,
+        "avg_return_pct": 14.08,
+        "median_return_pct": 14.08,
+        "total_pnl": 28150,
+        "capital_used": 200000,
+        "capital_return_pct": 14.07,
+        "best_return_pct": 17.1,
+        "worst_return_pct": 11.05
+      },
+      "v6e": {
+        "trades": 2,
+        "win_rate_pct": 100.0,
+        "avg_return_pct": 14.08,
+        "median_return_pct": 14.08,
+        "total_pnl": 28150,
+        "capital_used": 200000,
+        "capital_return_pct": 14.07,
+        "best_return_pct": 17.1,
+        "worst_return_pct": 11.05
+      },
+      "delta_avg_return_pct": 0.0,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 0,
+      "v6e_exit_reasons": {
+        "trailing_stop": 2
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2025-10",
+      "trades": 8,
+      "pb_v4": {
+        "trades": 8,
+        "win_rate_pct": 50.0,
+        "avg_return_pct": 1.23,
+        "median_return_pct": -2.5,
+        "total_pnl": 9820,
+        "capital_used": 800000,
+        "capital_return_pct": 1.23,
+        "best_return_pct": 17.68,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 8,
+        "win_rate_pct": 50.0,
+        "avg_return_pct": 1.23,
+        "median_return_pct": -2.5,
+        "total_pnl": 9820,
+        "capital_used": 800000,
+        "capital_return_pct": 1.23,
+        "best_return_pct": 17.68,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 0.0,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 0,
+      "v6e_exit_reasons": {
+        "hard_stop": 4,
+        "trailing_stop": 4
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2025-11",
+      "trades": 31,
+      "pb_v4": {
+        "trades": 31,
+        "win_rate_pct": 70.97,
+        "avg_return_pct": 7.15,
+        "median_return_pct": 3.83,
+        "total_pnl": 221520,
+        "capital_used": 3100000,
+        "capital_return_pct": 7.15,
+        "best_return_pct": 30.49,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 31,
+        "win_rate_pct": 67.74,
+        "avg_return_pct": 14.04,
+        "median_return_pct": 2.31,
+        "total_pnl": 435220,
+        "capital_used": 3100000,
+        "capital_return_pct": 14.04,
+        "best_return_pct": 137.2,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 6.89,
+      "delta_median_return_pct": -1.52,
+      "delta_win_rate_pct": -3.23,
+      "delta_total_pnl": 213700,
+      "v6e_exit_reasons": {
+        "trailing_stop": 15,
+        "hard_stop": 9,
+        "trend_review_close": 7
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2025-12",
+      "trades": 8,
+      "pb_v4": {
+        "trades": 8,
+        "win_rate_pct": 62.5,
+        "avg_return_pct": 0.5,
+        "median_return_pct": 2.0,
+        "total_pnl": 4040,
+        "capital_used": 800000,
+        "capital_return_pct": 0.51,
+        "best_return_pct": 9.43,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 8,
+        "win_rate_pct": 62.5,
+        "avg_return_pct": 0.36,
+        "median_return_pct": 2.0,
+        "total_pnl": 2860,
+        "capital_used": 800000,
+        "capital_return_pct": 0.36,
+        "best_return_pct": 9.89,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": -0.14,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": -1180,
+      "v6e_exit_reasons": {
+        "trend_review_close": 2,
+        "trailing_stop": 3,
+        "hard_stop": 3
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2026-01",
+      "trades": 24,
+      "pb_v4": {
+        "trades": 24,
+        "win_rate_pct": 29.17,
+        "avg_return_pct": -0.35,
+        "median_return_pct": -7.0,
+        "total_pnl": -8460,
+        "capital_used": 2400000,
+        "capital_return_pct": -0.35,
+        "best_return_pct": 35.42,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 24,
+        "win_rate_pct": 29.17,
+        "avg_return_pct": -0.35,
+        "median_return_pct": -7.0,
+        "total_pnl": -8460,
+        "capital_used": 2400000,
+        "capital_return_pct": -0.35,
+        "best_return_pct": 35.42,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 0.0,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 0,
+      "v6e_exit_reasons": {
+        "trailing_stop": 7,
+        "hard_stop": 17
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2026-02",
+      "trades": 16,
+      "pb_v4": {
+        "trades": 16,
+        "win_rate_pct": 25.0,
+        "avg_return_pct": 0.76,
+        "median_return_pct": -7.0,
+        "total_pnl": 12120,
+        "capital_used": 1600000,
+        "capital_return_pct": 0.76,
+        "best_return_pct": 52.1,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 16,
+        "win_rate_pct": 25.0,
+        "avg_return_pct": 0.76,
+        "median_return_pct": -7.0,
+        "total_pnl": 12120,
+        "capital_used": 1600000,
+        "capital_return_pct": 0.76,
+        "best_return_pct": 52.1,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 0.0,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 0,
+      "v6e_exit_reasons": {
+        "hard_stop": 12,
+        "trailing_stop": 4
+      },
+      "v6e_latest_close_unresolved": 0
+    },
+    {
+      "month": "2026-03",
+      "trades": 97,
+      "pb_v4": {
+        "trades": 97,
+        "win_rate_pct": 56.7,
+        "avg_return_pct": 7.23,
+        "median_return_pct": 2.72,
+        "total_pnl": 701080,
+        "capital_used": 9700000,
+        "capital_return_pct": 7.23,
+        "best_return_pct": 74.39,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 97,
+        "win_rate_pct": 56.7,
+        "avg_return_pct": 7.51,
+        "median_return_pct": 2.33,
+        "total_pnl": 728210,
+        "capital_used": 9700000,
+        "capital_return_pct": 7.51,
+        "best_return_pct": 102.14,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 0.28,
+      "delta_median_return_pct": -0.39,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 27130,
+      "v6e_exit_reasons": {
+        "hard_stop": 41,
+        "trailing_stop": 46,
+        "trend_review_close": 9,
+        "latest_close_after_review": 1
+      },
+      "v6e_latest_close_unresolved": 1
+    },
+    {
+      "month": "2026-04",
+      "trades": 13,
+      "pb_v4": {
+        "trades": 13,
+        "win_rate_pct": 84.62,
+        "avg_return_pct": 10.33,
+        "median_return_pct": 8.52,
+        "total_pnl": 134260,
+        "capital_used": 1300000,
+        "capital_return_pct": 10.33,
+        "best_return_pct": 35.69,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 13,
+        "win_rate_pct": 84.62,
+        "avg_return_pct": 11.47,
+        "median_return_pct": 11.47,
+        "total_pnl": 149060,
+        "capital_used": 1300000,
+        "capital_return_pct": 11.47,
+        "best_return_pct": 35.69,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 1.14,
+      "delta_median_return_pct": 2.95,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 14800,
+      "v6e_exit_reasons": {
+        "trailing_stop": 9,
+        "latest_close_after_review": 1,
+        "hard_stop": 2,
+        "trend_review_close": 1
+      },
+      "v6e_latest_close_unresolved": 1
+    },
+    {
+      "month": "2026-05",
+      "trades": 24,
+      "pb_v4": {
+        "trades": 24,
+        "win_rate_pct": 33.33,
+        "avg_return_pct": -0.0,
+        "median_return_pct": -7.0,
+        "total_pnl": -100,
+        "capital_used": 2400000,
+        "capital_return_pct": -0.0,
+        "best_return_pct": 28.16,
+        "worst_return_pct": -7.0
+      },
+      "v6e": {
+        "trades": 24,
+        "win_rate_pct": 33.33,
+        "avg_return_pct": -0.0,
+        "median_return_pct": -7.0,
+        "total_pnl": -100,
+        "capital_used": 2400000,
+        "capital_return_pct": -0.0,
+        "best_return_pct": 28.16,
+        "worst_return_pct": -7.0
+      },
+      "delta_avg_return_pct": 0.0,
+      "delta_median_return_pct": 0.0,
+      "delta_win_rate_pct": 0.0,
+      "delta_total_pnl": 0,
+      "v6e_exit_reasons": {
+        "hard_stop": 16,
+        "trailing_stop": 8
+      },
+      "v6e_latest_close_unresolved": 0
+    }
+  ],
+  "robust_gate": {
+    "pass": false,
+    "reasons": [
+      "test average worsened",
+      "test median worsened",
+      "test still has latest-close unresolved exits"
+    ]
+  }
+}
