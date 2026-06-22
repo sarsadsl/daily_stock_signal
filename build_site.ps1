@@ -14,6 +14,8 @@ if (Test-Path -LiteralPath $sitePath) {
 
 New-Item -ItemType Directory -Path $sitePath | Out-Null
 
+$script:stockManifest = @()
+
 function Copy-FileIfExists {
     param(
         [Parameter(Mandatory = $true)][string]$Source,
@@ -63,8 +65,18 @@ function Copy-LatestStockCsvs {
             }
         }
 
-    foreach ($entry in $latestByCode.Values) {
+    foreach ($code in ($latestByCode.Keys | Sort-Object)) {
+        $entry = $latestByCode[$code]
         Copy-Item -LiteralPath $entry.File.FullName -Destination (Join-Path $targetDir $entry.File.Name) -Force
+        $match = [regex]::Match($entry.File.Name, "^(\d{4})_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.csv$")
+        $script:stockManifest += [ordered]@{
+            key = ("{0}:{1}" -f $Market.ToUpperInvariant(), $code)
+            market = $Market.ToUpperInvariant()
+            stock_no = $code
+            file = ("../data/all_{0}/{1}" -f $Market, $entry.File.Name)
+            start_date = $match.Groups[2].Value
+            end_date = $match.Groups[3].Value
+        }
     }
 }
 
@@ -109,6 +121,13 @@ if (Test-Path -LiteralPath $chartsSource) {
 
 Copy-LatestStockCsvs -Market "twse"
 Copy-LatestStockCsvs -Market "tpex"
+
+$reportsOutput = Join-Path $sitePath "reports"
+New-Item -ItemType Directory -Path $reportsOutput -Force | Out-Null
+$script:stockManifest |
+    Sort-Object market, stock_no |
+    ConvertTo-Json -Depth 4 |
+    Set-Content -LiteralPath (Join-Path $reportsOutput "stock_data_manifest.json") -Encoding UTF8
 
 $metadata = [ordered]@{
     built_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
