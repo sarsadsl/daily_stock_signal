@@ -280,6 +280,18 @@
       height: 460px;
       display: block;
     }
+    .followup-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafafa;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .followup-box strong { color: var(--ink); }
+    .followup-box ul { margin: 6px 0 0 18px; padding: 0; }
+    .followup-box li { margin: 3px 0; }
     .no-max-note {
       margin-top: 14px;
       border-left: 4px solid var(--purple);
@@ -685,6 +697,21 @@
     const text = value => value === null || value === undefined || value === '' ? '-' : String(value);
     const esc = value => text(value).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
 
+    function exitReasonLabel(row) {
+      const reason = String(row.exitReason || '');
+      if (reason === 'trailing_stop') {
+        return row.source === 'PB-V4 baseline'
+          ? '移動停利：曾達 +12% 後啟動，從最高價回落 12% 或守 +2% 獲利底線時出場'
+          : '移動停利：價格達啟動條件後，從高點回落到追蹤停利線出場';
+      }
+      if (reason === 'hard_stop') return '硬停損：盤中低點碰到進場價 -7%';
+      if (reason === 'max_hold_close') return '時間到出場：持有到最長天數，用當日收盤價出場';
+      if (reason === 'latest_close') return '尚未正式出場：先用最新收盤價估值';
+      if (reason === 'pending_next_open') return '等待進場：訊號後還沒有隔日開盤價';
+      if (reason === 'latest_close_no_max_hold') return '無最長持有測試：尚未觸發停損/停利，估到資料最後收盤';
+      return reason || '-';
+    }
+
     let allTradeRows = [];
     let stockManifest = new Map();
     let currentSort = { key: 'signalDate', direction: 'desc' };
@@ -820,7 +847,7 @@
             <td>${esc(row.holdingDays)}</td>
             <td class="${Number(row.returnPct) >= 0 ? 'num-pos' : 'num-neg'}">${pct(row.returnPct)}</td>
             <td class="${Number(row.pnl) >= 0 ? 'num-pos' : 'num-neg'}">${money(row.pnl)}</td>
-            <td class="left">${esc(row.exitReason)}</td>
+            <td class="left">${esc(exitReasonLabel(row))}</td>
             <td class="left">${esc(row.reasons)}</td>
           </tr>`;
         const chartRow = expandedChartId === row._id ? `
@@ -829,7 +856,8 @@
               <div class="inline-chart-panel" id="inline-chart-${row._id}">
                 <div class="inline-chart-head"><strong>${esc(row.stockNo)} ${esc(row.stockName)} K線圖</strong><span class="muted">訊號 ${esc(row.signalDate)}｜買進 ${esc(row.entryDate)}｜賣出/估值 ${esc(row.exitDate)}</span></div>
                 <canvas class="inline-chart-canvas" id="canvas-${row._id}" width="1100" height="460"></canvas>
-                <div class="chart-legend"><span><span class="legend-dot" style="background:#2563eb"></span>訊號日</span><span><span class="legend-dot" style="background:#16a34a"></span>買進日</span><span><span class="legend-dot" style="background:#dc2626"></span>賣出 / 估值日</span><span>灰線：MA20 / MA60；下方柱：成交量</span></div>
+                <div class="chart-legend"><span><span class="legend-dot" style="background:#f59e0b"></span>MA5</span><span><span class="legend-dot" style="background:#8b5cf6"></span>MA10</span><span><span class="legend-dot" style="background:#64748b"></span>MA20</span><span><span class="legend-dot" style="background:#94a3b8"></span>MA60</span><span><span class="legend-dot" style="background:#2563eb"></span>訊號日</span><span><span class="legend-dot" style="background:#16a34a"></span>買進日</span><span><span class="legend-dot" style="background:#dc2626"></span>賣出 / 估值日</span><span><span class="legend-dot" style="background:#7c3aed"></span>出場後同股後續訊號</span></div>
+                <div class="followup-box" id="followup-${row._id}">檢查出場後是否還有同股後續訊號中...</div>
               </div>
             </td>
           </tr>` : '';
@@ -903,6 +931,27 @@
       return rows.slice(start, end);
     }
 
+    function followupSignals(trade) {
+      const exitTime = Date.parse(trade.exitDate || trade.signalDate || '');
+      const signalTime = Date.parse(trade.signalDate || '');
+      const baseTime = Number.isFinite(exitTime) && exitTime > 0 ? exitTime : signalTime;
+      return allTradeRows
+        .filter(row => row._id !== trade._id && row.market === trade.market && row.stockNo === trade.stockNo)
+        .filter(row => Date.parse(row.signalDate || '') > baseTime)
+        .sort((a, b) => Date.parse(a.signalDate || '') - Date.parse(b.signalDate || ''));
+    }
+
+    function renderFollowupBox(trade) {
+      const box = document.getElementById(`followup-${trade._id}`);
+      if (!box) return;
+      const rows = followupSignals(trade);
+      if (!rows.length) {
+        box.innerHTML = '<strong>出場後同股後續訊號：</strong>目前這份報告資料裡沒有看到同一檔股票在出場後再次符合 pullback / 進場紀錄。這不代表技術面完全沒有反彈，只代表沒有符合目前報告保存的條件。';
+        return;
+      }
+      box.innerHTML = `<strong>出場後同股後續訊號：</strong>找到 ${rows.length} 筆，前 5 筆如下：<ul>${rows.slice(0, 5).map(row => `<li>${esc(row.signalDate)}｜${esc(row.source)}｜${esc(row.status)}｜訊號收盤 ${price(row.signalClose)}｜買進 ${esc(row.entryDate)} @ ${price(row.entryPrice)}｜${esc(row.reasons)}</li>`).join('')}</ul>`;
+    }
+
     function drawKline(canvas, rows, trade) {
       const ctx = canvas.getContext('2d');
       const dpr = window.devicePixelRatio || 1;
@@ -953,6 +1002,8 @@
         });
         ctx.stroke();
       }
+      drawMa(5, '#f59e0b');
+      drawMa(10, '#8b5cf6');
       drawMa(20, '#64748b');
       drawMa(60, '#94a3b8');
 
@@ -990,6 +1041,10 @@
       drawMarker(trade.signalDate, '訊號', '#2563eb', trade.signalClose);
       drawMarker(trade.entryDate, '買', '#16a34a', trade.entryPrice);
       drawMarker(trade.exitDate, trade.status === '未實現' ? '估' : '賣', '#dc2626', trade.exitPrice);
+      followupSignals(trade).forEach((row, index) => {
+        if (index >= 8) return;
+        drawMarker(row.signalDate, '後訊', '#7c3aed', row.signalClose);
+      });
 
       ctx.fillStyle = '#475467';
       ctx.font = '12px sans-serif';
@@ -1020,6 +1075,7 @@
         const allRows = parseCsv(csvText);
         const visibleRows = chartWindow(allRows, trade);
         drawKline(canvas, visibleRows, trade);
+        renderFollowupBox(trade);
       } catch (error) {
         panel.insertAdjacentHTML('beforeend', `<p class="num-neg">K線讀取失敗：${esc(error.message)}</p>`);
       }
