@@ -203,6 +203,7 @@
       cursor: wait;
     }
     .mode-button { color: var(--muted); }
+    .report-link { text-decoration: none; }
     .mode-button.active {
       color: var(--blue);
       border-color: #9bbcff;
@@ -2163,6 +2164,7 @@
       </div>
       <div class="actions" aria-label="工具列">
         <button class="primary-button" id="syncButton" type="button">同步今日資料</button>
+        <a class="mode-button report-link" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
         <input class="control search" id="searchInput" type="search" placeholder="搜尋股票、訊號">
         <select class="control" id="marketFilter" aria-label="市場"></select>
         <select class="control" id="strategyFilter" aria-label="策略" hidden></select>

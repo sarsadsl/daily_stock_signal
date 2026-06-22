@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pullback 策略實驗樣本與數據總覽</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e4e7ec;
+      --blue: #2563eb;
+      --green: #16803c;
+      --orange: #b45309;
+      --red: #b42318;
+      --purple: #6d28d9;
+      --shadow: 0 16px 40px rgba(15, 23, 42, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top left, #e0ecff, transparent 32rem), var(--bg);
+      line-height: 1.65;
+    }
+    header {
+      padding: 44px 28px 24px;
+      max-width: 1180px;
+      margin: auto;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+    }
+    .subtitle {
+      color: var(--muted);
+      max-width: 880px;
+      font-size: 17px;
+      margin: 0;
+    }
+    main {
+      max-width: 1180px;
+      margin: auto;
+      padding: 0 28px 64px;
+    }
+    section { margin-top: 24px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    @media (max-width: 850px) { .span-4, .span-6, .span-8 { grid-column: span 12; } }
+    h2 { margin: 0 0 14px; font-size: 24px; letter-spacing: -0.02em; }
+    h3 { margin: 0 0 10px; font-size: 18px; }
+    p { margin: 8px 0; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #eef2ff;
+      color: #3730a3;
+      margin: 0 6px 8px 0;
+      white-space: nowrap;
+    }
+    .pill.green { background:#ecfdf3; color:#027a48; }
+    .pill.orange { background:#fff7ed; color:#b45309; }
+    .pill.red { background:#fef3f2; color:#b42318; }
+    .pill.gray { background:#f2f4f7; color:#475467; }
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 760px) { .kpi { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    .kpi > div {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fafbff;
+    }
+    .kpi .value { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+    .kpi .label { color: var(--muted); font-size: 13px; }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      vertical-align: top;
+    }
+    th:first-child, td:first-child, td.left, th.left { text-align: left; }
+    thead th {
+      background: #f8fafc;
+      color: #344054;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+    .num-pos { color: var(--green); font-weight: 700; }
+    .num-neg { color: var(--red); font-weight: 700; }
+    .muted { color: var(--muted); }
+    .note {
+      border-left: 4px solid var(--blue);
+      background: #eff6ff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #1e3a8a;
+    }
+    .warn {
+      border-left: 4px solid var(--orange);
+      background: #fff7ed;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #7c2d12;
+    }
+    .bad {
+      border-left: 4px solid var(--red);
+      background: #fef3f2;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #7a271a;
+    }
+    code {
+      background: #f2f4f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .92em;
+    }
+    .version-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .bar {
+      height: 9px;
+      background: #eef2f6;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .bar > span { display: block; height: 100%; background: var(--blue); border-radius: 999px; }
+    .small { font-size: 13px; }
+    .footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pullback 策略實驗樣本與數據總覽</h1>
+    <p class="subtitle">依據 <code>CODEX_HANDOFF.md</code> 與現有報告檔整理。所有版本皆以「每筆固定 100,000 元」作為等額資金回測，不使用成交量、市值或訊號分數加權。</p>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card span-8">
+        <h2>目前結論</h2>
+        <p class="note"><strong>目前 pullback 研究 baseline 是 <code>PB-V4.0-1y-discount2-swing</code>。</strong> 它要求隔日開盤至少比訊號日收盤低 2%，再用較寬的 swing 出場規則降低過早被洗掉的問題。</p>
+        <p class="warn"><strong>不可部署：</strong>V1 最近 10 日很強，但樣本時間太短；V5 強勢股過濾在最後 20% holdout 失敗；breakout 系列也已被擴樣本否決。</p>
+        <div>
+          <span class="pill green">目前 baseline：PB-V4</span>
+          <span class="pill orange">V5 過濾器失敗</span>
+          <span class="pill gray">每筆等額 100,000</span>
+          <span class="pill red">尚不可部署</span>
+        </div>
+      </div>
+      <div class="card span-4">
+        <h2>核心規則</h2>
+        <p><strong>訊號：</strong>多頭趨勢中的回測 / 支撐 / 月線 / 季線型訊號。</p>
+        <p><strong>進場：</strong>訊號日之後的下一個交易日開盤。</p>
+        <p><strong>資金：</strong>每筆固定 <code>100,000</code>。</p>
+        <p><strong>最新 baseline 出場：</strong>-7% 硬停損；+12% 後啟動 12% 移動停利，並有 +2% 獲利底線；最多持有 20 日。</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>版本總表</h2>
+      <table>
+        <thead>
+          <tr>
+            <th class="left">版本</th>
+            <th class="left">實驗定位</th>
+            <th>主要交易數</th>
+            <th>勝率</th>
+            <th>平均報酬</th>
+            <th>中位數</th>
+            <th>總損益</th>
+            <th class="left">結論</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left"><code>PB-V1.0-recent10</code></td>
+            <td class="left">最近 10 交易日保留版，無額外長期驗證</td>
+            <td>324</td><td class="num-pos">62.65%</td><td class="num-pos">7.11%</td><td class="num-pos">2.79%</td><td class="num-pos">2,303,120</td>
+            <td class="left">短期很強，但行情 regime 偏誤明顯</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V2.0-3y-fixed10d</code></td>
+            <td class="left">三年資料，同邏輯固定 10 日觀察</td>
+            <td>3,542</td><td>42.77%</td><td class="num-pos">1.97%</td><td class="num-neg">-2.61%</td><td class="num-pos">6,992,530</td>
+            <td class="left">長期不穩，不能證明策略有效</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V3.0-1y-trailing10d</code></td>
+            <td class="left">一年資料，加 -7% 停損與 +7%/7% 移動停利</td>
+            <td>2,911</td><td>49.50%</td><td class="num-pos">2.06%</td><td class="num-neg">-0.08%</td><td class="num-pos">6,001,820</td>
+            <td class="left">比三年版好，但中位數接近 0</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V4.0-1y-discount2-swing</code></td>
+            <td class="left">一年資料，只做隔日開低 2%+，改 swing 出場</td>
+            <td>223</td><td class="num-pos">52.91%</td><td class="num-pos">4.94%</td><td class="num-pos">2.00%</td><td class="num-pos">1,102,430</td>
+            <td class="left"><strong>目前研究 baseline</strong></td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V5.0-strong-filter-holdout</code></td>
+            <td class="left">在 PB-V4 上測三種強勢股過濾，60/20/20 holdout</td>
+            <td>223 控制組</td><td>見下方</td><td>見下方</td><td>見下方</td><td>見下方</td>
+            <td class="left"><strong class="num-neg">過濾器全數失敗，不可部署</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <div class="version-title">
+          <h2>PB-V1.0-recent10</h2>
+          <span class="pill gray">保留版</span>
+        </div>
+        <p class="muted">最近 10 個交易日、既有所有訊號回測；pullback 使用 -7% 停損，沒停損則估到最新收盤。</p>
+        <div class="kpi">
+          <div><div class="value">493</div><div class="label">報告內不重複股票</div></div>
+          <div><div class="value">996</div><div class="label">合併後訊號</div></div>
+          <div><div class="value">324</div><div class="label">已實現 pullback</div></div>
+          <div><div class="value">185</div><div class="label">pullback 股票</div></div>
+        </div>
+        <h3>變體結果</h3>
+        <table>
+          <thead><tr><th class="left">變體</th><th>交易</th><th>勝率</th><th>平均</th><th>中位數</th></tr></thead>
+          <tbody>
+            <tr><td class="left">所有 pullback</td><td>324</td><td>62.65%</td><td>7.11%</td><td>2.79%</td></tr>
+            <tr><td class="left">隔日不追高</td><td>152</td><td>75.00%</td><td>10.22%</td><td>5.35%</td></tr>
+            <tr><td class="left">隔日開低 2%+</td><td>70</td><td>81.43%</td><td>15.56%</td><td>12.59%</td></tr>
+            <tr><td class="left">隔日開低 5%+</td><td>55</td><td>87.27%</td><td>17.00%</td><td>13.09%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-6">
+        <div class="version-title">
+          <h2>PB-V3.0-1y-trailing10d</h2>
+          <span class="pill orange">一年 + 移動停利</span>
+        </div>
+        <p class="muted">一年資料；-7% 停損；+7% 後啟動 7% 回撤移動停利；最多持有 10 日。</p>
+        <div class="kpi">
+          <div><div class="value">1,936</div><div class="label">合格資料檔</div></div>
+          <div><div class="value">343,276</div><div class="label">股票×日期觀察</div></div>
+          <div><div class="value">2,911</div><div class="label">pullback 交易</div></div>
+          <div><div class="value">632</div><div class="label">pullback 股票</div></div>
+        </div>
+        <h3>變體結果</h3>
+        <table>
+          <thead><tr><th class="left">變體</th><th>交易</th><th>勝率</th><th>平均</th><th>中位數</th></tr></thead>
+          <tbody>
+            <tr><td class="left">所有 pullback</td><td>2,911</td><td>49.50%</td><td>2.06%</td><td class="num-neg">-0.08%</td></tr>
+            <tr><td class="left">隔日不追高</td><td>1,108</td><td>48.74%</td><td>2.04%</td><td class="num-neg">-0.17%</td></tr>
+            <tr><td class="left">隔日開低 2%+</td><td>224</td><td>56.25%</td><td>3.93%</td><td>1.31%</td></tr>
+            <tr><td class="left">隔日開低 5%+</td><td>50</td><td>66.00%</td><td>5.31%</td><td>3.94%</td></tr>
+          </tbody>
+        </table>
+        <h3>出場分布</h3>
+        <p class="small">硬停損 1,222；移動停利 1,143；持有期滿 546。</p>
+        <div class="bar"><span style="width:42%"></span></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <div class="version-title">
+          <h2>PB-V2.0-3y-fixed10d</h2>
+          <span class="pill gray">三年驗證</span>
+        </div>
+        <p class="muted">三年擴樣本；固定 10 日視窗。此版用來檢查 pullback 是否長期穩定。</p>
+        <div class="kpi">
+          <div><div class="value">279</div><div class="label">合格三年檔</div></div>
+          <div><div class="value">186,489</div><div class="label">股票×日期觀察</div></div>
+          <div><div class="value">3,542</div><div class="label">pullback 交易</div></div>
+          <div><div class="value">270</div><div class="label">pullback 股票</div></div>
+        </div>
+        <table>
+          <thead><tr><th class="left">變體</th><th>交易</th><th>勝率</th><th>平均</th><th>中位數</th></tr></thead>
+          <tbody>
+            <tr><td class="left">所有 pullback</td><td>3,542</td><td>42.77%</td><td>1.97%</td><td class="num-neg">-2.61%</td></tr>
+            <tr><td class="left">隔日不追高</td><td>1,363</td><td>44.17%</td><td>2.20%</td><td class="num-neg">-2.01%</td></tr>
+            <tr><td class="left">隔日開低 2%+</td><td>222</td><td>46.85%</td><td>3.35%</td><td class="num-neg">-2.08%</td></tr>
+            <tr><td class="left">隔日開低 5%+</td><td>44</td><td>50.00%</td><td>5.43%</td><td>0.77%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card span-6">
+        <div class="version-title">
+          <h2>PB-V4.0-1y-discount2-swing</h2>
+          <span class="pill green">目前 baseline</span>
+        </div>
+        <p class="muted">只在隔日開盤至少折價 2% 時進場；出場由 V3 的短線 trailing 改為較寬的 swing exit。</p>
+        <div class="kpi">
+          <div><div class="value">1,936</div><div class="label">合格一年資料檔</div></div>
+          <div><div class="value">323,916</div><div class="label">股票×日期觀察</div></div>
+          <div><div class="value">223</div><div class="label">折價 2%+ 交易</div></div>
+          <div><div class="value">175</div><div class="label">不重複股票</div></div>
+        </div>
+        <table>
+          <thead><tr><th class="left">出場版本</th><th>交易</th><th>勝率</th><th>平均</th><th>中位數</th><th>總損益</th></tr></thead>
+          <tbody>
+            <tr><td class="left">V3 短線 trailing baseline</td><td>223</td><td>56.05%</td><td>3.95%</td><td>1.32%</td><td>880,170</td></tr>
+            <tr><td class="left"><strong>V4 swing exit</strong></td><td>223</td><td>52.91%</td><td>4.94%</td><td>2.00%</td><td>1,102,430</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted">V4 swing 出場：104 筆硬停損、98 筆移動停利、21 筆持有期滿。</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>PB-V5.0 強勢股過濾 holdout 測試</h2>
+      <p class="bad"><strong>結論：</strong>三個強勢股過濾條件都沒有通過預先宣告的 robust gate。雖然部分 validation 表現變好，但最後 20% test 樣本只有 6–9 筆且中位數仍偏弱，因此不能部署。</p>
+      <p>切分日期：validation 從 <code>2026-03-11</code> 開始，test 從 <code>2026-04-15</code> 開始。控制組是 PB-V4 規則，不加額外強勢股過濾。</p>
+      <table>
+        <thead>
+          <tr>
+            <th class="left">版本 / 過濾器</th>
+            <th>全期交易</th>
+            <th>全期平均</th>
+            <th>Validation 交易</th>
+            <th>Validation 平均</th>
+            <th>Test 交易</th>
+            <th>Test 勝率</th>
+            <th>Test 平均</th>
+            <th>Test 中位數</th>
+            <th>Robust</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left">Control：PB-V4</td><td>223</td><td>4.94%</td><td>59</td><td>6.54%</td><td>35</td><td>48.57%</td><td>3.69%</td><td class="num-neg">-7.00%</td><td>否</td>
+          </tr>
+          <tr>
+            <td class="left">Price strength</td><td>74</td><td>5.79%</td><td>17</td><td>14.97%</td><td>9</td><td>33.33%</td><td class="num-neg">-1.06%</td><td class="num-neg">-7.00%</td><td>否</td>
+          </tr>
+          <tr>
+            <td class="left">Orderly pullback</td><td>59</td><td>5.64%</td><td>14</td><td>11.35%</td><td>6</td><td>50.00%</td><td>1.91%</td><td class="num-neg">-1.15%</td><td>否</td>
+          </tr>
+          <tr>
+            <td class="left">Confirmed leader</td><td>59</td><td>5.64%</td><td>14</td><td>11.35%</td><td>6</td><td>50.00%</td><td>1.91%</td><td class="num-neg">-1.15%</td><td>否</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="grid">
+      <div class="card span-6">
+        <h2>樣本漏斗比較</h2>
+        <table>
+          <thead><tr><th class="left">版本</th><th>資料檔</th><th>觀察數</th><th>原始訊號</th><th>Pullback 交易</th></tr></thead>
+          <tbody>
+            <tr><td class="left">V1 recent10</td><td>493 股票出現於報告</td><td class="muted">未在版本檔保存</td><td>996 合併訊號</td><td>324</td></tr>
+            <tr><td class="left">V2 3y</td><td>279 合格</td><td>186,489</td><td>23,009</td><td>3,542</td></tr>
+            <tr><td class="left">V3 1y trailing</td><td>1,936 合格</td><td>343,276</td><td>21,610</td><td>2,911</td></tr>
+            <tr><td class="left">V4 1y discount2 swing</td><td>1,936 合格</td><td>323,916</td><td>19,321</td><td>223</td></tr>
+            <tr><td class="left">V5 filters</td><td>1,936 合格</td><td>323,916</td><td>19,321</td><td>223 控制組</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card span-6">
+        <h2>給決策者的解讀</h2>
+        <p><strong>1. V1 很可能吃到近期行情紅利。</strong> 最近 10 日勝率與報酬都很漂亮，但一年與三年放大後，中位數明顯回落。</p>
+        <p><strong>2. V3 證明移動停利有作用，但不足以讓所有 pullback 穩定。</strong> 移動停利觸發 1,143 筆，但所有 pullback 的中位數仍約 0。</p>
+        <p><strong>3. V4 是目前比較合理的研究基準。</strong> 隔日開低 2% 避免追高，swing exit 提升平均與中位數，但勝率仍未達 60%。</p>
+        <p><strong>4. V5 告訴我們不要再硬調同一年資料。</strong> 強勢股過濾器在 validation 好看，但 holdout test 不穩，且樣本過小。</p>
+      </div>
+    </section>
+
+    <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_pb_v1_0_recent10.json</code>、<code>reports/pullback_pb_v2_0_3y.json</code>、<code>reports/pullback_pb_v3_0_1y_trailing10d.json</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v5_0_strong_filter_holdout.json</code>。</p>
+  </main>
+</body>
+</html>

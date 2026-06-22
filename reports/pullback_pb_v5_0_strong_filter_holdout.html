@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PB-V5 強勢股濾網防過度擬合測試</title>
+<style>
+:root{--ink:#17202a;--muted:#67727e;--line:#dfe4e8;--paper:#f7f8f6;--accent:#0c6b58;--bad:#9d3b32}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,"Noto Sans TC",sans-serif}
+main{max-width:1440px;margin:auto;padding:32px 24px} h1{font-size:28px;margin:0 0 6px;letter-spacing:0} p{color:var(--muted);margin:0 0 24px}
+.summary{display:flex;gap:32px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:24px}
+.summary b{display:block;font-size:18px} table{width:100%;border-collapse:collapse;background:white} th,td{padding:13px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top} th{font-size:12px;color:var(--muted);background:#eef1ef} small{display:block;color:var(--muted);margin-top:4px} .pass{color:var(--accent);font-weight:700} .fail{color:var(--bad);font-weight:700}
+@media(max-width:900px){main{padding:20px 12px}.summary{display:block}.summary div{margin:8px 0}.table{overflow:auto}table{min-width:1050px}}
+</style></head><body><main>
+<h1>強勢股濾網：先防過度擬合</h1>
+<p>固定 PB-V4 的隔日開低 2% 進場與波段出場，只增加三層事前濾網。門檻在回測前固定，不依報酬調參。</p>
+<section class="summary"><div>驗證期開始<b>2026-03-11</b></div><div>測試期開始<b>2026-04-15</b></div><div>穩健門檻<b>驗證與測試均改善，且各至少 20 筆</b></div></section>
+<div class="table"><table><thead><tr><th>版本</th><th>保留率</th><th>前 60%</th><th>中間 20%</th><th>最後 20%</th><th>判定</th></tr></thead><tbody><tr><td><strong>control</strong><small>PB-V4 原規則，不加強勢濾網</small></td><td>100.0%</td><td>129 筆 / 勝率 54.26% / 平均 4.55% / 中位 2.00%</td><td>59 筆 / 勝率 52.54% / 平均 6.54% / 中位 2.00%<small>相對控制 +0.00 pt</small></td><td>35 筆 / 勝率 48.57% / 平均 3.69% / 中位 -7.00%<small>相對控制 +0.00 pt</small></td><td><span class=fail>控制組</span></td></tr><tr><td><strong>price_strength</strong><small>20 日漲幅 &gt;= 8%，且收盤距 60 日高點不超過 15%</small></td><td>33.2%</td><td>48 筆 / 勝率 50.00% / 平均 3.82% / 中位 0.48%</td><td>17 筆 / 勝率 58.82% / 平均 14.97% / 中位 4.55%<small>相對控制 +8.43 pt</small></td><td>9 筆 / 勝率 33.33% / 平均 -1.06% / 中位 -7.00%<small>相對控制 -4.75 pt</small></td><td><span class=fail>未通過</span></td></tr><tr><td><strong>orderly_pullback</strong><small>價格強勢 + 收盤仍在 MA60 上 + 訊號日量 &lt;= 20 日均量 1.2 倍</small></td><td>26.5%</td><td>39 筆 / 勝率 56.41% / 平均 4.16% / 中位 2.00%</td><td>14 筆 / 勝率 50.00% / 平均 11.35% / 中位 -1.23%<small>相對控制 +4.81 pt</small></td><td>6 筆 / 勝率 50.00% / 平均 1.91% / 中位 -1.15%<small>相對控制 -1.78 pt</small></td><td><span class=fail>未通過</span></td></tr><tr><td><strong>confirmed_leader</strong><small>回檔秩序 + 過去 40 日至少一次帶量推進日</small></td><td>26.5%</td><td>39 筆 / 勝率 56.41% / 平均 4.16% / 中位 2.00%</td><td>14 筆 / 勝率 50.00% / 平均 11.35% / 中位 -1.23%<small>相對控制 +4.81 pt</small></td><td>6 筆 / 勝率 50.00% / 平均 1.91% / 中位 -1.15%<small>相對控制 -1.78 pt</small></td><td><span class=fail>未通過</span></td></tr></tbody></table></div>
+</main></body></html>

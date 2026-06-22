@@ -83,6 +83,14 @@ if (Test-Path -LiteralPath $reportsSource) {
     foreach ($name in @("daily_signal_alert.json", "daily_signal_alert.csv", "daily_signal_alert.txt", "daily_signal_top_lists.json")) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
+
+    foreach ($name in @(
+        "pullback_experiment_summary.html",
+        "pullback_pb_v4_0_1y_discount2_swing.html",
+        "pullback_pb_v5_0_strong_filter_holdout.html"
+    )) {
+        Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
+    }
 }
 
 $chartsSource = Join-Path (Join-Path $rootPath "charts") "daily_alert"
