@@ -80,7 +80,14 @@ $reportsSource = Join-Path $rootPath "reports"
 if (Test-Path -LiteralPath $reportsSource) {
     $reportsTarget = Join-Path $sitePath "reports"
     New-Item -ItemType Directory -Path $reportsTarget -Force | Out-Null
-    foreach ($name in @("daily_signal_alert.json", "daily_signal_alert.csv", "daily_signal_alert.txt", "daily_signal_top_lists.json")) {
+    foreach ($name in @(
+        "daily_signal_alert.json",
+        "daily_signal_alert.csv",
+        "daily_signal_alert.txt",
+        "daily_signal_top_lists.json",
+        "recent_all_signal_backtest_smart.json",
+        "pullback_pb_v4_0_1y_discount2_swing.json"
+    )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
 

@@ -173,6 +173,53 @@
     }
     .bar > span { display: block; height: 100%; background: var(--blue); border-radius: 999px; }
     .small { font-size: 13px; }
+    .table-tools {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 12px 0 14px;
+    }
+    .table-tools input,
+    .table-tools select {
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0 12px;
+      background: white;
+      color: var(--ink);
+      min-width: 180px;
+    }
+    .detail-table-wrapper {
+      max-height: 620px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+    }
+    .detail-table-wrapper table {
+      border: 0;
+      border-radius: 0;
+      min-width: 1280px;
+    }
+    .detail-table-wrapper thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .status-chip {
+      display: inline-flex;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+      background: #f2f4f7;
+      color: #475467;
+    }
+    .status-chip.realized { background: #ecfdf3; color: #027a48; }
+    .status-chip.unrealized { background: #fff7ed; color: #b45309; }
+    .status-chip.pending { background: #eff6ff; color: #1d4ed8; }
     .footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
   </style>
 </head>
@@ -413,7 +460,191 @@
       </div>
     </section>
 
+    <section class="card" id="trade-details">
+      <h2>逐筆個股明細：已實現 / 未實現</h2>
+      <p class="muted">這裡提供你手動驗證用的買進、賣出時間與價格。PB-V4 baseline 交易皆為已實現回測；最近 10 日報告會另外列出 <code>open_to_latest</code> 與 <code>pending_next_open</code> 等未實現狀態。</p>
+      <div class="kpi" id="detailKpis">
+        <div><div class="value">讀取中</div><div class="label">PB-V4 已實現</div></div>
+        <div><div class="value">讀取中</div><div class="label">最近 10 日已實現</div></div>
+        <div><div class="value">讀取中</div><div class="label">最近 10 日未實現</div></div>
+        <div><div class="value">讀取中</div><div class="label">最近 10 日 pending</div></div>
+      </div>
+      <div class="table-tools">
+        <input id="tradeSearch" type="search" placeholder="搜尋代號、名稱、原因、日期">
+        <select id="tradeSourceFilter" aria-label="資料來源">
+          <option value="all">全部來源</option>
+          <option value="PB-V4 baseline">PB-V4 baseline</option>
+          <option value="recent10 pullback">最近 10 日 pullback</option>
+        </select>
+        <select id="tradeStatusFilter" aria-label="狀態">
+          <option value="all">全部狀態</option>
+          <option value="已實現">已實現</option>
+          <option value="未實現">未實現</option>
+          <option value="等待進場">等待進場</option>
+        </select>
+        <span class="small muted" id="tradeCount">讀取中</span>
+      </div>
+      <div class="detail-table-wrapper">
+        <table id="tradeTable">
+          <thead>
+            <tr>
+              <th class="left">來源</th>
+              <th class="left">狀態</th>
+              <th>訊號日</th>
+              <th class="left">股票</th>
+              <th>訊號收盤</th>
+              <th>買進日</th>
+              <th>買進價</th>
+              <th>賣出日 / 估值日</th>
+              <th>賣出價 / 估值價</th>
+              <th>持有日</th>
+              <th>報酬</th>
+              <th>損益</th>
+              <th class="left">出場原因</th>
+              <th class="left">訊號原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="14" class="left muted">讀取明細中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">狀態解讀：<strong>已實現</strong>＝已觸發停損、移動停利或回測持有期滿；<strong>未實現</strong>＝目前只估到最新收盤，尚未真正出場；<strong>等待進場</strong>＝訊號出現但缺少隔日開盤資料。</p>
+    </section>
+
     <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_pb_v1_0_recent10.json</code>、<code>reports/pullback_pb_v2_0_3y.json</code>、<code>reports/pullback_pb_v3_0_1y_trailing10d.json</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v5_0_strong_filter_holdout.json</code>。</p>
   </main>
+  <script>
+    const fmt = new Intl.NumberFormat('zh-TW');
+    const money = value => value === '' || value === null || value === undefined || Number.isNaN(Number(value)) ? '-' : fmt.format(Math.round(Number(value)));
+    const pct = value => value === '' || value === null || value === undefined || Number.isNaN(Number(value)) ? '-' : `${Number(value).toFixed(2)}%`;
+    const price = value => value === '' || value === null || value === undefined || Number.isNaN(Number(value)) ? '-' : Number(value).toFixed(2);
+    const text = value => value === null || value === undefined || value === '' ? '-' : String(value);
+    const esc = value => text(value).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+
+    let allTradeRows = [];
+
+    function normalizeV4Trade(row) {
+      return {
+        source: 'PB-V4 baseline',
+        status: '已實現',
+        statusClass: 'realized',
+        signalDate: row.signal_date,
+        market: row.market,
+        stockNo: row.stock_no,
+        stockName: row.stock_name,
+        signalClose: row.signal_close,
+        entryDate: row.entry_date,
+        entryPrice: row.entry_price,
+        exitDate: row.exit_date,
+        exitPrice: row.exit_price,
+        holdingDays: row.holding_days,
+        returnPct: row.return_pct,
+        pnl: row.pnl,
+        exitReason: row.exit_reason,
+        reasons: row.reasons,
+      };
+    }
+
+    function normalizeRecentTrade(row) {
+      let status = '未實現';
+      let statusClass = 'unrealized';
+      if (row.status === 'stopped') {
+        status = '已實現';
+        statusClass = 'realized';
+      } else if (row.status === 'pending_next_open') {
+        status = '等待進場';
+        statusClass = 'pending';
+      }
+      return {
+        source: 'recent10 pullback',
+        status,
+        statusClass,
+        signalDate: row.signal_date,
+        market: row.market,
+        stockNo: row.stock_no,
+        stockName: row.stock_name,
+        signalClose: row.signal_close,
+        entryDate: row.entry_date,
+        entryPrice: row.entry_price,
+        exitDate: row.exit_date,
+        exitPrice: row.exit_price,
+        holdingDays: row.holding_days,
+        returnPct: row.return_pct,
+        pnl: row.pnl,
+        exitReason: row.exit_reason || row.status,
+        reasons: row.reasons,
+      };
+    }
+
+    function renderKpis(rows) {
+      const v4 = rows.filter(row => row.source === 'PB-V4 baseline').length;
+      const recentRealized = rows.filter(row => row.source === 'recent10 pullback' && row.status === '已實現').length;
+      const recentUnrealized = rows.filter(row => row.source === 'recent10 pullback' && row.status === '未實現').length;
+      const recentPending = rows.filter(row => row.source === 'recent10 pullback' && row.status === '等待進場').length;
+      document.getElementById('detailKpis').innerHTML = `
+        <div><div class="value">${fmt.format(v4)}</div><div class="label">PB-V4 已實現</div></div>
+        <div><div class="value">${fmt.format(recentRealized)}</div><div class="label">最近 10 日已實現</div></div>
+        <div><div class="value">${fmt.format(recentUnrealized)}</div><div class="label">最近 10 日未實現</div></div>
+        <div><div class="value">${fmt.format(recentPending)}</div><div class="label">最近 10 日等待進場</div></div>
+      `;
+    }
+
+    function renderTrades() {
+      const query = document.getElementById('tradeSearch').value.trim().toLowerCase();
+      const source = document.getElementById('tradeSourceFilter').value;
+      const status = document.getElementById('tradeStatusFilter').value;
+      const filtered = allTradeRows.filter(row => {
+        if (source !== 'all' && row.source !== source) return false;
+        if (status !== 'all' && row.status !== status) return false;
+        if (!query) return true;
+        return [row.source, row.status, row.signalDate, row.market, row.stockNo, row.stockName, row.entryDate, row.exitDate, row.exitReason, row.reasons]
+          .map(value => String(value || '').toLowerCase())
+          .some(value => value.includes(query));
+      });
+      document.getElementById('tradeCount').textContent = `顯示 ${fmt.format(filtered.length)} / ${fmt.format(allTradeRows.length)} 筆`;
+      const tbody = document.querySelector('#tradeTable tbody');
+      tbody.innerHTML = filtered.map(row => `
+        <tr>
+          <td class="left">${esc(row.source)}</td>
+          <td class="left"><span class="status-chip ${row.statusClass}">${esc(row.status)}</span></td>
+          <td>${esc(row.signalDate)}</td>
+          <td class="left"><strong>${esc(row.stockNo)}</strong> ${esc(row.stockName)} <span class="muted">${esc(row.market)}</span></td>
+          <td>${price(row.signalClose)}</td>
+          <td>${esc(row.entryDate)}</td>
+          <td>${price(row.entryPrice)}</td>
+          <td>${esc(row.exitDate)}</td>
+          <td>${price(row.exitPrice)}</td>
+          <td>${esc(row.holdingDays)}</td>
+          <td class="${Number(row.returnPct) >= 0 ? 'num-pos' : 'num-neg'}">${pct(row.returnPct)}</td>
+          <td class="${Number(row.pnl) >= 0 ? 'num-pos' : 'num-neg'}">${money(row.pnl)}</td>
+          <td class="left">${esc(row.exitReason)}</td>
+          <td class="left">${esc(row.reasons)}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="14" class="left muted">沒有符合條件的資料</td></tr>';
+    }
+
+    async function loadTradeDetails() {
+      try {
+        const [v4, recent] = await Promise.all([
+          fetch('pullback_pb_v4_0_1y_discount2_swing.json').then(res => res.json()),
+          fetch('recent_all_signal_backtest_smart.json').then(res => res.json()),
+        ]);
+        const v4Rows = (v4.trades || []).filter(row => row.exit_style === 'swing_d2').map(normalizeV4Trade);
+        const recentRows = (recent.rows || []).filter(row => row.category === 'pullback').map(normalizeRecentTrade);
+        allTradeRows = [...v4Rows, ...recentRows].sort((a, b) => String(b.signalDate).localeCompare(String(a.signalDate)) || String(a.stockNo).localeCompare(String(b.stockNo)));
+        renderKpis(allTradeRows);
+        renderTrades();
+      } catch (error) {
+        document.querySelector('#tradeTable tbody').innerHTML = `<tr><td colspan="14" class="left num-neg">明細讀取失敗：${esc(error.message)}</td></tr>`;
+      }
+    }
+
+    ['tradeSearch', 'tradeSourceFilter', 'tradeStatusFilter'].forEach(id => {
+      document.addEventListener('input', event => { if (event.target && event.target.id === id) renderTrades(); });
+      document.addEventListener('change', event => { if (event.target && event.target.id === id) renderTrades(); });
+    });
+    loadTradeDetails();
+  </script>
 </body>
 </html>
