@@ -705,7 +705,7 @@
           : '移動停利：價格達啟動條件後，從高點回落到追蹤停利線出場';
       }
       if (reason === 'hard_stop') return '硬停損：盤中低點碰到進場價 -7%';
-      if (reason === 'max_hold_close') return '時間到出場：持有到最長天數，用當日收盤價出場';
+      if (reason === 'max_hold_close') return '時間到出場：持有滿 20 日後用收盤價出場；這不代表趨勢轉弱，只是原規則強制結束回測';
       if (reason === 'latest_close') return '尚未正式出場：先用最新收盤價估值';
       if (reason === 'pending_next_open') return '等待進場：訊號後還沒有隔日開盤價';
       if (reason === 'latest_close_no_max_hold') return '無最長持有測試：尚未觸發停損/停利，估到資料最後收盤';
@@ -941,15 +941,65 @@
         .sort((a, b) => Date.parse(a.signalDate || '') - Date.parse(b.signalDate || ''));
     }
 
-    function renderFollowupBox(trade) {
+    function simulateNoMaxHold(rows, trade) {
+      const entryIndex = rows.findIndex(row => row.date === trade.entryDate);
+      if (entryIndex < 0 || !Number.isFinite(Number(trade.entryPrice))) return null;
+      const entryPrice = Number(trade.entryPrice);
+      const hardStop = entryPrice * 0.93;
+      const activationPrice = entryPrice * 1.12;
+      const floorPrice = entryPrice * 1.02;
+      let highest = entryPrice;
+      let trailingStop = null;
+      const observed = [];
+      for (let index = entryIndex; index < rows.length; index += 1) {
+        const row = rows[index];
+        observed.push(row);
+        let exitPrice = null;
+        let exitReason = '';
+        if (row.low <= hardStop) {
+          exitPrice = hardStop;
+          exitReason = 'hard_stop';
+        }
+        if (trailingStop !== null && row.low <= trailingStop && (exitPrice === null || trailingStop > exitPrice)) {
+          exitPrice = trailingStop;
+          exitReason = 'trailing_stop';
+        }
+        if (exitPrice !== null) {
+          return {
+            exitDate: row.date,
+            exitPrice,
+            exitReason,
+            holdingDays: observed.length,
+            returnPct: (exitPrice / entryPrice - 1) * 100,
+            mfePct: (Math.max(...observed.map(item => item.high)) / entryPrice - 1) * 100,
+          };
+        }
+        highest = Math.max(highest, row.high);
+        if (highest >= activationPrice) {
+          trailingStop = Math.max(trailingStop || 0, highest * 0.88, floorPrice);
+        }
+      }
+      const last = rows[rows.length - 1];
+      return {
+        exitDate: last.date,
+        exitPrice: last.close,
+        exitReason: 'latest_close_no_max_hold',
+        holdingDays: observed.length,
+        returnPct: (last.close / entryPrice - 1) * 100,
+        mfePct: (Math.max(...observed.map(item => item.high)) / entryPrice - 1) * 100,
+      };
+    }
+
+    function renderFollowupBox(trade, priceRows = []) {
       const box = document.getElementById(`followup-${trade._id}`);
       if (!box) return;
+      const noMax = priceRows.length ? simulateNoMaxHold(priceRows, trade) : null;
+      const noMaxHtml = trade.exitReason === 'max_hold_close' && noMax ? `<p><strong>如果不因 20 日時間到出場、而是續抱：</strong>${esc(noMax.exitDate)} 會以「${esc(exitReasonLabel({ ...trade, exitReason: noMax.exitReason }))}」出場 / 估值，報酬約 <strong class="${noMax.returnPct >= 0 ? 'num-pos' : 'num-neg'}">${pct(noMax.returnPct)}</strong>，持有 ${noMax.holdingDays} 日，期間最大浮盈約 ${pct(noMax.mfePct)}。原本 max_hold_close 報酬是 ${pct(trade.returnPct)}。</p>` : '';
       const rows = followupSignals(trade);
-      if (!rows.length) {
-        box.innerHTML = '<strong>出場後同股後續訊號：</strong>目前這份報告資料裡沒有看到同一檔股票在出場後再次符合 pullback / 進場紀錄。這不代表技術面完全沒有反彈，只代表沒有符合目前報告保存的條件。';
-        return;
-      }
-      box.innerHTML = `<strong>出場後同股後續訊號：</strong>找到 ${rows.length} 筆，前 5 筆如下：<ul>${rows.slice(0, 5).map(row => `<li>${esc(row.signalDate)}｜${esc(row.source)}｜${esc(row.status)}｜訊號收盤 ${price(row.signalClose)}｜買進 ${esc(row.entryDate)} @ ${price(row.entryPrice)}｜${esc(row.reasons)}</li>`).join('')}</ul>`;
+      const followupHtml = !rows.length
+        ? '<p><strong>出場後同股後續訊號：</strong>目前這份報告資料裡沒有看到同一檔股票在出場後再次符合 pullback / 進場紀錄。這不代表技術面完全沒有反彈，只代表沒有符合目前報告保存的條件。</p>'
+        : `<p><strong>出場後同股後續訊號：</strong>找到 ${rows.length} 筆，前 5 筆如下：</p><ul>${rows.slice(0, 5).map(row => `<li>${esc(row.signalDate)}｜${esc(row.source)}｜${esc(row.status)}｜訊號收盤 ${price(row.signalClose)}｜買進 ${esc(row.entryDate)} @ ${price(row.entryPrice)}｜${esc(row.reasons)}</li>`).join('')}</ul>`;
+      box.innerHTML = noMaxHtml + followupHtml;
     }
 
     function drawKline(canvas, rows, trade) {
@@ -1075,7 +1125,7 @@
         const allRows = parseCsv(csvText);
         const visibleRows = chartWindow(allRows, trade);
         drawKline(canvas, visibleRows, trade);
-        renderFollowupBox(trade);
+        renderFollowupBox(trade, allRows);
       } catch (error) {
         panel.insertAdjacentHTML('beforeend', `<p class="num-neg">K線讀取失敗：${esc(error.message)}</p>`);
       }
