@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang='zh-Hant'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>PB-V6.0-trend-review-variants</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif; margin: 0; background: #f6f7fb; color: #172033; line-height: 1.65; }
+main { max-width: 1180px; margin: auto; padding: 32px 24px 64px; }
+.card { background: #fff; border: 1px solid #e4e7ec; border-radius: 18px; padding: 20px; margin: 18px 0; box-shadow: 0 12px 34px rgba(15,23,42,.06); }
+h1 { margin: 0 0 10px; font-size: 34px; }
+table { width: 100%; border-collapse: collapse; background: #fff; font-size: 14px; }
+th, td { border-bottom: 1px solid #e4e7ec; padding: 10px; text-align: right; vertical-align: top; }
+th { background: #f8fafc; }
+.left { text-align: left; }
+.note { border-left: 4px solid #2563eb; background: #eff6ff; padding: 12px 14px; border-radius: 12px; }
+.warn { border-left: 4px solid #b45309; background: #fff7ed; padding: 12px 14px; border-radius: 12px; }
+code { background: #f2f4f7; padding: 2px 6px; border-radius: 6px; }
+</style>
+</head>
+<body><main>
+<h1>PB-V6.0-trend-review-variants</h1>
+<p class='note'>測試目的：把 PB-V4 的第 20 天 <code>max_hold_close</code> 改成「趨勢檢查」，符合條件就續抱，不符合才出場。</p>
+<div class='card'>
+<h2>Baseline</h2>
+<p>PB-V4 原版：223 筆，勝率 52.91%，平均 4.94%，中位數 2.00%，總損益 1,102,430。</p>
+</div>
+<div class='card'>
+<h2>變體總表</h2>
+<table><thead><tr><th class='left'>版本</th><th>交易</th><th>勝率</th><th>平均</th><th>中位數</th><th>總損益</th><th>被趨勢檢查影響</th><th>估到最新收盤</th><th class='left'>出場分布</th></tr></thead><tbody><tr><td class='left'>第20日站上MA20才續抱；跌破MA20出場</td><td>223</td><td>52.47%</td><td>5.33%</td><td>2.00%</td><td>1,187,910</td><td>21</td><td>1</td><td>{'hard_stop': 104, 'trailing_stop': 107, 'trend_review_close': 11, 'latest_close_after_review': 1}</td></tr><tr><td class='left'>第20日站上MA10才續抱；跌破MA10出場</td><td>223</td><td>52.47%</td><td>4.96%</td><td>2.00%</td><td>1,105,270</td><td>21</td><td>0</td><td>{'hard_stop': 104, 'trailing_stop': 102, 'trend_review_close': 17}</td></tr><tr><td class='left'>第20日仍站上MA60且MA20≥MA60才續抱</td><td>223</td><td>52.47%</td><td>5.89%</td><td>2.00%</td><td>1,313,360</td><td>21</td><td>2</td><td>{'hard_stop': 105, 'trailing_stop': 113, 'trend_review_close': 3, 'latest_close_after_review': 2}</td></tr><tr><td class='left'>第20日未跌破前20日低點才續抱；跌破前低出場</td><td>223</td><td>52.02%</td><td>6.02%</td><td>2.00%</td><td>1,341,850</td><td>21</td><td>3</td><td>{'hard_stop': 105, 'trailing_stop': 113, 'trend_review_close': 2, 'latest_close_after_review': 3}</td></tr><tr><td class='left'>第20日站上MA20續抱；之後改用跌破MA20出場，不再用移動停利</td><td>223</td><td>52.47%</td><td>6.08%</td><td>2.00%</td><td>1,356,880</td><td>21</td><td>2</td><td>{'hard_stop': 104, 'trailing_stop': 98, 'trend_review_close': 19, 'latest_close_after_review': 2}</td></tr><tr><td class='left'>寬鬆趨勢檢查：站上MA20或靠近MA60且MA20≥MA60才續抱</td><td>223</td><td>52.02%</td><td>6.03%</td><td>2.00%</td><td>1,344,800</td><td>21</td><td>3</td><td>{'hard_stop': 105, 'trailing_stop': 113, 'trend_review_close': 2, 'latest_close_after_review': 3}</td></tr></tbody></table>
+</div>
+<div class='card'>
+<h2>目前數字最佳：第20日站上MA20續抱；之後改用跌破MA20出場，不再用移動停利</h2>
+<p class='warn'>平均報酬最高不等於可部署。仍需看勝率、中位數、估值未實現數量，以及後續 holdout / walk-forward。</p>
+<table><thead><tr><th class='left'>股票</th><th>訊號日</th><th>PB-V4出場</th><th>PB-V4報酬</th><th>變體出場</th><th class='left'>變體原因</th><th>變體報酬</th><th>差異</th></tr></thead><tbody><tr><td class='left'>3037 欣興</td><td>2025-11-18</td><td>2025-12-16</td><td>30.49%</td><td>2026-03-09</td><td>trend_review_close</td><td>137.20%</td><td>106.71%</td></tr><tr><td class='left'>8131 福懋科</td><td>2025-11-20</td><td>2025-12-18</td><td>16.50%</td><td>2026-02-02</td><td>trend_review_close</td><td>77.75%</td><td>61.25%</td></tr><tr><td class='left'>6196 帆宣</td><td>2026-03-20</td><td>2026-04-21</td><td>41.71%</td><td>2026-06-18</td><td>latest_close_after_review</td><td>102.14%</td><td>60.43%</td></tr><tr><td class='left'>6603 富強鑫</td><td>2025-11-10</td><td>2025-12-08</td><td>24.93%</td><td>2026-01-26</td><td>trend_review_close</td><td>62.47%</td><td>37.54%</td></tr><tr><td class='left'>2851 中再保</td><td>2026-04-15</td><td>2026-05-14</td><td>8.52%</td><td>2026-06-18</td><td>latest_close_after_review</td><td>27.87%</td><td>19.35%</td></tr><tr><td class='left'>8039 台虹</td><td>2025-11-04</td><td>2025-12-02</td><td>28.37%</td><td>2025-12-29</td><td>trend_review_close</td><td>42.95%</td><td>14.58%</td></tr><tr><td class='left'>6190 萬泰科</td><td>2026-03-27</td><td>2026-04-28</td><td>34.33%</td><td>2026-06-08</td><td>trend_review_close</td><td>43.28%</td><td>8.95%</td></tr><tr><td class='left'>2009 第一銅</td><td>2025-12-09</td><td>2026-01-08</td><td>9.43%</td><td>2026-01-22</td><td>trend_review_close</td><td>9.89%</td><td>0.46%</td></tr><tr><td class='left'>5864 致和證</td><td>2026-03-06</td><td>2026-04-07</td><td>-1.04%</td><td>2026-04-07</td><td>trend_review_close</td><td>-1.04%</td><td>0.00%</td></tr><tr><td class='left'>8299 群聯</td><td>2025-11-20</td><td>2025-12-18</td><td>1.41%</td><td>2025-12-18</td><td>trend_review_close</td><td>1.41%</td><td>0.00%</td></tr><tr><td class='left'>2369 菱生</td><td>2026-03-30</td><td>2026-04-29</td><td>2.72%</td><td>2026-04-29</td><td>trend_review_close</td><td>2.72%</td><td>0.00%</td></tr><tr><td class='left'>2891 中信金</td><td>2026-03-20</td><td>2026-04-21</td><td>4.33%</td><td>2026-04-21</td><td>trend_review_close</td><td>4.33%</td><td>0.00%</td></tr><tr><td class='left'>4739 康普</td><td>2025-12-12</td><td>2026-01-13</td><td>7.60%</td><td>2026-01-29</td><td>trend_review_close</td><td>5.96%</td><td>-1.64%</td></tr><tr><td class='left'>2883 凱基金</td><td>2026-03-06</td><td>2026-04-07</td><td>5.12%</td><td>2026-04-23</td><td>trend_review_close</td><td>3.32%</td><td>-1.80%</td></tr><tr><td class='left'>2369 菱生</td><td>2026-03-27</td><td>2026-04-28</td><td>3.00%</td><td>2026-04-29</td><td>trend_review_close</td><td>0.67%</td><td>-2.33%</td></tr></tbody></table>
+</div>
+</main></body></html>

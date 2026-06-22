@@ -612,6 +612,17 @@
         <p><strong>4. V5 告訴我們不要再硬調同一年資料。</strong> 強勢股過濾器在 validation 好看，但 holdout test 不穩，且樣本過小。</p>
         <p class="no-max-note"><strong>拿掉 max hold 的測試：</strong>PB-V4 從 20 日上限改成不設最長持有後，平均報酬由 4.94% 升至 6.04%，但勝率由 52.91% 小降至 52.47%，中位數仍是 2.00%。而且有 3 筆持有到資料最後一天才估值，這不是完整已實現出場，所以只能當研究，不建議直接把 max hold 拿掉後部署。</p>
         <p class="no-max-note"><strong>PB-V6 趨勢檢查版：</strong>第 20 天不再強制賣出，而是檢查是否仍站上 MA20 / MA60 且 MA20 ≥ MA60；趨勢仍成立就續抱，直到硬停損、移動停利、趨勢轉弱或資料結束。結果：223 筆、勝率 52.02%、平均報酬 6.03%、中位數 2.00%、總損益 1,344,800。相較 PB-V4，平均報酬提升，但勝率略降；原本 21 筆 max_hold_close 中，有些續抱大幅改善，也有欣興、景碩這類第 20 天出場反而較漂亮的案例。因此這版可作為研究方向，但還需要再切 holdout / walk-forward 驗證。</p>
+        <div class="no-max-note"><strong>PB-V6 續抱條件批次測試：</strong>
+          <table style="margin-top:10px"><thead><tr><th class="left">續抱條件</th><th>勝率</th><th>平均</th><th>中位數</th><th>總損益</th><th>估到最新收盤</th></tr></thead><tbody>
+            <tr><td class="left">V6E：第20日站上 MA20 續抱；之後跌破 MA20 出場，不再用移動停利</td><td>52.47%</td><td>6.08%</td><td>2.00%</td><td>1,356,880</td><td>2</td></tr>
+            <tr><td class="left">V6F：站上 MA20 或靠近 MA60 且 MA20 ≥ MA60 續抱</td><td>52.02%</td><td>6.03%</td><td>2.00%</td><td>1,344,800</td><td>3</td></tr>
+            <tr><td class="left">V6D：未跌破前20日低點續抱；跌破前低出場</td><td>52.02%</td><td>6.02%</td><td>2.00%</td><td>1,341,850</td><td>3</td></tr>
+            <tr><td class="left">V6C：仍站上 MA60 且 MA20 ≥ MA60 續抱</td><td>52.47%</td><td>5.89%</td><td>2.00%</td><td>1,313,360</td><td>2</td></tr>
+            <tr><td class="left">V6A：站上 MA20 續抱；跌破 MA20 出場，保留移動停利</td><td>52.47%</td><td>5.33%</td><td>2.00%</td><td>1,187,910</td><td>1</td></tr>
+            <tr><td class="left">V6B：站上 MA10 續抱；跌破 MA10 出場</td><td>52.47%</td><td>4.96%</td><td>2.00%</td><td>1,105,270</td><td>0</td></tr>
+          </tbody></table>
+          <p class="small">目前數字最佳是 V6E，但它的 best return 到 137.20%，代表少數延長持有的大贏家對平均貢獻很大；中位數仍沒有改善，所以仍不能直接部署。完整報告：<a href="pullback_pb_v6_trend_review_variants.html" target="_blank" rel="noopener">PB-V6 續抱條件批次測試</a>。</p>
+        </div>
       </div>
     </section>
 
