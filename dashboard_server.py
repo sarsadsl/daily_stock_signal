@@ -410,8 +410,8 @@ def sync_one_symbol(market: str, symbol: Symbol, start: date, today: date) -> tu
     return [], f"{symbol.code} 完成，無訊號", False
 
 
-def sync_daily_market_data(markets: list[str], limit: int | None = None) -> bool:
-    today = date.today()
+def sync_daily_market_data(markets: list[str], limit: int | None = None, target_date: date | None = None) -> bool:
+    today = target_date or date.today()
     update_status(message="載入股票清單", current="TWSE + TPEx")
     symbols_by_market = {market: load_symbols(market, limit) for market in markets}
     all_symbols = [(market, symbol) for market, symbols in symbols_by_market.items() for symbol in symbols]
@@ -461,7 +461,8 @@ def sync_daily_market_data(markets: list[str], limit: int | None = None) -> bool
                     append_csv_row(latest_path, daily_row)
                     records = [row for row in existing + [daily_row] if start.isoformat() <= row.get("date", "") <= target_date.isoformat()]
                 elif latest_path and latest_date and latest_date >= target_date:
-                    records = existing
+                    records = merge_rows(existing, [daily_row], start, target_date)
+                    write_csv(latest_path, records)
                 else:
                     records = merge_rows(existing, [daily_row], start, target_date)
                     write_csv(output, records)
@@ -491,10 +492,16 @@ def sync_daily_market_data(markets: list[str], limit: int | None = None) -> bool
     return True
 
 
-def sync_market_data(markets: list[str], limit: int | None, workers: int = DEFAULT_WORKERS, mode: str = "auto") -> None:
+def sync_market_data(
+    markets: list[str],
+    limit: int | None,
+    workers: int = DEFAULT_WORKERS,
+    mode: str = "auto",
+    target_date: date | None = None,
+) -> None:
     if mode in {"auto", "daily"} and limit is None:
         try:
-            sync_daily_market_data(markets, limit)
+            sync_daily_market_data(markets, limit, target_date)
             return
         except Exception as exc:
             append_log(f"快速同步失敗：{exc}")
@@ -505,7 +512,7 @@ def sync_market_data(markets: list[str], limit: int | None, workers: int = DEFAU
             )
             return
 
-    today = date.today()
+    today = target_date or date.today()
     start = today - timedelta(days=365)
     update_status(message="載入股票清單", current="TWSE + TPEx")
     all_symbols = [(market, symbol) for market in markets for symbol in load_symbols(market, limit)]

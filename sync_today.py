@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 
 from dashboard_server import sync_market_data
+from fetch_daily_trades import parse_iso_date
 
 
 def parse_args() -> argparse.Namespace:
@@ -19,13 +20,15 @@ def parse_args() -> argparse.Namespace:
         default="auto",
         help="auto uses whole-market daily sync first, symbol forces per-stock sync.",
     )
+    parser.add_argument("--as-of", help="Target market date in YYYY-MM-DD. Defaults to today.")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     markets = [market for market in args.market.split(",") if market in {"twse", "tpex"}]
-    sync_market_data(markets or ["twse", "tpex"], args.limit, args.workers, args.mode)
+    target_date = parse_iso_date(args.as_of) if args.as_of else None
+    sync_market_data(markets or ["twse", "tpex"], args.limit, args.workers, args.mode, target_date)
     return 0
 
 

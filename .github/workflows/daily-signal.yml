@@ -5,6 +5,11 @@ on:
     # 18:00 Asia/Taipei, Monday-Friday.
     - cron: "0 10 * * 1-5"
   workflow_dispatch:
+    inputs:
+      as_of:
+        description: "Target market date in YYYY-MM-DD. Leave blank for today."
+        required: false
+        type: string
 
 concurrency:
   group: daily-stock-signal-main
@@ -39,7 +44,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Sync market data
-        run: python sync_today.py --workers 6 --mode auto
+        run: |
+          if [ -n "${{ inputs.as_of }}" ]; then
+            python sync_today.py --workers 6 --mode auto --as-of "${{ inputs.as_of }}"
+          else
+            python sync_today.py --workers 6 --mode auto
+          fi
 
       - name: Build signal reports
         env:
@@ -63,8 +73,9 @@ jobs:
           from pathlib import Path
           from zoneinfo import ZoneInfo
 
+          expected = "${{ inputs.as_of }}"
           now = datetime.now(ZoneInfo("Asia/Taipei"))
-          today = now.date().isoformat()
+          today = expected or now.date().isoformat()
           if now.weekday() >= 5:
               print(f"Weekend in Asia/Taipei; skipping freshness check for {today}.")
               raise SystemExit(0)
