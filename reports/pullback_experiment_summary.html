@@ -60,6 +60,7 @@
       border-radius: 20px;
       padding: 22px;
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
     .span-4 { grid-column: span 4; }
     .span-6 { grid-column: span 6; }
@@ -173,6 +174,13 @@
     }
     .bar > span { display: block; height: 100%; background: var(--blue); border-radius: 999px; }
     .small { font-size: 13px; }
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-scroll table {
+      min-width: 760px;
+    }
     .table-tools {
       display: flex;
       gap: 10px;
@@ -386,11 +394,11 @@
     <section class="grid">
       <div class="card span-8">
         <h2>目前結論</h2>
-        <p class="note"><strong>目前 pullback 研究 baseline 是 <code>PB-V4.0-1y-discount2-swing</code>。</strong> 它要求隔日開盤至少比訊號日收盤低 2%，再用較寬的 swing 出場規則降低過早被洗掉的問題。</p>
-        <p class="warn"><strong>不可部署：</strong>V1 最近 10 日很強，但樣本時間太短；V5 強勢股過濾在最後 20% holdout 失敗；breakout 系列也已被擴樣本否決。</p>
+        <p class="note"><strong>目前 pullback 的凍結候選版是 <code>PB-V18.0-finite-capital</code>。</strong> 它把 PB-V15 的全訊號歷史、PB-V17 的跳空感知雙段出場，再加上 50 萬本金 / 最多 5 檔 / 每日最多新增 2 檔 / 成本與滑價壓力，整理成可執行組合規則。</p>
+        <p class="warn"><strong>仍不能直接實盤：</strong>PB-V18 雖然是第一個完整一年通過門檻、且成本後仍贏 0050 的版本，但最後 20% 留出切片仍偏弱，所以目前定位是「凍結候選版」，不是正式部署版。</p>
         <div>
-          <span class="pill green">目前 baseline：PB-V4</span>
-          <span class="pill orange">V5 過濾器失敗</span>
+          <span class="pill green">凍結候選：PB-V18</span>
+          <span class="pill orange">研究基準：PB-V4 / PB-V15</span>
           <span class="pill gray">每筆等額 100,000</span>
           <span class="pill red">尚不可部署</span>
         </div>
@@ -400,12 +408,74 @@
         <p><strong>訊號：</strong>多頭趨勢中的回測 / 支撐 / 月線 / 季線型訊號。</p>
         <p><strong>進場：</strong>訊號日之後的下一個交易日開盤。</p>
         <p><strong>資金：</strong>每筆固定 <code>100,000</code>。</p>
-        <p><strong>最新 baseline 出場：</strong>-7% 硬停損；+12% 後啟動 12% 移動停利，並有 +2% 獲利底線；最多持有 20 日。</p>
+        <p><strong>PB-V18 出場：</strong>-7% 硬停損；高點達 +12% 後把停損抬到 +2%；高點達 +15% 後改用高點回撤 18% 的 runner stop，並保留 +2% 獲利底線。</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>V8 / V9 / V10 / V14 / V18 演進比較</h2>
+      <p class="muted">這五版是從「怎麼挑標的」一路走到「怎麼真的拿有限本金去做」的關鍵節點。下面把目標、主要差異、樣本數量與結果攤平放在一起。</p>
+      <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="left">版本</th>
+            <th class="left">目標</th>
+            <th class="left">和前版相比的關鍵差異</th>
+            <th>樣本數量</th>
+            <th>完整期表現</th>
+            <th class="left">結論</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left"><code>PB-V8</code></td>
+            <td class="left">先只研究「多週期進場濾網」能不能把 pullback 做到 60% / 10%</td>
+            <td class="left">加入週 / 月趨勢、三關價、0050 盤勢、市場廣度、每日 top-N 排名；共測 2,304 組可解釋入口</td>
+            <td>2,304 組入口<br><span class="small muted">選定版本 38 筆<br>母體 223 筆</span></td>
+            <td>38 筆｜55.26%｜8.22%</td>
+            <td class="left">測試切片只剩 5 筆且平均 <span class="num-neg">-3.90%</span>，代表單靠進場濾網不夠</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V9</code></td>
+            <td class="left">固定較強的入口後，改研究「怎樣出場才不會太早被洗掉」</td>
+            <td class="left">把進場固定成 <code>abc_fast + monthly trend + close near MA20</code>，比較 9 種戰術倉 / 核心倉 / 混合出場</td>
+            <td>79 筆入口 cohort<br><span class="small muted">9 種出場</span></td>
+            <td>79 筆｜55.70%｜24.40%<br><span class="small muted">已出場 74 筆｜52.70%｜12.11%</span></td>
+            <td class="left">平均報酬看起來很漂亮，但靠少數長抱飆股撐起來，留出測試是 <span class="num-neg">-0.12%</span></td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V10</code></td>
+            <td class="left">把進場和出場一起聯合搜尋，確認是不是有組合能自然過關</td>
+            <td class="left">2,304 組入口 × 9 種出場，共 20,736 組；只用 train + validation 選規則，最後 20% 不碰</td>
+            <td>20,736 組組合<br><span class="small muted">選定組合 79 筆</span></td>
+            <td>79 筆｜55.70%｜24.40%<br><span class="small muted">未實現 5 筆</span></td>
+            <td class="left">沒有任何組合同時滿足低未實現與留出測試過關，證明單靠搜尋會碰到過擬合</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V14</code></td>
+            <td class="left">驗證「只做大盤主升段」能不能修正三年樣本失敗</td>
+            <td class="left">0050 做 4:1 分割還原後，加入單一預先宣告閘門：<code>0050 close &gt; MA60 且 MA20 &gt; MA60</code></td>
+            <td>64 筆已出場<br><span class="small muted">訊號保留率 89.04%<br>原本 72 筆</span></td>
+            <td>64 筆｜57.81%｜9.35%</td>
+            <td class="left">比全市場寬停利略好，但還是沒到 60% / 10%；盤勢閘門本身不是解答</td>
+          </tr>
+          <tr>
+            <td class="left"><code>PB-V18</code></td>
+            <td class="left">把研究版收斂成真正可執行的有限本金組合，並納入成本壓力</td>
+            <td class="left">凍結 PB-V15 進場 + PB-V17 跳空感知出場，再加 50 萬本金、5 檔上限、每日最多新增 2 檔、手續費、證交稅與雙邊 0.10% 滑價壓力</td>
+            <td>28 筆選入<br><span class="small muted">27 筆已出場<br>1 筆未實現</span></td>
+            <td>成本後 27 筆｜62.96%｜12.26%<br><span class="small muted">壓力後本金報酬 64.91%</span></td>
+            <td class="left">第一個完整一年過門檻的版本，但最後 20% 已出場僅 5 筆、平均 <span class="num-neg">-0.36%</span>，所以先凍結觀察</td>
+          </tr>
+        </tbody>
+      </table>
       </div>
     </section>
 
     <section class="card">
       <h2>版本總表</h2>
+      <div class="table-scroll">
       <table>
         <thead>
           <tr>
@@ -452,6 +522,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </section>
 
     <section class="grid">
@@ -628,19 +699,21 @@
     </section>
 
     <section class="card" id="trade-details">
-      <h2>逐筆個股明細：已實現 / 未實現</h2>
-      <p class="muted">這裡提供你手動驗證用的買進、賣出時間與價格。PB-V4 baseline 交易皆為已實現回測；最近 10 日報告會另外列出 <code>open_to_latest</code> 與 <code>pending_next_open</code> 等未實現狀態。</p>
+      <h2>逐筆個股明細：PB-V4 / PB-V18 / 最近 10 日</h2>
+      <p class="muted">這裡提供你手動驗證用的買進、賣出時間與價格。除了 PB-V4 baseline 與最近 10 日 pullback 之外，現在也把 <code>PB-V18</code> 的實際組合操作紀錄併進來，方便直接比對「研究版」和「有限本金版」的差別。</p>
       <div class="kpi" id="detailKpis">
         <div><div class="value">讀取中</div><div class="label">PB-V4 已實現</div></div>
+        <div><div class="value">讀取中</div><div class="label">PB-V18 已出場</div></div>
+        <div><div class="value">讀取中</div><div class="label">PB-V18 未出場</div></div>
         <div><div class="value">讀取中</div><div class="label">最近 10 日已實現</div></div>
-        <div><div class="value">讀取中</div><div class="label">最近 10 日未實現</div></div>
-        <div><div class="value">讀取中</div><div class="label">最近 10 日 pending</div></div>
+        <div><div class="value">讀取中</div><div class="label">最近 10 日未實現 / pending</div></div>
       </div>
       <div class="table-tools">
         <input id="tradeSearch" type="search" placeholder="搜尋代號、名稱、原因、日期">
         <select id="tradeSourceFilter" aria-label="資料來源">
           <option value="all">全部來源</option>
           <option value="PB-V4 baseline">PB-V4 baseline</option>
+          <option value="PB-V18 finite-capital">PB-V18 finite-capital</option>
           <option value="recent10 pullback">最近 10 日 pullback</option>
         </select>
         <select id="tradeStatusFilter" aria-label="狀態">
@@ -676,10 +749,10 @@
           </tbody>
         </table>
       </div>
-      <p class="small muted">狀態解讀：<strong>已實現</strong>＝已觸發停損、移動停利或回測持有期滿；<strong>未實現</strong>＝目前只估到最新收盤，尚未真正出場；<strong>等待進場</strong>＝訊號出現但缺少隔日開盤資料。</p>
+      <p class="small muted">狀態解讀：<strong>已實現</strong>＝已觸發停損、移動停利、runner stop 或回測持有期滿；<strong>未實現</strong>＝目前只估到最新收盤，尚未真正出場；<strong>等待進場</strong>＝訊號出現但缺少隔日開盤資料。</p>
     </section>
 
-    <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_pb_v1_0_recent10.json</code>、<code>reports/pullback_pb_v2_0_3y.json</code>、<code>reports/pullback_pb_v3_0_1y_trailing10d.json</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v5_0_strong_filter_holdout.json</code>。</p>
+    <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v8_multitimeframe_search.json</code>、<code>reports/pullback_pb_v9_core_position.json</code>、<code>reports/pullback_pb_v10_joint_search.json</code>、<code>reports/pullback_pb_v14_market_gate.json</code>、<code>reports/pullback_pb_v18_finite_capital.json</code>、<code>recent_all_signal_backtest_smart.json</code>。</p>
   </main>
 
   <div class="modal-backdrop" id="chartModal" role="dialog" aria-modal="true" aria-labelledby="chartTitle">
@@ -718,6 +791,10 @@
           : '移動停利：價格達啟動條件後，從高點回落到追蹤停利線出場';
       }
       if (reason === 'hard_stop') return '硬停損：盤中低點碰到進場價 -7%';
+      if (reason === 'gap_hard_stop') return '跳空硬停損：開盤直接低於硬停損價，按開盤價出場';
+      if (reason === 'gap_runner_stop') return '跳空 runner stop：開盤直接低於獲利保護線，按開盤價出場';
+      if (reason === 'runner_trailing_stop') return 'runner stop：高點達強勢門檻後，依高點回撤 18% 或 +2% 底線出場';
+      if (reason === 'rebound_profit_floor') return '反彈保本停利：曾達啟動門檻後回落至 +2% 獲利底線';
       if (reason === 'max_hold_close') return '時間到出場：持有滿 20 日後用收盤價出場；這不代表趨勢轉弱，只是原規則強制結束回測';
       if (reason === 'latest_close') return '尚未正式出場：先用最新收盤價估值';
       if (reason === 'pending_next_open') return '等待進場：訊號後還沒有隔日開盤價';
@@ -785,16 +862,41 @@
       };
     }
 
+    function normalizeV18Trade(row) {
+      const unresolved = Boolean(row.unresolved);
+      return {
+        source: 'PB-V18 finite-capital',
+        status: unresolved ? '未實現' : '已實現',
+        statusClass: unresolved ? 'unrealized' : 'realized',
+        signalDate: row.signal_date,
+        market: row.market,
+        stockNo: row.stock_no,
+        stockName: row.stock_name,
+        signalClose: row.signal_close,
+        entryDate: row.entry_date,
+        entryPrice: row.entry_price,
+        exitDate: row.exit_date,
+        exitPrice: row.exit_price,
+        holdingDays: row.holding_days,
+        returnPct: row.return_pct,
+        pnl: row.pnl,
+        exitReason: row.exit_reason,
+        reasons: `${row.reasons || ''}｜日排名 ${row.daily_rank ?? '-'}｜成本 ${pct(row.transaction_cost_pct)}`,
+      };
+    }
+
     function renderKpis(rows) {
       const v4 = rows.filter(row => row.source === 'PB-V4 baseline').length;
+      const v18Realized = rows.filter(row => row.source === 'PB-V18 finite-capital' && row.status === '已實現').length;
+      const v18Unrealized = rows.filter(row => row.source === 'PB-V18 finite-capital' && row.status === '未實現').length;
       const recentRealized = rows.filter(row => row.source === 'recent10 pullback' && row.status === '已實現').length;
-      const recentUnrealized = rows.filter(row => row.source === 'recent10 pullback' && row.status === '未實現').length;
-      const recentPending = rows.filter(row => row.source === 'recent10 pullback' && row.status === '等待進場').length;
+      const recentOpen = rows.filter(row => row.source === 'recent10 pullback' && row.status !== '已實現').length;
       document.getElementById('detailKpis').innerHTML = `
         <div><div class="value">${fmt.format(v4)}</div><div class="label">PB-V4 已實現</div></div>
+        <div><div class="value">${fmt.format(v18Realized)}</div><div class="label">PB-V18 已出場</div></div>
+        <div><div class="value">${fmt.format(v18Unrealized)}</div><div class="label">PB-V18 未出場</div></div>
         <div><div class="value">${fmt.format(recentRealized)}</div><div class="label">最近 10 日已實現</div></div>
-        <div><div class="value">${fmt.format(recentUnrealized)}</div><div class="label">最近 10 日未實現</div></div>
-        <div><div class="value">${fmt.format(recentPending)}</div><div class="label">最近 10 日等待進場</div></div>
+        <div><div class="value">${fmt.format(recentOpen)}</div><div class="label">最近 10 日未實現 / pending</div></div>
       `;
     }
 
@@ -1146,15 +1248,24 @@
 
     async function loadTradeDetails() {
       try {
-        const [v4, recent, manifest] = await Promise.all([
+        const [v4, v18, recent] = await Promise.all([
           fetch('pullback_pb_v4_0_1y_discount2_swing.json').then(res => res.json()),
+          fetch('pullback_pb_v18_finite_capital.json').then(res => res.json()),
           fetch('recent_all_signal_backtest_smart.json').then(res => res.json()),
-          fetch('stock_data_manifest.json').then(res => res.json()),
         ]);
-        stockManifest = new Map((manifest || []).map(item => [item.key, item]));
+        try {
+          const manifest = await fetch('stock_data_manifest.json').then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          });
+          stockManifest = new Map((manifest || []).map(item => [item.key, item]));
+        } catch (manifestError) {
+          stockManifest = new Map();
+        }
         const v4Rows = (v4.trades || []).filter(row => row.exit_style === 'swing_d2').map(normalizeV4Trade);
+        const v18Rows = (v18.portfolio_trades || []).map(normalizeV18Trade);
         const recentRows = (recent.rows || []).filter(row => row.category === 'pullback').map(normalizeRecentTrade);
-        allTradeRows = [...v4Rows, ...recentRows]
+        allTradeRows = [...v4Rows, ...v18Rows, ...recentRows]
           .map((row, index) => ({ ...row, _id: `trade-${index}` }))
           .sort((a, b) => String(b.signalDate).localeCompare(String(a.signalDate)) || String(a.stockNo).localeCompare(String(b.stockNo)));
         renderKpis(allTradeRows);
