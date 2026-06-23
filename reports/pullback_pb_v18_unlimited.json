@@ -1,0 +1,2445 @@
+{
+  "version": "PB-V18-plus-unlimited",
+  "methodology": {
+    "base": "Same V18 source: one-year enriched pullback signals, prior-only rolling score, avoid_score4 filter, then V17 gap-aware runner exit.",
+    "removed_constraints": [
+      "TWD 500,000 finite capital cap",
+      "max 5 active positions",
+      "max 2 new entries per signal date",
+      "no duplicate active stock",
+      "daily ranking selection capacity limit"
+    ],
+    "kept": [
+      "each accepted signal is still a TWD 100,000 standard simulation unit",
+      "same V17 runner exit",
+      "same fee/tax model and +0.10% adverse slippage stress used by V18+",
+      "same 10 random stock-code 60/20/20 split seeds as pullback_plus_random_splits"
+    ],
+    "interpretation": "This tests whether V18+'s apparent edge survives after removing capacity/portfolio selection. It is not a finite-capital executable portfolio."
+  },
+  "universe": {
+    "candidate_trades": 52,
+    "unique_stocks": 48,
+    "gross_full": {
+      "trades": 52,
+      "win_rate_pct": 61.54,
+      "avg_return_pct": 10.1,
+      "median_return_pct": 2.0,
+      "total_pnl": 525120,
+      "capital_used": 5200000,
+      "capital_return_pct": 10.1,
+      "best_return_pct": 137.2,
+      "worst_return_pct": -10.15,
+      "benchmark_avg_return_pct": 8.08,
+      "avg_excess_return_pct": 0.48,
+      "beat_benchmark_rate_pct": 32.65,
+      "unresolved": 3
+    },
+    "stress_full": {
+      "trades": 52,
+      "win_rate_pct": 61.54,
+      "avg_return_pct": 9.26,
+      "median_return_pct": 1.2,
+      "total_pnl": 481452,
+      "capital_used": 5200000,
+      "capital_return_pct": 9.26,
+      "best_return_pct": 135.67,
+      "worst_return_pct": -10.88,
+      "benchmark_avg_return_pct": 7.47,
+      "avg_excess_return_pct": 0.26,
+      "beat_benchmark_rate_pct": 32.65,
+      "unresolved": 3
+    }
+  },
+  "runs": [
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062301,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 30,
+        "stock_validation": 12,
+        "stock_test": 10,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 53.33,
+          "avg_return_pct": 5.44,
+          "median_return_pct": 1.5,
+          "total_pnl": 163220,
+          "capital_used": 3000000,
+          "capital_return_pct": 5.44,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 6.88,
+          "avg_excess_return_pct": -1.95,
+          "beat_benchmark_rate_pct": 27.59,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 12,
+          "win_rate_pct": 66.67,
+          "avg_return_pct": 8.35,
+          "median_return_pct": 2.0,
+          "total_pnl": 100190,
+          "capital_used": 1200000,
+          "capital_return_pct": 8.35,
+          "best_return_pct": 60.61,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 11.99,
+          "avg_excess_return_pct": -5.75,
+          "beat_benchmark_rate_pct": 27.27,
+          "unresolved": 1
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 80.0,
+          "avg_return_pct": 26.17,
+          "median_return_pct": 7.13,
+          "total_pnl": 261710,
+          "capital_used": 1000000,
+          "capital_return_pct": 26.17,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -7.95,
+          "benchmark_avg_return_pct": 7.18,
+          "avg_excess_return_pct": 15.9,
+          "beat_benchmark_rate_pct": 55.56,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 53.33,
+          "avg_return_pct": 4.63,
+          "median_return_pct": 0.71,
+          "total_pnl": 138785,
+          "capital_used": 3000000,
+          "capital_return_pct": 4.63,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 6.27,
+          "avg_excess_return_pct": -2.15,
+          "beat_benchmark_rate_pct": 27.59,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 12,
+          "win_rate_pct": 66.67,
+          "avg_return_pct": 7.52,
+          "median_return_pct": 1.2,
+          "total_pnl": 90227,
+          "capital_used": 1200000,
+          "capital_return_pct": 7.52,
+          "best_return_pct": 59.5,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 11.36,
+          "avg_excess_return_pct": -5.95,
+          "beat_benchmark_rate_pct": 27.27,
+          "unresolved": 1
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 80.0,
+          "avg_return_pct": 25.24,
+          "median_return_pct": 6.31,
+          "total_pnl": 252440,
+          "capital_used": 1000000,
+          "capital_return_pct": 25.24,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -8.69,
+          "benchmark_avg_return_pct": 6.57,
+          "avg_excess_return_pct": 15.6,
+          "beat_benchmark_rate_pct": 55.56,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062302,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 32,
+        "stock_validation": 10,
+        "stock_test": 10,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 9.64,
+          "median_return_pct": 2.0,
+          "total_pnl": 308580,
+          "capital_used": 3200000,
+          "capital_return_pct": 9.64,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 10.14,
+          "avg_excess_return_pct": -0.83,
+          "beat_benchmark_rate_pct": 29.03,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 3.79,
+          "median_return_pct": 2.0,
+          "total_pnl": 37910,
+          "capital_used": 1000000,
+          "capital_return_pct": 3.79,
+          "best_return_pct": 19.42,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 3.83,
+          "avg_excess_return_pct": -0.04,
+          "beat_benchmark_rate_pct": 50.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 17.86,
+          "median_return_pct": 0.95,
+          "total_pnl": 178630,
+          "capital_used": 1000000,
+          "capital_return_pct": 17.86,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -9.99,
+          "benchmark_avg_return_pct": 5.43,
+          "avg_excess_return_pct": 6.21,
+          "beat_benchmark_rate_pct": 25.0,
+          "unresolved": 2
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 8.81,
+          "median_return_pct": 1.2,
+          "total_pnl": 281787,
+          "capital_used": 3200000,
+          "capital_return_pct": 8.81,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 9.52,
+          "avg_excess_return_pct": -1.05,
+          "beat_benchmark_rate_pct": 29.03,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 2.99,
+          "median_return_pct": 1.2,
+          "total_pnl": 29854,
+          "capital_used": 1000000,
+          "capital_return_pct": 2.99,
+          "best_return_pct": 18.53,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 3.23,
+          "avg_excess_return_pct": -0.25,
+          "beat_benchmark_rate_pct": 50.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 16.98,
+          "median_return_pct": 0.16,
+          "total_pnl": 169811,
+          "capital_used": 1000000,
+          "capital_return_pct": 16.98,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.72,
+          "benchmark_avg_return_pct": 4.83,
+          "avg_excess_return_pct": 5.96,
+          "beat_benchmark_rate_pct": 25.0,
+          "unresolved": 2
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062303,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 32,
+        "stock_validation": 9,
+        "stock_test": 11,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 53.12,
+          "avg_return_pct": 1.43,
+          "median_return_pct": 0.95,
+          "total_pnl": 45640,
+          "capital_used": 3200000,
+          "capital_return_pct": 1.43,
+          "best_return_pct": 53.96,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 5.98,
+          "avg_excess_return_pct": -6.93,
+          "beat_benchmark_rate_pct": 20.0,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 77.78,
+          "avg_return_pct": 28.43,
+          "median_return_pct": 9.65,
+          "total_pnl": 255880,
+          "capital_used": 900000,
+          "capital_return_pct": 28.43,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -7.0,
+          "benchmark_avg_return_pct": 10.94,
+          "avg_excess_return_pct": 17.49,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 20.33,
+          "median_return_pct": 15.86,
+          "total_pnl": 223600,
+          "capital_used": 1100000,
+          "capital_return_pct": 20.33,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 11.82,
+          "avg_excess_return_pct": 7.38,
+          "beat_benchmark_rate_pct": 60.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 53.12,
+          "avg_return_pct": 0.63,
+          "median_return_pct": 0.16,
+          "total_pnl": 20273,
+          "capital_used": 3200000,
+          "capital_return_pct": 0.63,
+          "best_return_pct": 52.88,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 5.37,
+          "avg_excess_return_pct": -7.1,
+          "beat_benchmark_rate_pct": 20.0,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 77.78,
+          "avg_return_pct": 27.49,
+          "median_return_pct": 8.81,
+          "total_pnl": 247427,
+          "capital_used": 900000,
+          "capital_return_pct": 27.49,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -7.75,
+          "benchmark_avg_return_pct": 10.32,
+          "avg_excess_return_pct": 17.17,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 19.43,
+          "median_return_pct": 14.99,
+          "total_pnl": 213752,
+          "capital_used": 1100000,
+          "capital_return_pct": 19.43,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 11.2,
+          "avg_excess_return_pct": 7.11,
+          "beat_benchmark_rate_pct": 60.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062304,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 32,
+        "stock_validation": 10,
+        "stock_test": 10,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 7.62,
+          "median_return_pct": 2.0,
+          "total_pnl": 243840,
+          "capital_used": 3200000,
+          "capital_return_pct": 7.62,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 7.01,
+          "avg_excess_return_pct": -2.25,
+          "beat_benchmark_rate_pct": 31.03,
+          "unresolved": 3
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 50.0,
+          "avg_return_pct": -1.13,
+          "median_return_pct": -2.98,
+          "total_pnl": -11340,
+          "capital_used": 1000000,
+          "capital_return_pct": -1.13,
+          "best_return_pct": 14.22,
+          "worst_return_pct": -7.95,
+          "benchmark_avg_return_pct": 7.36,
+          "avg_excess_return_pct": -8.49,
+          "beat_benchmark_rate_pct": 10.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 70.0,
+          "avg_return_pct": 29.26,
+          "median_return_pct": 8.93,
+          "total_pnl": 292620,
+          "capital_used": 1000000,
+          "capital_return_pct": 29.26,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -7.0,
+          "benchmark_avg_return_pct": 11.91,
+          "avg_excess_return_pct": 17.36,
+          "beat_benchmark_rate_pct": 60.0,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 6.79,
+          "median_return_pct": 1.2,
+          "total_pnl": 217398,
+          "capital_used": 3200000,
+          "capital_return_pct": 6.79,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 6.41,
+          "avg_excess_return_pct": -2.45,
+          "beat_benchmark_rate_pct": 31.03,
+          "unresolved": 3
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 50.0,
+          "avg_return_pct": -1.91,
+          "median_return_pct": -3.75,
+          "total_pnl": -19128,
+          "capital_used": 1000000,
+          "capital_return_pct": -1.91,
+          "best_return_pct": 13.36,
+          "worst_return_pct": -8.69,
+          "benchmark_avg_return_pct": 6.75,
+          "avg_excess_return_pct": -8.66,
+          "beat_benchmark_rate_pct": 10.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 70.0,
+          "avg_return_pct": 28.32,
+          "median_return_pct": 8.1,
+          "total_pnl": 283183,
+          "capital_used": 1000000,
+          "capital_return_pct": 28.32,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -7.75,
+          "benchmark_avg_return_pct": 11.28,
+          "avg_excess_return_pct": 17.04,
+          "beat_benchmark_rate_pct": 60.0,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062305,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 30,
+        "stock_validation": 11,
+        "stock_test": 11,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 53.33,
+          "avg_return_pct": 4.31,
+          "median_return_pct": 0.97,
+          "total_pnl": 129440,
+          "capital_used": 3000000,
+          "capital_return_pct": 4.31,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 7.8,
+          "avg_excess_return_pct": -4.42,
+          "beat_benchmark_rate_pct": 24.14,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 17.94,
+          "median_return_pct": 2.0,
+          "total_pnl": 197310,
+          "capital_used": 1100000,
+          "capital_return_pct": 17.94,
+          "best_return_pct": 68.44,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 12.13,
+          "avg_excess_return_pct": 1.56,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 2
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 18.03,
+          "median_return_pct": 2.0,
+          "total_pnl": 198370,
+          "capital_used": 1100000,
+          "capital_return_pct": 18.03,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -7.95,
+          "benchmark_avg_return_pct": 5.53,
+          "avg_excess_return_pct": 12.51,
+          "beat_benchmark_rate_pct": 45.45,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 53.33,
+          "avg_return_pct": 3.51,
+          "median_return_pct": 0.18,
+          "total_pnl": 105188,
+          "capital_used": 3000000,
+          "capital_return_pct": 3.51,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.18,
+          "avg_excess_return_pct": -4.61,
+          "beat_benchmark_rate_pct": 24.14,
+          "unresolved": 1
+        },
+        "stock_validation": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 17.05,
+          "median_return_pct": 1.2,
+          "total_pnl": 187605,
+          "capital_used": 1100000,
+          "capital_return_pct": 17.05,
+          "best_return_pct": 67.28,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 11.5,
+          "avg_excess_return_pct": 1.33,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 2
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 72.73,
+          "avg_return_pct": 17.15,
+          "median_return_pct": 1.2,
+          "total_pnl": 188659,
+          "capital_used": 1100000,
+          "capital_return_pct": 17.15,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -8.69,
+          "benchmark_avg_return_pct": 4.92,
+          "avg_excess_return_pct": 12.23,
+          "beat_benchmark_rate_pct": 45.45,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062306,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 32,
+        "stock_validation": 9,
+        "stock_test": 11,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 12.7,
+          "median_return_pct": 2.0,
+          "total_pnl": 406550,
+          "capital_used": 3200000,
+          "capital_return_pct": 12.7,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 7.97,
+          "avg_excess_return_pct": 3.85,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 6.46,
+          "median_return_pct": 0.9,
+          "total_pnl": 58140,
+          "capital_used": 900000,
+          "capital_return_pct": 6.46,
+          "best_return_pct": 47.11,
+          "worst_return_pct": -7.95,
+          "benchmark_avg_return_pct": 8.85,
+          "avg_excess_return_pct": -2.39,
+          "beat_benchmark_rate_pct": 22.22,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 63.64,
+          "avg_return_pct": 5.49,
+          "median_return_pct": 2.0,
+          "total_pnl": 60430,
+          "capital_used": 1100000,
+          "capital_return_pct": 5.49,
+          "best_return_pct": 53.96,
+          "worst_return_pct": -7.0,
+          "benchmark_avg_return_pct": 7.72,
+          "avg_excess_return_pct": -7.07,
+          "beat_benchmark_rate_pct": 20.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 62.5,
+          "avg_return_pct": 11.85,
+          "median_return_pct": 1.2,
+          "total_pnl": 379225,
+          "capital_used": 3200000,
+          "capital_return_pct": 11.85,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.36,
+          "avg_excess_return_pct": 3.62,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 5.64,
+          "median_return_pct": 0.11,
+          "total_pnl": 50760,
+          "capital_used": 900000,
+          "capital_return_pct": 5.64,
+          "best_return_pct": 46.07,
+          "worst_return_pct": -8.69,
+          "benchmark_avg_return_pct": 8.24,
+          "avg_excess_return_pct": -2.6,
+          "beat_benchmark_rate_pct": 22.22,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 63.64,
+          "avg_return_pct": 4.68,
+          "median_return_pct": 1.2,
+          "total_pnl": 51467,
+          "capital_used": 1100000,
+          "capital_return_pct": 4.68,
+          "best_return_pct": 52.88,
+          "worst_return_pct": -7.75,
+          "benchmark_avg_return_pct": 7.11,
+          "avg_excess_return_pct": -7.25,
+          "beat_benchmark_rate_pct": 20.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062307,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 33,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 33,
+          "win_rate_pct": 60.61,
+          "avg_return_pct": 8.15,
+          "median_return_pct": 2.0,
+          "total_pnl": 269100,
+          "capital_used": 3300000,
+          "capital_return_pct": 8.15,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 6.4,
+          "avg_excess_return_pct": -0.11,
+          "beat_benchmark_rate_pct": 29.03,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 44.44,
+          "avg_return_pct": 7.83,
+          "median_return_pct": -7.0,
+          "total_pnl": 70500,
+          "capital_used": 900000,
+          "capital_return_pct": 7.83,
+          "best_return_pct": 68.44,
+          "worst_return_pct": -7.95,
+          "benchmark_avg_return_pct": 8.72,
+          "avg_excess_return_pct": -0.89,
+          "beat_benchmark_rate_pct": 33.33,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 80.0,
+          "avg_return_pct": 18.55,
+          "median_return_pct": 11.72,
+          "total_pnl": 185520,
+          "capital_used": 1000000,
+          "capital_return_pct": 18.55,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -7.0,
+          "benchmark_avg_return_pct": 13.24,
+          "avg_excess_return_pct": 3.86,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 33,
+          "win_rate_pct": 60.61,
+          "avg_return_pct": 7.33,
+          "median_return_pct": 1.2,
+          "total_pnl": 241736,
+          "capital_used": 3300000,
+          "capital_return_pct": 7.33,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 5.79,
+          "avg_excess_return_pct": -0.32,
+          "beat_benchmark_rate_pct": 29.03,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 44.44,
+          "avg_return_pct": 7.01,
+          "median_return_pct": -7.75,
+          "total_pnl": 63053,
+          "capital_used": 900000,
+          "capital_return_pct": 7.01,
+          "best_return_pct": 67.28,
+          "worst_return_pct": -8.69,
+          "benchmark_avg_return_pct": 8.11,
+          "avg_excess_return_pct": -1.1,
+          "beat_benchmark_rate_pct": 33.33,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 10,
+          "win_rate_pct": 80.0,
+          "avg_return_pct": 17.67,
+          "median_return_pct": 10.87,
+          "total_pnl": 176664,
+          "capital_used": 1000000,
+          "capital_return_pct": 17.67,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -7.75,
+          "benchmark_avg_return_pct": 12.61,
+          "avg_excess_return_pct": 3.61,
+          "beat_benchmark_rate_pct": 44.44,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062308,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 32,
+        "stock_validation": 9,
+        "stock_test": 11,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 65.62,
+          "avg_return_pct": 12.17,
+          "median_return_pct": 2.0,
+          "total_pnl": 389400,
+          "capital_used": 3200000,
+          "capital_return_pct": 12.17,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.47,
+          "avg_excess_return_pct": 1.31,
+          "beat_benchmark_rate_pct": 34.48,
+          "unresolved": 3
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 8.79,
+          "median_return_pct": 2.0,
+          "total_pnl": 79090,
+          "capital_used": 900000,
+          "capital_return_pct": 8.79,
+          "best_return_pct": 68.44,
+          "worst_return_pct": -7.0,
+          "benchmark_avg_return_pct": 13.1,
+          "avg_excess_return_pct": -4.31,
+          "beat_benchmark_rate_pct": 22.22,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 5.15,
+          "median_return_pct": 0.9,
+          "total_pnl": 56630,
+          "capital_used": 1100000,
+          "capital_return_pct": 5.15,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 2.95,
+          "avg_excess_return_pct": 2.2,
+          "beat_benchmark_rate_pct": 36.36,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 32,
+          "win_rate_pct": 65.62,
+          "avg_return_pct": 11.32,
+          "median_return_pct": 1.2,
+          "total_pnl": 362168,
+          "capital_used": 3200000,
+          "capital_return_pct": 11.32,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.86,
+          "avg_excess_return_pct": 1.09,
+          "beat_benchmark_rate_pct": 34.48,
+          "unresolved": 3
+        },
+        "stock_validation": {
+          "trades": 9,
+          "win_rate_pct": 55.56,
+          "avg_return_pct": 7.96,
+          "median_return_pct": 1.2,
+          "total_pnl": 71596,
+          "capital_used": 900000,
+          "capital_return_pct": 7.96,
+          "best_return_pct": 67.28,
+          "worst_return_pct": -7.75,
+          "benchmark_avg_return_pct": 12.47,
+          "avg_excess_return_pct": -4.52,
+          "beat_benchmark_rate_pct": 22.22,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 4.34,
+          "median_return_pct": 0.11,
+          "total_pnl": 47688,
+          "capital_used": 1100000,
+          "capital_return_pct": 4.34,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 2.35,
+          "avg_excess_return_pct": 1.98,
+          "beat_benchmark_rate_pct": 36.36,
+          "unresolved": 0
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062309,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 30,
+        "stock_validation": 10,
+        "stock_test": 12,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 6.6,
+          "median_return_pct": 2.0,
+          "total_pnl": 198090,
+          "capital_used": 3000000,
+          "capital_return_pct": 6.6,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 6.53,
+          "avg_excess_return_pct": -1.31,
+          "beat_benchmark_rate_pct": 28.57,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 70.0,
+          "avg_return_pct": 14.59,
+          "median_return_pct": 2.0,
+          "total_pnl": 145950,
+          "capital_used": 1000000,
+          "capital_return_pct": 14.59,
+          "best_return_pct": 68.44,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 13.97,
+          "avg_excess_return_pct": 0.62,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 12,
+          "win_rate_pct": 58.33,
+          "avg_return_pct": 15.09,
+          "median_return_pct": 1.5,
+          "total_pnl": 181080,
+          "capital_used": 1200000,
+          "capital_return_pct": 15.09,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -9.99,
+          "benchmark_avg_return_pct": 6.67,
+          "avg_excess_return_pct": 4.88,
+          "beat_benchmark_rate_pct": 36.36,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 60.0,
+          "avg_return_pct": 5.78,
+          "median_return_pct": 1.2,
+          "total_pnl": 173466,
+          "capital_used": 3000000,
+          "capital_return_pct": 5.78,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 5.93,
+          "avg_excess_return_pct": -1.51,
+          "beat_benchmark_rate_pct": 28.57,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 10,
+          "win_rate_pct": 70.0,
+          "avg_return_pct": 13.73,
+          "median_return_pct": 1.2,
+          "total_pnl": 137309,
+          "capital_used": 1000000,
+          "capital_return_pct": 13.73,
+          "best_return_pct": 67.28,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 13.34,
+          "avg_excess_return_pct": 0.39,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 12,
+          "win_rate_pct": 58.33,
+          "avg_return_pct": 14.22,
+          "median_return_pct": 0.71,
+          "total_pnl": 170678,
+          "capital_used": 1200000,
+          "capital_return_pct": 14.22,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.72,
+          "benchmark_avg_return_pct": 6.07,
+          "avg_excess_return_pct": 4.64,
+          "beat_benchmark_rate_pct": 36.36,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    },
+    {
+      "strategy": "V18+ unlimited",
+      "seed": 2026062310,
+      "stock_counts": {
+        "stock_train": 29,
+        "stock_validation": 9,
+        "stock_test": 10,
+        "full": 48
+      },
+      "trade_counts": {
+        "stock_train": 30,
+        "stock_validation": 11,
+        "stock_test": 11,
+        "full": 52
+      },
+      "chosen_rule": "fixed V18 candidate source; no finite-capital selection",
+      "chosen_exit": "V17 runner with V18 stress cost",
+      "gross_summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 66.67,
+          "avg_return_pct": 11.45,
+          "median_return_pct": 2.0,
+          "total_pnl": 343600,
+          "capital_used": 3000000,
+          "capital_return_pct": 11.45,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -9.99,
+          "benchmark_avg_return_pct": 9.05,
+          "avg_excess_return_pct": 0.17,
+          "beat_benchmark_rate_pct": 35.71,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 11.4,
+          "median_return_pct": 0.9,
+          "total_pnl": 125360,
+          "capital_used": 1100000,
+          "capital_return_pct": 11.4,
+          "best_return_pct": 75.07,
+          "worst_return_pct": -9.69,
+          "benchmark_avg_return_pct": 8.87,
+          "avg_excess_return_pct": 2.52,
+          "beat_benchmark_rate_pct": 18.18,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 5.11,
+          "median_return_pct": 1.04,
+          "total_pnl": 56160,
+          "capital_used": 1100000,
+          "capital_return_pct": 5.11,
+          "best_return_pct": 47.11,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 4.5,
+          "avg_excess_return_pct": -0.9,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 10.1,
+          "median_return_pct": 2.0,
+          "total_pnl": 525120,
+          "capital_used": 5200000,
+          "capital_return_pct": 10.1,
+          "best_return_pct": 137.2,
+          "worst_return_pct": -10.15,
+          "benchmark_avg_return_pct": 8.08,
+          "avg_excess_return_pct": 0.48,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      },
+      "summaries": {
+        "stock_train": {
+          "trades": 30,
+          "win_rate_pct": 66.67,
+          "avg_return_pct": 10.61,
+          "median_return_pct": 1.2,
+          "total_pnl": 318187,
+          "capital_used": 3000000,
+          "capital_return_pct": 10.61,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.72,
+          "benchmark_avg_return_pct": 8.44,
+          "avg_excess_return_pct": -0.05,
+          "beat_benchmark_rate_pct": 35.71,
+          "unresolved": 2
+        },
+        "stock_validation": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 10.55,
+          "median_return_pct": 0.11,
+          "total_pnl": 116045,
+          "capital_used": 1100000,
+          "capital_return_pct": 10.55,
+          "best_return_pct": 73.88,
+          "worst_return_pct": -10.42,
+          "benchmark_avg_return_pct": 8.26,
+          "avg_excess_return_pct": 2.29,
+          "beat_benchmark_rate_pct": 18.18,
+          "unresolved": 0
+        },
+        "stock_test": {
+          "trades": 11,
+          "win_rate_pct": 54.55,
+          "avg_return_pct": 4.29,
+          "median_return_pct": 0.25,
+          "total_pnl": 47220,
+          "capital_used": 1100000,
+          "capital_return_pct": 4.29,
+          "best_return_pct": 46.07,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 3.9,
+          "avg_excess_return_pct": -1.11,
+          "beat_benchmark_rate_pct": 40.0,
+          "unresolved": 1
+        },
+        "full": {
+          "trades": 52,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 9.26,
+          "median_return_pct": 1.2,
+          "total_pnl": 481452,
+          "capital_used": 5200000,
+          "capital_return_pct": 9.26,
+          "best_return_pct": 135.67,
+          "worst_return_pct": -10.88,
+          "benchmark_avg_return_pct": 7.47,
+          "avg_excess_return_pct": 0.26,
+          "beat_benchmark_rate_pct": 32.65,
+          "unresolved": 3
+        }
+      }
+    }
+  ],
+  "statistics": {
+    "runs": 10,
+    "stock_test": {
+      "trades": {
+        "min": 10.0,
+        "p25": 10.0,
+        "mean": 10.7,
+        "median": 11.0,
+        "p75": 11.0,
+        "max": 12.0,
+        "stdev": 0.64
+      },
+      "win_rate_pct": {
+        "min": 54.55,
+        "p25": 58.75,
+        "mean": 66.65,
+        "median": 66.82,
+        "p75": 72.73,
+        "max": 80.0,
+        "stdev": 9.26
+      },
+      "avg_return_pct": {
+        "min": 4.29,
+        "p25": 7.06,
+        "mean": 15.23,
+        "median": 17.06,
+        "p75": 18.99,
+        "max": 28.32,
+        "stdev": 8.08
+      },
+      "pass_60win_10avg_count": 6,
+      "avg_ge_10_count": 7,
+      "win_ge_60_count": 7
+    },
+    "full": {
+      "win_rate_pct": {
+        "min": 61.54,
+        "p25": 61.54,
+        "mean": 61.54,
+        "median": 61.54,
+        "p75": 61.54,
+        "max": 61.54,
+        "stdev": 0.0
+      },
+      "avg_return_pct": {
+        "min": 9.26,
+        "p25": 9.26,
+        "mean": 9.26,
+        "median": 9.26,
+        "p75": 9.26,
+        "max": 9.26,
+        "stdev": 0.0
+      }
+    }
+  },
+  "gross_statistics": {
+    "runs": 10,
+    "stock_test": {
+      "trades": {
+        "min": 10.0,
+        "p25": 10.0,
+        "mean": 10.7,
+        "median": 11.0,
+        "p75": 11.0,
+        "max": 12.0,
+        "stdev": 0.64
+      },
+      "win_rate_pct": {
+        "min": 54.55,
+        "p25": 58.75,
+        "mean": 66.65,
+        "median": 66.82,
+        "p75": 72.73,
+        "max": 80.0,
+        "stdev": 9.26
+      },
+      "avg_return_pct": {
+        "min": 5.11,
+        "p25": 7.89,
+        "mean": 16.1,
+        "median": 17.95,
+        "p75": 19.88,
+        "max": 29.26,
+        "stdev": 8.12
+      },
+      "pass_60win_10avg_count": 6,
+      "avg_ge_10_count": 7,
+      "win_ge_60_count": 7
+    },
+    "full": {
+      "win_rate_pct": {
+        "min": 61.54,
+        "p25": 61.54,
+        "mean": 61.54,
+        "median": 61.54,
+        "p75": 61.54,
+        "max": 61.54,
+        "stdev": 0.0
+      },
+      "avg_return_pct": {
+        "min": 10.1,
+        "p25": 10.1,
+        "mean": 10.1,
+        "median": 10.1,
+        "p75": 10.1,
+        "max": 10.1,
+        "stdev": 0.0
+      }
+    }
+  },
+  "original_v18_finite_reference": {
+    "statistics": {
+      "runs": 10,
+      "stock_test": {
+        "trades": {
+          "min": 8.0,
+          "p25": 9.0,
+          "mean": 9.4,
+          "median": 9.0,
+          "p75": 10.0,
+          "max": 11.0,
+          "stdev": 0.8
+        },
+        "win_rate_pct": {
+          "min": 54.55,
+          "p25": 56.67,
+          "mean": 67.4,
+          "median": 68.34,
+          "p75": 73.75,
+          "max": 88.89,
+          "stdev": 10.68
+        },
+        "avg_return_pct": {
+          "min": 3.65,
+          "p25": 8.15,
+          "mean": 16.07,
+          "median": 15.89,
+          "p75": 22.33,
+          "max": 29.98,
+          "stdev": 9.06
+        },
+        "pass_60win_10avg_count": 6,
+        "avg_ge_10_count": 7,
+        "win_ge_60_count": 7
+      },
+      "full": {
+        "win_rate_pct": {
+          "min": 64.29,
+          "p25": 64.29,
+          "mean": 64.29,
+          "median": 64.29,
+          "p75": 64.29,
+          "max": 64.29,
+          "stdev": 0.0
+        },
+        "avg_return_pct": {
+          "min": 12.31,
+          "p25": 12.31,
+          "mean": 12.31,
+          "median": 12.31,
+          "p75": 12.31,
+          "max": 12.31,
+          "stdev": 0.0
+        }
+      }
+    },
+    "runs": [
+      {
+        "strategy": "V18+",
+        "seed": 2026062301,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 23,
+          "stock_validation": 9,
+          "stock_test": 8,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 23,
+            "win_rate_pct": 60.87,
+            "avg_return_pct": 6.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 145086,
+            "capital_used": 2300000,
+            "capital_return_pct": 6.31,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 5.39,
+            "avg_excess_return_pct": 0.33,
+            "beat_benchmark_rate_pct": 31.82,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 66.67,
+            "avg_return_pct": 4.14,
+            "median_return_pct": 1.2,
+            "total_pnl": 37273,
+            "capital_used": 900000,
+            "capital_return_pct": 4.14,
+            "best_return_pct": 30.62,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 7.4,
+            "avg_excess_return_pct": -6.57,
+            "beat_benchmark_rate_pct": 25.0,
+            "unresolved": 1
+          },
+          "stock_test": {
+            "trades": 8,
+            "win_rate_pct": 75.0,
+            "avg_return_pct": 29.98,
+            "median_return_pct": 7.28,
+            "total_pnl": 239818,
+            "capital_used": 800000,
+            "capital_return_pct": 29.98,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -8.69,
+            "benchmark_avg_return_pct": 8.16,
+            "avg_excess_return_pct": 18.55,
+            "beat_benchmark_rate_pct": 42.86,
+            "unresolved": 1
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062302,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 21,
+          "stock_validation": 9,
+          "stock_test": 9,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 21,
+            "win_rate_pct": 66.67,
+            "avg_return_pct": 8.34,
+            "median_return_pct": 1.2,
+            "total_pnl": 175140,
+            "capital_used": 2100000,
+            "capital_return_pct": 8.34,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.55,
+            "avg_excess_return_pct": 0.25,
+            "beat_benchmark_rate_pct": 25.0,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 1.38,
+            "median_return_pct": 1.2,
+            "total_pnl": 12409,
+            "capital_used": 900000,
+            "capital_return_pct": 1.38,
+            "best_return_pct": 18.53,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 2.46,
+            "avg_excess_return_pct": -1.08,
+            "beat_benchmark_rate_pct": 44.44,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 18.86,
+            "median_return_pct": 0.21,
+            "total_pnl": 169701,
+            "capital_used": 900000,
+            "capital_return_pct": 18.86,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.72,
+            "benchmark_avg_return_pct": 5.39,
+            "avg_excess_return_pct": 6.93,
+            "beat_benchmark_rate_pct": 28.57,
+            "unresolved": 2
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062303,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 21,
+          "stock_validation": 8,
+          "stock_test": 9,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 21,
+            "win_rate_pct": 57.14,
+            "avg_return_pct": -0.46,
+            "median_return_pct": 1.2,
+            "total_pnl": -9741,
+            "capital_used": 2100000,
+            "capital_return_pct": -0.46,
+            "best_return_pct": 19.27,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 3.88,
+            "avg_excess_return_pct": -5.33,
+            "beat_benchmark_rate_pct": 20.0,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 8,
+            "win_rate_pct": 75.0,
+            "avg_return_pct": 23.49,
+            "median_return_pct": 5.01,
+            "total_pnl": 187931,
+            "capital_used": 800000,
+            "capital_return_pct": 23.49,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -7.75,
+            "benchmark_avg_return_pct": 8.28,
+            "avg_excess_return_pct": 15.21,
+            "beat_benchmark_rate_pct": 37.5,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 9,
+            "win_rate_pct": 77.78,
+            "avg_return_pct": 22.95,
+            "median_return_pct": 17.45,
+            "total_pnl": 206510,
+            "capital_used": 900000,
+            "capital_return_pct": 22.95,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 10.54,
+            "avg_excess_return_pct": 11.44,
+            "beat_benchmark_rate_pct": 75.0,
+            "unresolved": 1
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062304,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 21,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 21,
+            "win_rate_pct": 61.9,
+            "avg_return_pct": 4.86,
+            "median_return_pct": 1.2,
+            "total_pnl": 102059,
+            "capital_used": 2100000,
+            "capital_return_pct": 4.86,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 4.56,
+            "avg_excess_return_pct": -1.82,
+            "beat_benchmark_rate_pct": 26.32,
+            "unresolved": 2
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": -1.26,
+            "median_return_pct": 0.25,
+            "total_pnl": -11381,
+            "capital_used": 900000,
+            "capital_return_pct": -1.26,
+            "best_return_pct": 13.36,
+            "worst_return_pct": -8.69,
+            "benchmark_avg_return_pct": 7.27,
+            "avg_excess_return_pct": -8.53,
+            "beat_benchmark_rate_pct": 11.11,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 10,
+            "win_rate_pct": 70.0,
+            "avg_return_pct": 28.32,
+            "median_return_pct": 8.1,
+            "total_pnl": 283183,
+            "capital_used": 1000000,
+            "capital_return_pct": 28.32,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -7.75,
+            "benchmark_avg_return_pct": 11.28,
+            "avg_excess_return_pct": 17.04,
+            "beat_benchmark_rate_pct": 60.0,
+            "unresolved": 0
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062305,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 20,
+          "stock_validation": 10,
+          "stock_test": 10,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 20,
+            "win_rate_pct": 50.0,
+            "avg_return_pct": 2.97,
+            "median_return_pct": -0.27,
+            "total_pnl": 59301,
+            "capital_used": 2000000,
+            "capital_return_pct": 2.97,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 6.11,
+            "avg_excess_return_pct": -3.14,
+            "beat_benchmark_rate_pct": 20.0,
+            "unresolved": 0
+          },
+          "stock_validation": {
+            "trades": 10,
+            "win_rate_pct": 70.0,
+            "avg_return_pct": 18.64,
+            "median_return_pct": 9.32,
+            "total_pnl": 186401,
+            "capital_used": 1000000,
+            "capital_return_pct": 18.64,
+            "best_return_pct": 67.28,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 10.18,
+            "avg_excess_return_pct": 4.1,
+            "beat_benchmark_rate_pct": 50.0,
+            "unresolved": 2
+          },
+          "stock_test": {
+            "trades": 10,
+            "win_rate_pct": 70.0,
+            "avg_return_pct": 12.92,
+            "median_return_pct": 1.2,
+            "total_pnl": 129163,
+            "capital_used": 1000000,
+            "capital_return_pct": 12.92,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -8.69,
+            "benchmark_avg_return_pct": 2.76,
+            "avg_excess_return_pct": 10.16,
+            "beat_benchmark_rate_pct": 40.0,
+            "unresolved": 0
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062306,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 20,
+          "stock_validation": 9,
+          "stock_test": 9,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 20,
+            "win_rate_pct": 65.0,
+            "avg_return_pct": 14.59,
+            "median_return_pct": 1.2,
+            "total_pnl": 291714,
+            "capital_used": 2000000,
+            "capital_return_pct": 14.59,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.27,
+            "avg_excess_return_pct": 7.07,
+            "beat_benchmark_rate_pct": 31.58,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 5.64,
+            "median_return_pct": 0.11,
+            "total_pnl": 50760,
+            "capital_used": 900000,
+            "capital_return_pct": 5.64,
+            "best_return_pct": 46.07,
+            "worst_return_pct": -8.69,
+            "benchmark_avg_return_pct": 8.24,
+            "avg_excess_return_pct": -2.6,
+            "beat_benchmark_rate_pct": 22.22,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 3.65,
+            "median_return_pct": 1.2,
+            "total_pnl": 32818,
+            "capital_used": 900000,
+            "capital_return_pct": 3.65,
+            "best_return_pct": 52.88,
+            "worst_return_pct": -7.75,
+            "benchmark_avg_return_pct": 4.86,
+            "avg_excess_return_pct": -7.36,
+            "beat_benchmark_rate_pct": 12.5,
+            "unresolved": 1
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062307,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 23,
+          "stock_validation": 9,
+          "stock_test": 9,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 23,
+            "win_rate_pct": 56.52,
+            "avg_return_pct": 5.11,
+            "median_return_pct": 0.25,
+            "total_pnl": 117556,
+            "capital_used": 2300000,
+            "capital_return_pct": 5.11,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 5.0,
+            "avg_excess_return_pct": -0.53,
+            "beat_benchmark_rate_pct": 18.18,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 44.44,
+            "avg_return_pct": 7.01,
+            "median_return_pct": -7.75,
+            "total_pnl": 63053,
+            "capital_used": 900000,
+            "capital_return_pct": 7.01,
+            "best_return_pct": 67.28,
+            "worst_return_pct": -8.69,
+            "benchmark_avg_return_pct": 8.11,
+            "avg_excess_return_pct": -1.1,
+            "beat_benchmark_rate_pct": 33.33,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 9,
+            "win_rate_pct": 88.89,
+            "avg_return_pct": 20.49,
+            "median_return_pct": 14.99,
+            "total_pnl": 184411,
+            "capital_used": 900000,
+            "capital_return_pct": 20.49,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -7.75,
+            "benchmark_avg_return_pct": 12.04,
+            "avg_excess_return_pct": 7.18,
+            "beat_benchmark_rate_pct": 50.0,
+            "unresolved": 1
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062308,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 18,
+          "stock_validation": 9,
+          "stock_test": 11,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 18,
+            "win_rate_pct": 61.11,
+            "avg_return_pct": 11.05,
+            "median_return_pct": 0.73,
+            "total_pnl": 198918,
+            "capital_used": 1800000,
+            "capital_return_pct": 11.05,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 6.99,
+            "avg_excess_return_pct": 3.58,
+            "beat_benchmark_rate_pct": 23.53,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 7.96,
+            "median_return_pct": 1.2,
+            "total_pnl": 71596,
+            "capital_used": 900000,
+            "capital_return_pct": 7.96,
+            "best_return_pct": 67.28,
+            "worst_return_pct": -7.75,
+            "benchmark_avg_return_pct": 12.47,
+            "avg_excess_return_pct": -4.52,
+            "beat_benchmark_rate_pct": 22.22,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 11,
+            "win_rate_pct": 54.55,
+            "avg_return_pct": 4.34,
+            "median_return_pct": 0.11,
+            "total_pnl": 47688,
+            "capital_used": 1100000,
+            "capital_return_pct": 4.34,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 2.35,
+            "avg_excess_return_pct": 1.98,
+            "beat_benchmark_rate_pct": 36.36,
+            "unresolved": 0
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062309,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 22,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 22,
+            "win_rate_pct": 63.64,
+            "avg_return_pct": 7.2,
+            "median_return_pct": 1.2,
+            "total_pnl": 158312,
+            "capital_used": 2200000,
+            "capital_return_pct": 7.2,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 4.66,
+            "avg_excess_return_pct": 0.76,
+            "beat_benchmark_rate_pct": 25.0,
+            "unresolved": 2
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 66.67,
+            "avg_return_pct": 15.12,
+            "median_return_pct": 1.2,
+            "total_pnl": 136104,
+            "capital_used": 900000,
+            "capital_return_pct": 15.12,
+            "best_return_pct": 67.28,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 12.37,
+            "avg_excess_return_pct": 2.75,
+            "beat_benchmark_rate_pct": 44.44,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 10,
+            "win_rate_pct": 60.0,
+            "avg_return_pct": 12.55,
+            "median_return_pct": 0.71,
+            "total_pnl": 125543,
+            "capital_used": 1000000,
+            "capital_return_pct": 12.55,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.72,
+            "benchmark_avg_return_pct": 6.47,
+            "avg_excess_return_pct": 6.09,
+            "beat_benchmark_rate_pct": 40.0,
+            "unresolved": 0
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      },
+      {
+        "strategy": "V18+",
+        "seed": 2026062310,
+        "stock_counts": {
+          "stock_train": 29,
+          "stock_validation": 9,
+          "stock_test": 10,
+          "full": 48
+        },
+        "chosen_rule": "fixed V18 ranking/finite positions",
+        "chosen_exit": "V17 runner with V18 stress cost",
+        "portfolio_counts": {
+          "stock_train": 22,
+          "stock_validation": 9,
+          "stock_test": 9,
+          "full": 28
+        },
+        "summaries": {
+          "stock_train": {
+            "trades": 22,
+            "win_rate_pct": 68.18,
+            "avg_return_pct": 12.43,
+            "median_return_pct": 1.2,
+            "total_pnl": 273514,
+            "capital_used": 2200000,
+            "capital_return_pct": 12.43,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.72,
+            "benchmark_avg_return_pct": 7.76,
+            "avg_excess_return_pct": 3.8,
+            "beat_benchmark_rate_pct": 33.33,
+            "unresolved": 1
+          },
+          "stock_validation": {
+            "trades": 9,
+            "win_rate_pct": 55.56,
+            "avg_return_pct": 12.09,
+            "median_return_pct": 0.11,
+            "total_pnl": 108803,
+            "capital_used": 900000,
+            "capital_return_pct": 12.09,
+            "best_return_pct": 73.88,
+            "worst_return_pct": -10.42,
+            "benchmark_avg_return_pct": 7.03,
+            "avg_excess_return_pct": 5.06,
+            "beat_benchmark_rate_pct": 22.22,
+            "unresolved": 0
+          },
+          "stock_test": {
+            "trades": 9,
+            "win_rate_pct": 66.67,
+            "avg_return_pct": 6.68,
+            "median_return_pct": 1.2,
+            "total_pnl": 60148,
+            "capital_used": 900000,
+            "capital_return_pct": 6.68,
+            "best_return_pct": 46.07,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 2.55,
+            "avg_excess_return_pct": 2.56,
+            "beat_benchmark_rate_pct": 50.0,
+            "unresolved": 1
+          },
+          "full": {
+            "trades": 28,
+            "win_rate_pct": 64.29,
+            "avg_return_pct": 12.31,
+            "median_return_pct": 1.2,
+            "total_pnl": 344591,
+            "capital_used": 2800000,
+            "capital_return_pct": 12.31,
+            "best_return_pct": 135.67,
+            "worst_return_pct": -10.88,
+            "benchmark_avg_return_pct": 7.41,
+            "avg_excess_return_pct": 4.64,
+            "beat_benchmark_rate_pct": 29.63,
+            "unresolved": 1
+          }
+        }
+      }
+    ]
+  }
+}
