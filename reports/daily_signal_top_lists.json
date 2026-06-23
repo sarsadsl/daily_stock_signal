@@ -25,7 +25,7 @@
       "ma10": 16.654999999999998,
       "ma20": 16.045000000000005,
       "ma60": 11.276000000000009,
-      "source": "data\\all_twse\\6116_2025-06-01_2026-06-01.csv",
+      "source": "data/all_twse/6116_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -43,7 +43,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\6116_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/6116_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -70,7 +70,7 @@
       "ma10": 155.2,
       "ma20": 156.525,
       "ma60": 148.86666666666673,
-      "source": "data\\all_twse\\2337_2025-06-02_2026-06-02.csv",
+      "source": "data/all_twse/2337_2025-06-02_2026-06-02.csv",
       "reasons": [
         "季線支撐後跳空站回5/10/20MA"
       ],
@@ -88,7 +88,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\2337_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/2337_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -115,7 +115,7 @@
       "ma10": 96.88999999999999,
       "ma20": 95.39500000000001,
       "ma60": 78.87000000000003,
-      "source": "data\\all_twse\\8150_2025-06-01_2026-06-01.csv",
+      "source": "data/all_twse/8150_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -133,7 +133,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\8150_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/8150_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
       "market": "TPEX",
@@ -160,7 +160,7 @@
       "ma10": 89.78000000000002,
       "ma20": 86.89999999999999,
       "ma60": 77.35000000000001,
-      "source": "data\\all_tpex\\5351_2025-06-02_2026-06-02.csv",
+      "source": "data/all_tpex/5351_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -178,7 +178,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\5351_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/5351_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -205,7 +205,7 @@
       "ma10": 214.85,
       "ma20": 221.5,
       "ma60": 189.25,
-      "source": "data\\all_twse\\2301_2025-06-02_2026-06-02.csv",
+      "source": "data/all_twse/2301_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -223,7 +223,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\2301_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/2301_2025-06-02_2026-06-02_kline_ma.png"
     }
   ],
   "breakout": [
@@ -252,7 +252,7 @@
       "ma10": 16.654999999999998,
       "ma20": 16.045000000000005,
       "ma60": 11.276000000000009,
-      "source": "data\\all_twse\\6116_2025-06-01_2026-06-01.csv",
+      "source": "data/all_twse/6116_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -270,7 +270,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\6116_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/6116_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -297,7 +297,7 @@
       "ma10": 155.2,
       "ma20": 156.525,
       "ma60": 148.86666666666673,
-      "source": "data\\all_twse\\2337_2025-06-02_2026-06-02.csv",
+      "source": "data/all_twse/2337_2025-06-02_2026-06-02.csv",
       "reasons": [
         "季線支撐後跳空站回5/10/20MA"
       ],
@@ -315,7 +315,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\2337_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/2337_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -342,7 +342,7 @@
       "ma10": 96.88999999999999,
       "ma20": 95.39500000000001,
       "ma60": 78.87000000000003,
-      "source": "data\\all_twse\\8150_2025-06-01_2026-06-01.csv",
+      "source": "data/all_twse/8150_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -360,7 +360,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\8150_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/8150_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
       "market": "TPEX",
@@ -387,7 +387,7 @@
       "ma10": 89.78000000000002,
       "ma20": 86.89999999999999,
       "ma60": 77.35000000000001,
-      "source": "data\\all_tpex\\5351_2025-06-02_2026-06-02.csv",
+      "source": "data/all_tpex/5351_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -405,7 +405,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\5351_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/5351_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
@@ -432,7 +432,7 @@
       "ma10": 214.85,
       "ma20": 221.5,
       "ma60": 189.25,
-      "source": "data\\all_twse\\2301_2025-06-02_2026-06-02.csv",
+      "source": "data/all_twse/2301_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -450,7 +450,7 @@
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts\\daily_alert\\2301_2025-06-02_2026-06-02_kline_ma.png"
+      "chart_path": "charts/daily_alert/2301_2025-06-02_2026-06-02_kline_ma.png"
     }
   ]
 }
