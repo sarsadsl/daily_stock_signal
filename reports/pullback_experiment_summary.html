@@ -413,6 +413,204 @@
     </section>
 
     <section class="card">
+      <h2>標準 10 萬單位重跑</h2>
+      <p class="note"><strong>這次口徑已改回你的模擬方式：</strong>每一筆符合條件的訊號都算一份 100,000 元交易，不設總本金上限、不限制同日檔數、不使用排名隊列，也不因同股舊部位尚未出場而跳過新訊號。</p>
+      <div class="kpi">
+        <div><div class="value">223</div><div class="label">PB-V4 全訊號筆數</div></div>
+        <div><div class="value">52.91% / 4.94%</div><div class="label">PB-V4 勝率 / 平均報酬</div></div>
+        <div><div class="value">79</div><div class="label">PB-V9 / V10 選定 cohort 筆數</div></div>
+        <div><div class="value">55.70% / 24.40%</div><div class="label">PB-V9 / V10 勝率 / 平均報酬</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>V4 樣本最大、最接近你原本偏好的「隔天開低」基準；V9 / V10 平均報酬最高，但樣本只剩 79 筆，而且包含未實現長抱部位，不能直接視為比 V4 更穩。V18 在這份重跑裡只拿來套成本與滑價，不使用 50 萬有限本金邏輯。</p>
+      <p><a href="pullback_standard_unit_rerun.html">打開標準 10 萬單位重跑報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>PB-V19：主升段確認後加碼</h2>
+      <p class="note"><strong>加碼單同樣固定 100,000。</strong>底倉不縮窄，仍用 PB-V4 全部折價 pullback 訊號；只有確認日收盤站上 MA20、突破訊號日高點或前 20 日高點、量能放大，且漲幅勝過 0050，才在隔天開盤加碼一份。</p>
+      <div class="kpi">
+        <div><div class="value">320 份</div><div class="label">V4 底倉 + 加碼總單位</div></div>
+        <div><div class="value">45.00% / 10.17%</div><div class="label">V4 底倉 + 加碼 勝率 / 平均</div></div>
+        <div><div class="value">97 份</div><div class="label">V4 底倉版加碼單</div></div>
+        <div><div class="value">26.80% / 22.18%</div><div class="label">加碼單勝率 / 平均</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>加碼方向確實會把平均報酬拉高，但目前加碼條件仍太像「少數大波段支付多數停損」：中位數仍是 -7.00%。原本所稱最後 20% 是依日期切的時間前推測試，不是股票 holdout；改用股票 60/20/20 切分後，V4 底倉加碼的股票測試組為 50 份 / 38.00% / -0.22%，核心底倉加碼為 49 份 / 26.53% / -1.17%，所以 PB-V19 目前仍是研究方向，不是凍結規則。</p>
+      <p><a href="pullback_pb_v19_main_wave_addon.html">打開 PB-V19 主升段加碼報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>PB-V20：模糊加碼測試</h2>
+      <p class="note"><strong>這版測的是「不要一確認就追高」。</strong>底倉仍維持 PB-V4，每份 100,000；加碼改測延後 2-3 日確認、等待 MA20 附近回測、加碼停損縮到 5% 或 4%，並允許最多加碼 3 次。</p>
+      <div class="kpi">
+        <div><div class="value">MA20 回測 + 4%</div><div class="label">股票測試集最佳變體</div></div>
+        <div><div class="value">44 份 / 43.18%</div><div class="label">股票測試集單位數 / 勝率</div></div>
+        <div><div class="value">1.03%</div><div class="label">股票測試集平均報酬</div></div>
+        <div><div class="value">40 份 / 10.56%</div><div class="label">加碼單數 / 平均報酬</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>相較 V19 立即加碼的股票測試組 -0.24%，等待 MA20 附近回測後再加碼讓股票測試組轉正到 1.03%，勝率也提高到 43.18%。但全期平均從 V19 的 10.19% 降到 5.80%，代表它降低追高被騙，也犧牲了部分最強波段報酬。方向比 V19 穩，但還不到可凍結。</p>
+      <p><a href="pullback_pb_v20_fuzzy_addon.html">打開 PB-V20 模糊加碼報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>PB-V21：加碼停損放寬測試</h2>
+      <p class="note"><strong>這版測的是「加碼後不要被盤中洗掉」。</strong>底倉維持 PB-V4，進場仍用 PB-V20 最穩的 MA20 回測加碼；出場另外比較收盤跌破結構、前三日寬限，以及加碼單 hard stop 放寬到 15%。</p>
+      <div class="kpi">
+        <div><div class="value">15% hard stop</div><div class="label">全體資料最高變體</div></div>
+        <div><div class="value">263 份 / 7.37%</div><div class="label">全體總單位 / 平均報酬</div></div>
+        <div><div class="value">44 份 / 0.69%</div><div class="label">股票測試集單位數 / 平均</div></div>
+        <div><div class="value">40 份 / 20.89%</div><div class="label">加碼單數 / 平均報酬</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>15% hard stop 確實把全體平均從 V20 參考版的 5.80% 拉到 7.37%，加碼單平均也從 10.56% 拉到 20.89%，代表它比較能留下大波段。不過股票 holdout 測試降到 0.69%，低於 V20 的 1.03%；結構收盤停損也只有 0.38% 或 0.15%。所以這次結果支持「洗出去的問題存在」，但還不支持把 15% hard stop 凍結成正式規則。</p>
+      <p><a href="pullback_pb_v21_addon_stop_variants.html">打開 PB-V21 加碼停損放寬報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>PB-V22：加碼單結構停損</h2>
+      <p class="note"><strong>這版補測更精準的結構停損：</strong>底倉仍維持 PB-V4 硬停損，加碼單不因盤中跌破就出場；只有收盤跌破 MA20、確認 K 低點、前一波回測低點，或收盤跌破 -15% 災難線，才視為加碼失敗。另同時列出同日收盤出場與隔天開盤出場。</p>
+      <div class="kpi">
+        <div><div class="value">40.00%</div><div class="label">精準結構版加碼勝率</div></div>
+        <div><div class="value">8.74%</div><div class="label">精準結構版加碼平均</div></div>
+        <div><div class="value">45.45% / 0.49%</div><div class="label">精準結構版股票測試勝率 / 平均</div></div>
+        <div><div class="value">55.00% / 41.27%</div><div class="label">寬鬆共振版加碼勝率 / 平均</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>你的判斷是對的：機械式盤中停損確實錯殺，精準結構版把加碼勝率從 V20 的 22.50% 提到 40.00%，中位數從 -4.00% 改善到 -0.48%。但股票 holdout 平均只有 0.49%，低於 V20 的 1.03%。寬鬆共振版全期很好看，但有 25 筆未實現加碼單，股票 holdout 也只有 0.86%，所以目前比較像「持有邏輯改善」，還不是可凍結的新規則。</p>
+      <p><a href="pullback_pb_v22_structural_addon_stop.html">打開 PB-V22 結構式加碼停損報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>PB-V23：獨立生命週期與加碼限制隔離</h2>
+      <p class="note"><strong>這版修正 V22 的限制污染。</strong>母單不再引用 PB-V4 出場日，而是用自己的 -7% hard stop、收盤同時跌破 MA20 與結構低點、或最新收盤估值；加碼單也不再被 PB-V4 出場日截斷，維持 PB-V22 寬鬆結構停損，只比較最多加碼 3 / 5 / 8 次與間隔 5 / 10 日。</p>
+      <div class="kpi">
+        <div><div class="value">595 / 680 / 721 份</div><div class="label">max3 / max5 / max8 全期單位</div></div>
+        <div><div class="value">37.96% / 36.11% / 35.79%</div><div class="label">max3 / max5 / max8 全期平均</div></div>
+        <div><div class="value">13.86%</div><div class="label">max3 股票測試平均</div></div>
+        <div><div class="value">457 份 / 35.27%</div><div class="label">max5 加碼單數 / 平均</div></div>
+      </div>
+      <p class="warn"><strong>判讀：</strong>你的懷疑成立：V22 的加碼次數偏少，很大一部分是被 PB-V4 出場日截斷。放開後，台達電從 V22 的 1 筆加碼變成 V23 焦點版 4 筆加碼，2026-05-14 的 5 月中回檔也被抓到。不過 V23 的高報酬含大量 <code>latest_close</code> 未實現估值：max5 全期 680 份中有 404 份未實現，加碼單 457 份中有 327 份未實現，所以它證明「限制確實錯了」，但還不能直接當作已實現績效。</p>
+      <p><a href="pullback_pb_v23_independent_lifecycle.html">打開 PB-V23 獨立生命週期報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>V8+ / V9+ / V10+ / V14+ / V18+：獨立進出場重算</h2>
+      <p class="note"><strong>這版是校正測試邏輯，不是新調參。</strong>V8、V9、V10、V14、V18 全部改用股票代號做 deterministic 60% / 20% / 20% 切分；出場也不再沿用 PB-V4 出場日期。每一筆仍是一份 100,000 的標準單位。</p>
+      <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="left">版本</th>
+            <th class="left">原本問題</th>
+            <th class="left">+ 版修正</th>
+            <th>股票測試集</th>
+            <th>全期結果</th>
+            <th class="left">判讀</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left"><code>V8+</code></td>
+            <td class="left">V8 原本只測入口濾網，評分直接吃 PB-V4 出場，且 train / validation / test 是日期切分。</td>
+            <td class="left">保留 V8 入口搜尋，但用獨立 V17 runner 出場重算；股票切分選規則。</td>
+            <td>12 份｜33.33%｜8.54%</td>
+            <td>51 份｜52.94%｜10.00%</td>
+            <td class="left">全期平均達 10%，但測試股票勝率明顯不足；這表示進場濾網仍不夠穩。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V9+</code></td>
+            <td class="left">V9 有獨立核心出場，但比較表混入 PB-V4 戰術倉與 hybrid；切分仍是日期。</td>
+            <td class="left">只比較 <code>ma20_core</code>、<code>weekly_core</code>、<code>wide_trail</code> 這些獨立出場；選出 weekly core。</td>
+            <td>14 份｜28.57%｜1.00%</td>
+            <td>79 份｜59.49%｜26.74%</td>
+            <td class="left">全期被少數長抱大贏家拉高，但 unseen stocks 表現很弱；不能再用舊版漂亮平均當結論。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V10+</code></td>
+            <td class="left">V10 繼承 V8/V9 的 PB-V4 tactical / hybrid 與日期切分，所以聯合搜尋也被污染。</td>
+            <td class="left">重新做入口 × 獨立出場聯合搜尋，只允許獨立出場；股票切分選規則。</td>
+            <td>8 份｜25.00%｜4.14%</td>
+            <td>39 份｜53.85%｜16.61%</td>
+            <td class="left">平均仍有波段味，但測試股票樣本太弱，暫時只能當研究訊號，不是穩定規則。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V14+</code></td>
+            <td class="left">V14 的寬版出場本身獨立，但原本是三年期 / 盤勢區間統計，沒有照股票身份切分。</td>
+            <td class="left">保留 0050 主升段閘門、PB-V11 入口與 PB-V13 frozen wide exit，改用股票切分重新統計。</td>
+            <td>12 份｜41.67%｜10.27%</td>
+            <td>65 份｜58.46%｜10.09%</td>
+            <td class="left">平均報酬接近目標，但股票測試勝率不足；不是乾淨過關。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V18+</code></td>
+            <td class="left">V18 出場本來就是 V17 runner，沒有吃 PB-V4；但原本 train / validation / test 是用日期。</td>
+            <td class="left">保留 V18 排名、最多持倉與成本壓力測試，改用股票切分重新統計。</td>
+            <td>10 份｜40.00%｜-0.42%</td>
+            <td>28 份｜64.29%｜12.31%</td>
+            <td class="left">全期仍過 60% / 10%，但股票測試集轉負，代表它還不是乾淨的外樣本勝利。</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="warn"><strong>結論：</strong>你的懷疑是對的。V8 與 V10 確實被 PB-V4 出場限制污染；V9 是部分污染；V14 / V18 的出場邏輯較乾淨，但切分方式不符合你指定的股票切分。重算後，V9+/V10+/V14+ 的全期平均仍漂亮，不過股票測試集勝率不夠好，所以不能再說它們已經大獲全勝。</p>
+      <p><a href="pullback_plus_independent_versions.html">打開 V8+/V9+/V10+/V14+/V18+ 獨立重算報告</a></p>
+    </section>
+
+    <section class="card">
+      <h2>Plus 版：10 次隨機股票切分</h2>
+      <p class="note"><strong>這版照你的新要求重跑：</strong>每次先把股票代號隨機打散，再切成 60% 訓練、20% 驗證、20% 測試；同一檔股票在單次切分中不會跨組。V8+/V9+/V10+ 每個 seed 都只用訓練+驗證選規則；V14+/V18+ 是固定策略，只做不同股票切分評估。</p>
+      <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="left">策略</th>
+            <th>測試勝率分布</th>
+            <th>測試平均報酬分布</th>
+            <th>達 60% / 10%</th>
+            <th>判讀</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left"><code>V8+</code></td>
+            <td>平均 41.52%｜中位 44.16%</td>
+            <td>平均 6.66%｜中位 6.55%</td>
+            <td>2 / 10</td>
+            <td class="left">仍偏不穩，入口濾網對不同股票切分敏感。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V9+</code></td>
+            <td>平均 62.50%｜中位 68.75%</td>
+            <td>平均 21.24%｜中位 16.18%</td>
+            <td>6 / 10</td>
+            <td class="left">隨機切分後比單次固定切分好很多，但平均報酬波動仍大。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V10+</code></td>
+            <td>平均 40.31%｜中位 46.43%</td>
+            <td>平均 11.84%｜中位 9.20%</td>
+            <td>3 / 10</td>
+            <td class="left">有波段報酬，但勝率不穩，還不像穩定規則。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V14+</code></td>
+            <td>平均 61.63%｜中位 59.94%</td>
+            <td>平均 11.44%｜中位 11.12%</td>
+            <td>5 / 10</td>
+            <td class="left">接近門檻，穩定度比固定切分看起來合理，但樣本仍小。</td>
+          </tr>
+          <tr>
+            <td class="left"><code>V18+</code></td>
+            <td>平均 67.40%｜中位 68.34%</td>
+            <td>平均 16.07%｜中位 15.89%</td>
+            <td>6 / 10</td>
+            <td class="left">10 次隨機股票切分中最像可追蹤候選，但每次測試單數約 8-11 份，仍需 forward paper trade。</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="warn"><strong>判讀：</strong>用單次股票切分會受抽樣影響很大。10 次隨機切分後，V9+、V14+、V18+ 比原本 deterministic test 更有說服力；其中 V18+ 的測試勝率與平均報酬分布最好，但測試交易數偏小，仍不能直接當成最終實盤規則。</p>
+      <p><a href="pullback_plus_random_splits.html">打開 Plus 版 10 次隨機股票切分報告</a></p>
+    </section>
+
+    <section class="card">
       <h2>V8 / V9 / V10 / V14 / V18 演進比較</h2>
       <p class="muted">這五版是從「怎麼挑標的」一路走到「怎麼真的拿有限本金去做」的關鍵節點。下面把目標、主要差異、樣本數量與結果攤平放在一起。</p>
       <div class="table-scroll">
@@ -752,7 +950,7 @@
       <p class="small muted">狀態解讀：<strong>已實現</strong>＝已觸發停損、移動停利、runner stop 或回測持有期滿；<strong>未實現</strong>＝目前只估到最新收盤，尚未真正出場；<strong>等待進場</strong>＝訊號出現但缺少隔日開盤資料。</p>
     </section>
 
-    <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v8_multitimeframe_search.json</code>、<code>reports/pullback_pb_v9_core_position.json</code>、<code>reports/pullback_pb_v10_joint_search.json</code>、<code>reports/pullback_pb_v14_market_gate.json</code>、<code>reports/pullback_pb_v18_finite_capital.json</code>、<code>recent_all_signal_backtest_smart.json</code>。</p>
+    <p class="footer">產出檔案：<code>reports/pullback_experiment_summary.html</code>。資料來源：<code>CODEX_HANDOFF.md</code>、<code>reports/pullback_standard_unit_rerun.json</code>、<code>reports/pullback_pb_v4_0_1y_discount2_swing.json</code>、<code>reports/pullback_pb_v8_multitimeframe_search.json</code>、<code>reports/pullback_pb_v9_core_position.json</code>、<code>reports/pullback_pb_v10_joint_search.json</code>、<code>reports/pullback_pb_v14_market_gate.json</code>、<code>reports/pullback_pb_v18_finite_capital.json</code>、<code>recent_all_signal_backtest_smart.json</code>。</p>
   </main>
 
   <div class="modal-backdrop" id="chartModal" role="dialog" aria-modal="true" aria-labelledby="chartTitle">

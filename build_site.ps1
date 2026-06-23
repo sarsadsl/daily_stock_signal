@@ -101,6 +101,14 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_pb_v4_0_1y_discount2_swing.json",
         "pullback_pb_v6_trend_review_variants.json",
         "pullback_pb_v6e_holdout.json",
+        "pullback_standard_unit_rerun.json",
+        "pullback_pb_v19_main_wave_addon.json",
+        "pullback_pb_v20_fuzzy_addon.json",
+        "pullback_pb_v21_addon_stop_variants.json",
+        "pullback_pb_v22_structural_addon_stop.json",
+        "pullback_pb_v23_independent_lifecycle.json",
+        "pullback_plus_independent_versions.json",
+        "pullback_plus_random_splits.json",
         "pullback_pb_v18_finite_capital.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
@@ -113,7 +121,15 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_pb_v6_trend_review_variants.html",
         "pullback_pb_v6_trend_review_variants.md",
         "pullback_pb_v6e_holdout.html",
-        "pullback_pb_v6e_holdout.md"
+        "pullback_pb_v6e_holdout.md",
+        "pullback_standard_unit_rerun.html",
+        "pullback_pb_v19_main_wave_addon.html",
+        "pullback_pb_v20_fuzzy_addon.html",
+        "pullback_pb_v21_addon_stop_variants.html",
+        "pullback_pb_v22_structural_addon_stop.html",
+        "pullback_pb_v23_independent_lifecycle.html",
+        "pullback_plus_independent_versions.html",
+        "pullback_plus_random_splits.html"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
