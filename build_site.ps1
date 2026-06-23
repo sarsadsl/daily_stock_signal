@@ -110,7 +110,8 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_plus_independent_versions.json",
         "pullback_plus_random_splits.json",
         "pullback_pb_v18_finite_capital.json",
-        "pullback_pb_v18_unlimited.json"
+        "pullback_pb_v18_unlimited.json",
+        "pullback_v9_v18_addon_compare.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
@@ -132,7 +133,9 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_plus_independent_versions.html",
         "pullback_plus_random_splits.html",
         "pullback_pb_v18_unlimited.html",
-        "pullback_pb_v18_unlimited.md"
+        "pullback_pb_v18_unlimited.md",
+        "pullback_v9_v18_addon_compare.html",
+        "pullback_v9_v18_addon_compare.md"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }

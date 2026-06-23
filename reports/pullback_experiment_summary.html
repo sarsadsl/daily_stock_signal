@@ -608,6 +608,7 @@
       </div>
       <p class="warn"><strong>判讀：</strong>用單次股票切分會受抽樣影響很大。10 次隨機切分後，V9+、V14+、V18+ 比原本 deterministic test 更有說服力；其中 V18+ 的測試勝率與平均報酬分布最好，但測試交易數偏小，仍不能直接當成最終實盤規則。</p>
       <p class="warn"><strong>V18+ 無限制重測：</strong>移除 50 萬本金、最多 5 檔、每日最多 2 筆、同股不得重複持有後，V18 候選從 28 筆 portfolio 成交變成 52 筆全部候選交易。壓力成本後 full 從原 V18+ 的 64.29% / 12.31% 降到 61.54% / 9.26%，已低於 10% 平均目標；10 次 random stock test 仍是 6 / 10 次達標，但平均勝率 / 平均報酬也小降到 66.65% / 15.23%。這表示 V18+ 的優勢一部分來自 ranking + 有限資金/持倉/每日進場限制，不是全部候選都同等優質。完整報告：<a href="pullback_pb_v18_unlimited.html">PB-V18+ no-limit 重測</a>。</p>
+      <p class="warn"><strong>V9+ / V18+ no-limit + V23 加碼：</strong>用 V23 同邏輯加碼後，V9+ weekly-core 母單 full 變成 256 份 / 60.94% / 35.02%，stock-test 35 份 / 51.43% / 14.22%，但未實現 18 份；V18+ no-limit 壓力成本後 full 變成 160 份 / 63.12% / 25.54%，stock-test 24 份 / 62.50% / 23.90%，但未實現 12 份。相較 PB-V23 原版 stock-test 114 份 / 48.25% / 12.37%，V18+ no-limit 加碼在數字上較漂亮，但樣本小且未實現比例高，應視為 forward tracking candidate，不是已實現勝利。完整報告：<a href="pullback_v9_v18_addon_compare.html">V9+ / V18+ no-limit 加 V23 加碼比較</a>。</p>
       <p><a href="pullback_plus_random_splits.html">打開 Plus 版 10 次隨機股票切分報告</a></p>
     </section>
 
