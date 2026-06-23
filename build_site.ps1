@@ -113,7 +113,8 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_pb_v18_unlimited.json",
         "pullback_v9_v18_addon_compare.json",
         "pullback_v18_score_pool_tests.json",
-        "pullback_v18_all_scores_no_limit.json"
+        "pullback_v18_all_scores_no_limit.json",
+        "pullback_v18_all_scores_addon.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
@@ -141,7 +142,9 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_v18_score_pool_tests.html",
         "pullback_v18_score_pool_tests.md",
         "pullback_v18_all_scores_no_limit.html",
-        "pullback_v18_all_scores_no_limit.md"
+        "pullback_v18_all_scores_no_limit.md",
+        "pullback_v18_all_scores_addon.html",
+        "pullback_v18_all_scores_addon.md"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
