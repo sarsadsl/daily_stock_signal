@@ -100,7 +100,8 @@ if (Test-Path -LiteralPath $reportsSource) {
         "recent_all_signal_backtest_smart.json",
         "pullback_pb_v4_0_1y_discount2_swing.json",
         "pullback_pb_v6_trend_review_variants.json",
-        "pullback_pb_v6e_holdout.json"
+        "pullback_pb_v6e_holdout.json",
+        "pullback_pb_v18_finite_capital.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }
