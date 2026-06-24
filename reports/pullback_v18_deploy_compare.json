@@ -1,0 +1,183 @@
+{
+  "version": "PB-V18-deploy-compare",
+  "methodology": {
+    "question": "Can the V18 all-score no-limit strategy be deployed, comparing mother-only vs V23 add-on version?",
+    "shared_conditions": [
+      "All one-year enriched pullback score buckets are included: score 5/4/3/2; score 1 has no trades.",
+      "avoid_score4 is removed; no stock is excluded by climax filter.",
+      "V17 runner is used for mother exits.",
+      "V18 fee/tax model and +0.10% adverse slippage each side are included.",
+      "No finite capital, max position, max-new-per-day, or duplicate-stock capacity limits.",
+      "TWD 100,000 standard unit per entry/add-on unit."
+    ],
+    "addon_version": "PB-V23 add-on lifecycle: MA20 retest, max5/spacing5, scan to data end, structural stop and 15% close-based catastrophic line."
+  },
+  "comparison": [
+    {
+      "id": "v18_all_score_no_limit_no_addon",
+      "label": "V18 all-score no-limit：不加碼",
+      "purpose": "Baseline mother trades only. All original score buckets are included; avoid_score4 is removed.",
+      "full": {
+        "units": 222,
+        "win_rate_pct": 48.65,
+        "avg_return_pct": 6.09,
+        "median_return_pct": -0.79,
+        "capital_return_pct": 6.09,
+        "best_return_pct": 149.36,
+        "worst_return_pct": -14.28,
+        "unresolved": 7,
+        "unresolved_rate_pct": 3.15
+      },
+      "deterministic_stock_test": null,
+      "package_stock_test": null,
+      "addon_units": null,
+      "random_stock_test": {
+        "trades": {
+          "min": 40.0,
+          "p25": 42.25,
+          "mean": 45.2,
+          "median": 44.0,
+          "p75": 47.75,
+          "max": 53.0,
+          "stdev": 3.79
+        },
+        "win_rate_pct": {
+          "min": 42.55,
+          "p25": 45.56,
+          "mean": 50.98,
+          "median": 49.52,
+          "p75": 57.41,
+          "max": 60.47,
+          "stdev": 6.53
+        },
+        "avg_return_pct": {
+          "min": 2.43,
+          "p25": 4.97,
+          "mean": 7.09,
+          "median": 6.41,
+          "p75": 8.94,
+          "max": 14.36,
+          "stdev": 3.66
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 2,
+        "win_ge_60_count": 1
+      }
+    },
+    {
+      "id": "v18_all_score_no_limit_v23_addon",
+      "label": "V18 all-score no-limit：V23 加碼",
+      "purpose": "Mother trades plus PB-V23 add-on lifecycle for capturing large waves.",
+      "full": {
+        "units": 678,
+        "win_rate_pct": 56.78,
+        "avg_return_pct": 25.12,
+        "median_return_pct": 1.28,
+        "total_pnl": 17033774,
+        "capital_used": 67800000,
+        "capital_return_pct": 25.12,
+        "best_return_pct": 657.45,
+        "worst_return_pct": -30.06,
+        "unresolved": 334,
+        "unresolved_rate_pct": 49.26
+      },
+      "deterministic_stock_test": {
+        "units": 114,
+        "win_rate_pct": 52.63,
+        "avg_return_pct": 9.83,
+        "median_return_pct": 1.15,
+        "total_pnl": 1120666,
+        "capital_used": 11400000,
+        "capital_return_pct": 9.83,
+        "best_return_pct": 167.61,
+        "worst_return_pct": -18.52,
+        "unresolved": 59,
+        "unresolved_rate_pct": 51.75
+      },
+      "package_full": {
+        "signals": 222,
+        "addon_signals": 169,
+        "addon_rate_pct": 76.13,
+        "avg_return_pct": 17.02,
+        "median_return_pct": 1.41,
+        "win_rate_pct": 54.95,
+        "total_pnl": 17033774,
+        "capital_used": 67800000,
+        "capital_return_pct": 25.12
+      },
+      "package_stock_test": {
+        "signals": 39,
+        "addon_signals": 30,
+        "addon_rate_pct": 76.92,
+        "avg_return_pct": 5.32,
+        "median_return_pct": -0.52,
+        "win_rate_pct": 46.15,
+        "total_pnl": 1120666,
+        "capital_used": 11400000,
+        "capital_return_pct": 9.83
+      },
+      "addon_units": {
+        "units": 456,
+        "win_rate_pct": 60.75,
+        "avg_return_pct": 34.39,
+        "median_return_pct": 9.41,
+        "total_pnl": 15681556,
+        "capital_used": 45600000,
+        "capital_return_pct": 34.39,
+        "best_return_pct": 657.45,
+        "worst_return_pct": -30.06,
+        "unresolved": 327,
+        "unresolved_rate_pct": 71.71
+      },
+      "random_stock_test": {
+        "trades": {
+          "min": 112.0,
+          "p25": 117.75,
+          "mean": 137.4,
+          "median": 132.0,
+          "p75": 145.75,
+          "max": 181.0,
+          "stdev": 23.66
+        },
+        "win_rate_pct": {
+          "min": 47.41,
+          "p25": 53.09,
+          "mean": 57.13,
+          "median": 59.42,
+          "p75": 61.95,
+          "max": 63.39,
+          "stdev": 5.8
+        },
+        "avg_return_pct": {
+          "min": 11.78,
+          "p25": 15.62,
+          "mean": 24.42,
+          "median": 24.8,
+          "p75": 30.33,
+          "max": 42.21,
+          "stdev": 9.31
+        },
+        "pass_60win_10avg_count": 5,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 5
+      }
+    }
+  ],
+  "deployment_assessment": {
+    "verdict": "not_deployable",
+    "label": "不可部署；可列為 forward paper-trading 觀察候選",
+    "positives": [
+      "Full average return clears 10% after V23 add-ons.",
+      "Add-on units capture large-wave upside and show high average return.",
+      "Random stock-test average return clears 10% in mean and all 10 seeds clear avg>=10."
+    ],
+    "blockers": [
+      "Deterministic stock-test does not clear 60% win / 10% average return.",
+      "Random stock-test pass count is only 5/10, not stable enough.",
+      "Unresolved exposure is very high; many gains are latest-close estimates, not realized exits.",
+      "Package stock-test is weak, meaning original signal quality is not strong enough even if add-ons lift unit returns.",
+      "Mother pool without add-ons is weak; deployment depends heavily on add-on winners."
+    ],
+    "recommended_next_step": "Track live signals with real-time unresolved/add-on exposure; do not use production capital until an untouched forward cohort resolves with >=60% win rate, >=10% average return, and acceptable drawdown/unresolved exposure."
+  }
+}
