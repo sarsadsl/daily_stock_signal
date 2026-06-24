@@ -88,6 +88,10 @@ $rankingsSource = Join-Path $rootPath "top_signal_rankings.html"
 $rankingsTarget = Join-Path $sitePath "rankings.html"
 Copy-FileIfExists -Source $rankingsSource -Destination $rankingsTarget
 
+$mwpSource = Join-Path $rootPath "mwp_a_strategy.html"
+$mwpTarget = Join-Path $sitePath "mwp_a_strategy.html"
+Copy-FileIfExists -Source $mwpSource -Destination $mwpTarget
+
 $reportsSource = Join-Path $rootPath "reports"
 if (Test-Path -LiteralPath $reportsSource) {
     $reportsTarget = Join-Path $sitePath "reports"
@@ -117,7 +121,8 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_v18_all_scores_addon.json",
         "pullback_v18_deploy_compare.json",
         "pullback_v9_fixed_random_splits.json",
-        "pullback_v9_fixed_addon_random_splits.json"
+        "pullback_v9_fixed_addon_random_splits.json",
+        "mwp_a_strategy_tracking.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }

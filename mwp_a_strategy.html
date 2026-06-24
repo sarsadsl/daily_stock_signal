@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>主升回檔加碼策略 MWP-A</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --panel: #ffffff;
+      --ink: #152033;
+      --muted: #66758c;
+      --line: #dbe3ef;
+      --soft: #edf3fb;
+      --red: #d92d43;
+      --green: #0f8a62;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --amber: #c98212;
+      --shadow: 0 18px 42px rgba(21, 32, 51, 0.1);
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f141b;
+      --panel: #151b24;
+      --ink: #e8eef6;
+      --muted: #9aa7b8;
+      --line: #2d3747;
+      --soft: #1d2531;
+      --red: #ff6b7a;
+      --green: #2dd4a3;
+      --blue: #7aa2ff;
+      --teal: #34d5c3;
+      --amber: #f2b84b;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+    }
+    * { box-sizing: border-box; }
+    * { scrollbar-width: thin; scrollbar-color: #5b7cfa #e7edf6; }
+    :root[data-theme="dark"] * { scrollbar-color: #64748b #111720; }
+    *::-webkit-scrollbar { width: 12px; height: 12px; }
+    *::-webkit-scrollbar-track { background: #e7edf6; border-radius: 999px; }
+    *::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #5b7cfa, #0f766e); border: 3px solid #e7edf6; border-radius: 999px; }
+    html { min-height: 100%; overflow-x: hidden; scrollbar-gutter: stable; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(21, 32, 51, 0.13) 1px, transparent 1.7px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(15, 118, 110, 0.08) 42%, rgba(217, 45, 67, 0.08)),
+        linear-gradient(180deg, #f8fbff 0, var(--bg) 360px);
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+    }
+    :root[data-theme="dark"] body {
+      background:
+        radial-gradient(circle at 1px 1px, rgba(232, 238, 246, 0.16) 1px, transparent 1.8px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(217, 45, 67, 0.1), rgba(15, 138, 98, 0.08) 42%, rgba(37, 99, 235, 0.1)),
+        linear-gradient(180deg, #111720 0, var(--bg) 360px);
+    }
+    button { font: inherit; }
+    a { color: inherit; }
+    .app { min-height: 100vh; padding-bottom: 24px; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(560px, 1.4fr);
+      gap: 16px;
+      align-items: start;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(219, 227, 239, 0.9);
+      background: rgba(249, 252, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+    :root[data-theme="dark"] .topbar { background: rgba(17, 23, 32, 0.92); border-color: rgba(45, 55, 71, 0.92); }
+    .brand h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 24px; line-height: 1.2; }
+    .brand h1::before { content: ""; width: 12px; height: 32px; border-radius: 999px; background: linear-gradient(180deg, var(--red), var(--teal)); box-shadow: 0 0 0 6px rgba(15, 118, 110, 0.08); }
+    .brand .meta { margin-top: 6px; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 4px; border: 1px solid rgba(219, 227, 239, 0.9); border-radius: 10px; background: rgba(255, 255, 255, 0.74); }
+    :root[data-theme="dark"] .actions { background: rgba(21, 27, 36, 0.72); border-color: var(--line); }
+    .mode-button, .primary-button, .icon-button {
+      height: 38px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 6px 16px rgba(21, 32, 51, 0.04);
+      display: inline-grid;
+      place-items: center;
+      min-width: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    :root[data-theme="dark"] .mode-button, :root[data-theme="dark"] .icon-button { background: #1d2531; border-color: var(--line); }
+    .primary-button { background: linear-gradient(135deg, #174ea6, #0f766e); color: #fff; font-weight: 800; min-width: 132px; }
+    .mode-button.active { color: var(--blue); border-color: #9bbcff; background: #edf4ff; }
+    :root[data-theme="dark"] .mode-button.active { background: rgba(122, 162, 255, 0.14); border-color: rgba(122, 162, 255, 0.5); }
+    .theme-button { min-width: 84px; color: #0f4c81; background: #eef7ff; border-color: #cfe0ff; font-weight: 800; }
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 18px 20px 0; }
+    .metric, .panel, .side-card { border: 1px solid rgba(219, 227, 239, 0.92); background: rgba(255, 255, 255, 0.88); box-shadow: var(--shadow); }
+    :root[data-theme="dark"] .metric, :root[data-theme="dark"] .panel, :root[data-theme="dark"] .side-card { background: rgba(21, 27, 36, 0.86); border-color: var(--line); }
+    .metric { min-height: 92px; padding: 16px; border-radius: 14px; display: grid; align-content: space-between; }
+    .metric span { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+    .metric strong { font-size: clamp(22px, 3vw, 34px); line-height: 1.05; }
+    .metric small { color: var(--muted); font-size: 12px; }
+    .content { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr); gap: 16px; padding: 18px 20px; }
+    .panel, .side-card { border-radius: 16px; overflow: hidden; }
+    .panel + .panel, .side-card + .side-card { margin-top: 16px; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); background: rgba(237, 243, 251, 0.7); }
+    :root[data-theme="dark"] .panel-head { background: rgba(29, 37, 49, 0.78); }
+    .panel-head h2 { margin: 0; font-size: 17px; }
+    .count { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 9px; border-radius: 999px; color: var(--muted); background: var(--soft); font-size: 12px; font-weight: 800; }
+    .panel-body { padding: 16px; }
+    .note { border: 1px solid rgba(201, 130, 18, 0.35); background: rgba(255, 247, 237, 0.78); border-radius: 12px; padding: 12px 14px; color: #7a4a00; line-height: 1.55; }
+    :root[data-theme="dark"] .note { background: rgba(201, 130, 18, 0.1); color: #ffd58a; }
+    .status-good { color: var(--green); }
+    .status-warn { color: var(--amber); }
+    .status-bad { color: var(--red); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .mini-card { border: 1px solid var(--line); border-radius: 14px; padding: 13px; background: rgba(255,255,255,0.72); }
+    :root[data-theme="dark"] .mini-card { background: rgba(29,37,49,0.55); }
+    .mini-card h3 { margin: 0 0 6px; font-size: 14px; }
+    .mini-card .big { font-size: 24px; font-weight: 900; }
+    .mini-card p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .table-wrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    th, td { padding: 10px 11px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; font-size: 13px; }
+    th:first-child, td:first-child { text-align: left; }
+    thead th { position: sticky; top: 0; background: var(--soft); color: var(--muted); font-size: 12px; z-index: 1; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 12px; font-weight: 800; }
+    :root[data-theme="dark"] .chip { background: #1d2531; }
+    .empty { padding: 18px; color: var(--muted); text-align: center; }
+    .site-footer { margin: 8px 20px 0; padding: 12px 14px; border: 1px solid rgba(21, 32, 51, 0.18); background: rgba(255, 255, 255, 0.48); color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 980px) { .topbar, .content { grid-template-columns: 1fr; } .actions { justify-content: flex-start; } .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .summary, .grid-2 { grid-template-columns: 1fr; } .topbar, .content { padding-left: 12px; padding-right: 12px; } .metric strong { font-size: 24px; } table { min-width: 640px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>主升回檔加碼策略 MWP-A</h1>
+        <div class="meta" id="dataMeta">讀取中</div>
+      </div>
+      <div class="actions" aria-label="工具列">
+        <a class="primary-button" href="index.html">每日策略訊號</a>
+        <a class="mode-button" href="reports/pullback_v9_fixed_addon_random_splits.html" target="_blank" rel="noopener">回測報告</a>
+        <a class="mode-button" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
+        <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
+        <button class="icon-button" id="reloadButton" type="button">↻</button>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="策略摘要">
+      <div class="metric"><span>策略狀態</span><strong id="metricStatus">-</strong><small>尚未 production-ready</small></div>
+      <div class="metric"><span>Random unit test</span><strong id="metricRandomUnit">-</strong><small id="metricRandomUnitMeta">-</small></div>
+      <div class="metric"><span>Random package test</span><strong id="metricRandomPackage">-</strong><small id="metricRandomPackageMeta">-</small></div>
+      <div class="metric"><span>未實現追蹤</span><strong id="metricUnresolved">-</strong><small id="metricUnresolvedMeta">-</small></div>
+    </section>
+
+    <main class="content">
+      <section>
+        <div class="panel">
+          <div class="panel-head"><h2>策略說明</h2><span class="count">MWP = Main Wave Pullback</span></div>
+          <div class="panel-body">
+            <div class="note" id="strategyNote">MWP-A 代表 Main Wave Pullback Add-on，也就是主升段回檔後，用加碼單追蹤大波段的候選策略。</div>
+            <div class="grid-2" style="margin-top:12px">
+              <div class="mini-card"><h3>母單條件</h3><p id="entryRule">-</p></div>
+              <div class="mini-card"><h3>加碼條件</h3><p id="addonRule">-</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>回測狀況</h2><span class="count">含未實現估值</span></div>
+          <div class="panel-body">
+            <div class="grid-2" id="backtestCards"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Forward cohort 正式追蹤</h2><span class="count" id="forwardCount">0 筆</span></div>
+          <div class="panel-body">
+            <div class="note" id="forwardNote">尚未有正式 forward record。</div>
+            <div class="table-wrap" style="margin-top:12px">
+              <table>
+                <thead><tr><th>股票</th><th>訊號日</th><th>狀態</th><th>母單</th><th>加碼</th><th>未實現</th></tr></thead>
+                <tbody id="forwardRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>歷史未實現單位</h2><span class="count" id="unresolvedCount">0 份</span></div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>股票</th><th>類型</th><th>訊號日</th><th>進場日</th><th>目前估值日</th><th>報酬</th><th>原因</th></tr></thead>
+                <tbody id="unresolvedRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <div class="side-card">
+          <div class="panel-head"><h2>今日雷達候選</h2><span class="count" id="radarDate">-</span></div>
+          <div class="panel-body">
+            <div class="note">目前先接每日訊號的「回檔雷達候選」。這不是正式 MWP-A 觸發；下一步會把 V9+ exact scanner 接入每日同步。</div>
+            <div class="table-wrap" style="margin-top:12px">
+              <table>
+                <thead><tr><th>股票</th><th>分數</th><th>收盤</th><th>量比</th></tr></thead>
+                <tbody id="radarRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="panel-head"><h2>追蹤重點</h2><span class="count">checklist</span></div>
+          <div class="panel-body">
+            <div class="chips">
+              <span class="chip">新訊號</span>
+              <span class="chip">等待隔日開盤</span>
+              <span class="chip">母單持有</span>
+              <span class="chip">MA20 retest 加碼</span>
+              <span class="chip">結構停損線</span>
+              <span class="chip">未實現損益</span>
+              <span class="chip">已實現出場</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="panel-head"><h2>風險提醒</h2><span class="count status-warn">未部署</span></div>
+          <div class="panel-body">
+            <div class="note">這個頁面是 forward paper-trading tracker，不是實盤部署頁。回測漂亮的部分仍有大量未實現估值，必須等未來 cohort 實際出場後再判斷。</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+    <footer class="site-footer"><strong>Created by Codex</strong> · Only for educational use. This dashboard is not financial advice.</footer>
+  </div>
+
+  <script>
+    const DATA_URL = "reports/mwp_a_strategy_tracking.json";
+    const fmtPct = value => Number.isFinite(Number(value)) ? `${Number(value).toFixed(2)}%` : "-";
+    const fmtNum = value => Number.isFinite(Number(value)) ? Number(value).toLocaleString("zh-TW") : "-";
+    const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem("dailySignalTheme", theme);
+      const btn = document.getElementById("themeToggle");
+      if (btn) btn.textContent = theme === "dark" ? "日間" : "夜間";
+    }
+    applyTheme(localStorage.getItem("dailySignalTheme") || "light");
+    document.getElementById("themeToggle").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+    document.getElementById("reloadButton").addEventListener("click", () => loadData());
+
+    function statCard(title, summary, countKey = "units") {
+      const count = summary?.[countKey] ?? summary?.trades ?? summary?.signals ?? "-";
+      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(summary?.win_rate_pct)} / ${fmtPct(summary?.avg_return_pct)}</div><p>${fmtNum(count)} 筆/份｜中位 ${fmtPct(summary?.median_return_pct)}｜未實現 ${fmtNum(summary?.unresolved || 0)}</p></div>`;
+    }
+
+    function randomCard(title, stat) {
+      const test = stat || {};
+      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(test.win_rate_pct?.mean)} / ${fmtPct(test.avg_return_pct?.mean)}</div><p>平均 ${fmtNum(test.trades?.mean)} 筆｜達標 ${fmtNum(test.pass_60win_10avg_count)} / 10</p></div>`;
+    }
+
+    function renderBacktest(backtest) {
+      document.getElementById("backtestCards").innerHTML = [
+        statCard("不加碼 full", backtest.no_addon_full, "trades"),
+        randomCard("不加碼 random stock-test", backtest.no_addon_random_stock_test),
+        statCard("加碼後 full units", backtest.addon_full_units),
+        statCard("加碼單 units", backtest.addon_addon_units),
+        randomCard("加碼後 random unit stock-test", backtest.addon_random_unit_stock_test),
+        randomCard("加碼後 random package stock-test", backtest.addon_random_package_stock_test),
+      ].join("");
+    }
+
+    function renderUnresolved(rows) {
+      document.getElementById("unresolvedCount").textContent = `${rows.length} 份`;
+      document.getElementById("unresolvedRows").innerHTML = rows.slice(0, 80).map(row => `
+        <tr>
+          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(row.market)}</small></td>
+          <td>${row.unit_type === "addon" ? `加碼 #${escapeHtml(row.addon_number)}` : "母單"}</td>
+          <td>${escapeHtml(row.signal_date)}</td>
+          <td>${escapeHtml(row.entry_date)}<br><small>${fmtNum(row.entry_price)}</small></td>
+          <td>${escapeHtml(row.exit_date)}</td>
+          <td class="${Number(row.return_pct) >= 0 ? "status-good" : "status-bad"}">${fmtPct(row.return_pct)}</td>
+          <td>${escapeHtml(row.exit_reason)}</td>
+        </tr>`).join("") || `<tr><td colspan="7" class="empty">目前沒有未實現單位。</td></tr>`;
+    }
+
+    function renderRadar(rows, date) {
+      document.getElementById("radarDate").textContent = date || "-";
+      document.getElementById("radarRows").innerHTML = rows.map(row => `
+        <tr>
+          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(row.market)}</small></td>
+          <td>${escapeHtml(row.score_label || row.score)}</td>
+          <td>${fmtNum(row.close)}</td>
+          <td>${fmtNum(row.volume_ratio)}</td>
+        </tr>`).join("") || `<tr><td colspan="4" class="empty">今日沒有雷達候選。</td></tr>`;
+    }
+
+    function renderForward(records, note) {
+      document.getElementById("forwardCount").textContent = `${records.length} 筆`;
+      document.getElementById("forwardNote").textContent = note || "尚未有正式 forward record。";
+      document.getElementById("forwardRows").innerHTML = records.map(row => `
+        <tr><td>${escapeHtml(row.label)}</td><td>${escapeHtml(row.signal_date)}</td><td>${escapeHtml(row.status)}</td><td>${escapeHtml(row.base_status)}</td><td>${escapeHtml(row.addon_status)}</td><td>${fmtPct(row.unrealized_return_pct)}</td></tr>
+      `).join("") || `<tr><td colspan="6" class="empty">正式 MWP-A forward cohort 尚未開始記錄。</td></tr>`;
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        const strategy = payload.strategy || {};
+        const backtest = payload.backtest || {};
+        const tracking = payload.tracking || {};
+        document.title = strategy.title || "主升回檔加碼策略 MWP-A";
+        document.getElementById("dataMeta").textContent = `${strategy.code_meaning || "Main Wave Pullback Add-on"} · ${strategy.status || "Forward tracking"}`;
+        document.getElementById("metricStatus").textContent = "觀察候選";
+        document.getElementById("metricRandomUnit").textContent = `${fmtPct(backtest.addon_random_unit_stock_test?.win_rate_pct?.mean)} / ${fmtPct(backtest.addon_random_unit_stock_test?.avg_return_pct?.mean)}`;
+        document.getElementById("metricRandomUnitMeta").textContent = `達標 ${fmtNum(backtest.addon_random_unit_stock_test?.pass_60win_10avg_count)} / 10`;
+        document.getElementById("metricRandomPackage").textContent = `${fmtPct(backtest.addon_random_package_stock_test?.win_rate_pct?.mean)} / ${fmtPct(backtest.addon_random_package_stock_test?.avg_return_pct?.mean)}`;
+        document.getElementById("metricRandomPackageMeta").textContent = `達標 ${fmtNum(backtest.addon_random_package_stock_test?.pass_60win_10avg_count)} / 10`;
+        document.getElementById("metricUnresolved").textContent = fmtNum(tracking.historical_unresolved_units?.length || 0);
+        document.getElementById("metricUnresolvedMeta").textContent = "歷史未實現單位";
+        document.getElementById("strategyNote").textContent = `${strategy.code} = ${strategy.code_meaning}。${strategy.description}`;
+        document.getElementById("entryRule").textContent = strategy.entry_rule || "-";
+        document.getElementById("addonRule").textContent = strategy.addon_rule || "-";
+        renderBacktest(backtest);
+        renderForward(tracking.formal_forward_records || [], tracking.formal_forward_note);
+        renderUnresolved(tracking.historical_unresolved_units || []);
+        renderRadar(tracking.daily_pullback_radar_candidates || [], tracking.as_of_daily_signal_date);
+      } catch (error) {
+        document.getElementById("dataMeta").textContent = `讀取失敗：${error.message}`;
+      }
+    }
+    loadData();
+  </script>
+</body>
+</html>
