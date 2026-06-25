@@ -26,6 +26,7 @@ from analyze_pullback_pb_v22_structural_addon_stop import (
     unit_payload,
 )
 from analyze_pullback_technical_phenotypes import find_series, make_series_map
+from pullback_lifecycle_filters import filter_same_stock_mother_entries
 from run_market_backtest import Row, csv_files, read_rows
 
 
@@ -270,6 +271,53 @@ def scan_addons(
     return addon_units
 
 
+def filter_source_trades_for_mother_lifecycle(
+    source_trades: list[dict[str, Any]],
+    series: dict[tuple[str, str], tuple[list[Row], dict[str, list[float | None]], dict[str, int]]],
+    benchmark_rows: list[Row],
+    benchmark_dates: dict[str, int],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    prepared: list[dict[str, Any]] = []
+    raw_buy_dates_by_stock: dict[tuple[str, str], list[str]] = {}
+    for source in source_trades:
+        market = str(source.get("market") or "").upper()
+        stock_no = str(source.get("stock_no") or "")
+        bundle = find_series(series, market, stock_no)
+        if not bundle:
+            continue
+        rows, indicators, dates = bundle
+        signal_index = dates.get(str(source.get("signal_date")))
+        if signal_index is None or signal_index + 1 >= len(rows):
+            continue
+        base_entry_index = signal_index + 1
+        base_entry = rows[base_entry_index]
+        confirm_index, _ = first_confirmation_index(
+            rows, indicators, signal_index, base_entry_index, benchmark_rows, benchmark_dates
+        )
+        base_exit = independent_base_exit(base_entry, rows, indicators, signal_index, base_entry_index, confirm_index)
+        key = (market, stock_no)
+        raw_buy_dates_by_stock.setdefault(key, []).append(base_entry.date)
+        prepared.append({
+            **source,
+            "market": market,
+            "stock_no": stock_no,
+            "entry_date": base_entry.date,
+            "entry_price": round(base_entry.open, 4),
+            "exit_date": base_exit.get("exit_date"),
+            "exit_reason": base_exit.get("exit_reason"),
+        })
+
+    accepted, diagnostics = filter_same_stock_mother_entries(
+        prepared, series, find_series, cooldown_trading_days=ADDON_BUY_COOLDOWN_TRADING_DAYS
+    )
+    for row in accepted:
+        key = (str(row.get("market") or "").upper(), str(row.get("stock_no") or ""))
+        row["same_stock_buy_signal_entry_dates"] = sorted(set(raw_buy_dates_by_stock.get(key, [])))
+        row["mother_lifecycle_filter"] = "same-stock active mother and 10-trading-day cooldown"
+    diagnostics["raw_buy_signal_dates_by_stock_count"] = len(raw_buy_dates_by_stock)
+    return accepted, diagnostics
+
+
 def simulate_variant(
     source_trades: list[dict[str, Any]],
     series: dict[tuple[str, str], tuple[list[Row], dict[str, list[float | None]], dict[str, int]]],
@@ -279,6 +327,9 @@ def simulate_variant(
     test_start: str,
     variant: dict[str, Any],
 ) -> dict[str, Any]:
+    source_trades, mother_lifecycle_diagnostics = filter_source_trades_for_mother_lifecycle(
+        source_trades, series, benchmark_rows, benchmark_dates
+    )
     units: list[dict[str, Any]] = []
     packages: list[dict[str, Any]] = []
     for source in source_trades:
@@ -363,6 +414,7 @@ def simulate_variant(
             "addon_units": summarize_units(addons),
             "stock_counts": stock_counts,
             "package_stock_counts": package_stock_counts,
+            "mother_lifecycle_filter": mother_lifecycle_diagnostics,
         },
         "units": units,
         "packages": packages,

@@ -8,106 +8,106 @@
   },
   "strategies": [
     {
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
       "source": "simulated: PB-V23 cap experiment",
       "summary": {
         "full_units": {
-          "units": 300,
-          "win_rate_pct": 43.33,
-          "avg_return_pct": 39.25,
-          "median_return_pct": -6.77,
-          "total_pnl": 11774340,
-          "capital_used": 30000000,
-          "capital_return_pct": 39.25,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -23.91,
-          "unresolved": 131
+          "units": 268,
+          "win_rate_pct": 44.4,
+          "avg_return_pct": 42.2,
+          "median_return_pct": -5.33,
+          "total_pnl": 11308450,
+          "capital_used": 26800000,
+          "capital_return_pct": 42.2,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.64,
+          "unresolved": 120
         },
         "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "addon_units": {
-          "units": 77,
-          "win_rate_pct": 64.94,
-          "avg_return_pct": 43.37,
-          "median_return_pct": 15.14,
-          "total_pnl": 3339830,
-          "capital_used": 7700000,
-          "capital_return_pct": 43.37,
-          "best_return_pct": 342.73,
-          "worst_return_pct": -23.91,
-          "unresolved": 54
+          "units": 78,
+          "win_rate_pct": 65.38,
+          "avg_return_pct": 51.28,
+          "median_return_pct": 15.07,
+          "total_pnl": 3999660,
+          "capital_used": 7800000,
+          "capital_return_pct": 51.28,
+          "best_return_pct": 644.48,
+          "worst_return_pct": -23.64,
+          "unresolved": 55
         },
         "full_packages": {
-          "signals": 223,
-          "addon_signals": 77,
-          "addon_rate_pct": 34.53,
-          "avg_return_pct": 29.28,
+          "signals": 190,
+          "addon_signals": 78,
+          "addon_rate_pct": 41.05,
+          "avg_return_pct": 28.04,
           "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 11774340,
-          "capital_used": 30000000,
-          "capital_return_pct": 39.25
+          "win_rate_pct": 34.74,
+          "total_pnl": 11308450,
+          "capital_used": 26800000,
+          "capital_return_pct": 42.2
         },
-        "addon_rate_pct": 34.53,
-        "base_count": 223,
-        "addon_count": 77,
+        "addon_rate_pct": 41.05,
+        "base_count": 190,
+        "addon_count": 78,
         "lifecycle_violations": 0
       },
       "random_unit_stock_test": {
         "units": {
-          "min": 52.0,
-          "p25": 55.75,
-          "mean": 58.0,
-          "median": 58.5,
-          "p75": 60.75,
-          "max": 62.0,
-          "stdev": 3.41
+          "min": 46.0,
+          "p25": 52.25,
+          "mean": 53.2,
+          "median": 54.0,
+          "p75": 55.75,
+          "max": 57.0,
+          "stdev": 3.28
         },
         "win_rate_pct": {
-          "min": 22.64,
-          "p25": 39.99,
-          "mean": 40.81,
-          "median": 41.53,
-          "p75": 45.67,
-          "max": 50.0,
-          "stdev": 7.4
+          "min": 30.43,
+          "p25": 38.03,
+          "mean": 41.8,
+          "median": 41.33,
+          "p75": 46.6,
+          "max": 50.91,
+          "stdev": 5.7
         },
         "avg_return_pct": {
-          "min": 13.66,
-          "p25": 29.31,
-          "mean": 33.52,
-          "median": 34.03,
-          "p75": 41.51,
-          "max": 52.15,
-          "stdev": 11.0
+          "min": 18.17,
+          "p25": 32.08,
+          "mean": 37.07,
+          "median": 35.61,
+          "p75": 37.99,
+          "max": 56.46,
+          "stdev": 10.33
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -5.29,
-          "median": -7.0,
-          "p75": -4.2,
-          "max": 0.22,
-          "stdev": 2.4
+          "mean": -4.89,
+          "median": -6.7,
+          "p75": -4.38,
+          "max": 4.78,
+          "stdev": 3.49
         },
         "capital_return_pct": {
-          "min": 13.66,
-          "p25": 29.31,
-          "mean": 33.52,
-          "median": 34.03,
-          "p75": 41.51,
-          "max": 52.15,
-          "stdev": 11.0
+          "min": 18.17,
+          "p25": 32.08,
+          "mean": 37.07,
+          "median": 35.61,
+          "p75": 37.99,
+          "max": 56.46,
+          "stdev": 10.33
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -115,49 +115,753 @@
       },
       "random_package_stock_test": {
         "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 32.93,
+          "median": 33.77,
+          "p75": 36.66,
+          "max": 42.11,
+          "stdev": 6.27
         },
         "avg_return_pct": {
-          "min": 7.48,
-          "p25": 22.12,
-          "mean": 25.38,
-          "median": 24.02,
-          "p75": 33.04,
-          "max": 42.11,
-          "stdev": 9.97
+          "min": 8.56,
+          "p25": 21.96,
+          "mean": 24.43,
+          "median": 22.71,
+          "p75": 26.5,
+          "max": 38.77,
+          "stdev": 7.85
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.93,
+          "mean": -6.86,
           "median": -7.0,
           "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
+          "max": -6.12,
+          "stdev": 0.3
         },
         "capital_return_pct": {
-          "min": 13.66,
-          "p25": 29.31,
-          "mean": 33.52,
-          "median": 34.03,
-          "p75": 41.51,
-          "max": 52.15,
-          "stdev": 11.0
+          "min": 18.17,
+          "p25": 32.08,
+          "mean": 37.07,
+          "median": 35.61,
+          "p75": 37.99,
+          "max": 56.46,
+          "stdev": 10.33
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 9,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.06,
+        "id": "pbv23_max1_band6",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
+        "max_addons": 1,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 32,
+      "addon_units_per_base": 0.411,
+      "score_return_first": 50.388
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 260,
+          "win_rate_pct": 43.85,
+          "avg_return_pct": 40.75,
+          "median_return_pct": -5.19,
+          "total_pnl": 10595670,
+          "capital_used": 26000000,
+          "capital_return_pct": 40.75,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -18.42,
+          "unresolved": 116
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 70,
+          "win_rate_pct": 65.71,
+          "avg_return_pct": 46.96,
+          "median_return_pct": 14.85,
+          "total_pnl": 3286880,
+          "capital_used": 7000000,
+          "capital_return_pct": 46.96,
+          "best_return_pct": 372.53,
+          "worst_return_pct": -18.42,
+          "unresolved": 51
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 70,
+          "addon_rate_pct": 36.84,
+          "avg_return_pct": 29.62,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 35.26,
+          "total_pnl": 10595670,
+          "capital_used": 26000000,
+          "capital_return_pct": 40.75
+        },
+        "addon_rate_pct": 36.84,
+        "base_count": 190,
+        "addon_count": 70,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 45.0,
+          "p25": 50.25,
+          "mean": 51.8,
+          "median": 51.5,
+          "p75": 54.0,
+          "max": 57.0,
+          "stdev": 3.25
+        },
+        "win_rate_pct": {
+          "min": 26.67,
+          "p25": 38.72,
+          "mean": 42.1,
+          "median": 41.53,
+          "p75": 46.48,
+          "max": 53.7,
+          "stdev": 7.0
+        },
+        "avg_return_pct": {
+          "min": 16.99,
+          "p25": 32.71,
+          "mean": 36.34,
+          "median": 36.87,
+          "p75": 38.31,
+          "max": 52.34,
+          "stdev": 9.16
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -4.8,
+          "median": -7.0,
+          "p75": -4.82,
+          "max": 5.05,
+          "stdev": 3.93
+        },
+        "capital_return_pct": {
+          "min": 16.99,
+          "p25": 32.71,
+          "mean": 36.34,
+          "median": 36.87,
+          "p75": 38.31,
+          "max": 52.34,
+          "stdev": 9.16
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
+        },
+        "avg_return_pct": {
+          "min": 9.18,
+          "p25": 22.26,
+          "mean": 25.52,
+          "median": 24.49,
+          "p75": 26.44,
+          "max": 45.02,
+          "stdev": 8.78
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.96,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.64,
+          "stdev": 0.11
+        },
+        "capital_return_pct": {
+          "min": 16.99,
+          "p25": 32.71,
+          "mean": 36.34,
+          "median": 36.87,
+          "p75": 38.31,
+          "max": 52.34,
+          "stdev": 9.16
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 9,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.03,
+        "id": "pbv23_max1_band3",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
+        "max_addons": 1,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 40,
+      "addon_units_per_base": 0.368,
+      "score_return_first": 49.8935
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 4%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 262,
+          "win_rate_pct": 43.89,
+          "avg_return_pct": 40.06,
+          "median_return_pct": -5.19,
+          "total_pnl": 10496910,
+          "capital_used": 26200000,
+          "capital_return_pct": 40.06,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.64,
+          "unresolved": 116
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 72,
+          "win_rate_pct": 65.28,
+          "avg_return_pct": 44.28,
+          "median_return_pct": 15.29,
+          "total_pnl": 3188120,
+          "capital_used": 7200000,
+          "capital_return_pct": 44.28,
+          "best_return_pct": 351.44,
+          "worst_return_pct": -23.64,
+          "unresolved": 51
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 72,
+          "addon_rate_pct": 37.89,
+          "avg_return_pct": 29.74,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 34.74,
+          "total_pnl": 10496910,
+          "capital_used": 26200000,
+          "capital_return_pct": 40.06
+        },
+        "addon_rate_pct": 37.89,
+        "base_count": 190,
+        "addon_count": 72,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 45.0,
+          "p25": 50.25,
+          "mean": 51.8,
+          "median": 52.0,
+          "p75": 54.0,
+          "max": 56.0,
+          "stdev": 3.12
+        },
+        "win_rate_pct": {
+          "min": 28.89,
+          "p25": 38.97,
+          "mean": 41.36,
+          "median": 39.64,
+          "p75": 45.23,
+          "max": 51.85,
+          "stdev": 5.94
+        },
+        "avg_return_pct": {
+          "min": 18.06,
+          "p25": 31.93,
+          "mean": 35.9,
+          "median": 35.41,
+          "p75": 37.64,
+          "max": 54.21,
+          "stdev": 9.07
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -5.09,
+          "median": -7.0,
+          "p75": -4.85,
+          "max": 5.38,
+          "stdev": 3.74
+        },
+        "capital_return_pct": {
+          "min": 18.06,
+          "p25": 31.93,
+          "mean": 35.9,
+          "median": 35.41,
+          "p75": 37.64,
+          "max": 54.21,
+          "stdev": 9.07
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 32.93,
+          "median": 33.77,
+          "p75": 36.66,
+          "max": 42.11,
+          "stdev": 6.27
+        },
+        "avg_return_pct": {
+          "min": 9.83,
+          "p25": 23.48,
+          "mean": 26.23,
+          "median": 24.95,
+          "p75": 27.27,
+          "max": 44.76,
+          "stdev": 8.58
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.86,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.12,
+          "stdev": 0.3
+        },
+        "capital_return_pct": {
+          "min": 18.06,
+          "p25": 31.93,
+          "mean": 35.9,
+          "median": 35.41,
+          "p75": 37.64,
+          "max": 54.21,
+          "stdev": 9.07
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 9,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.04,
+        "id": "pbv23_max1_band4",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 4%",
+        "max_addons": 1,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 38,
+      "addon_units_per_base": 0.379,
+      "score_return_first": 49.1435
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 3%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 297,
+          "win_rate_pct": 45.45,
+          "avg_return_pct": 39.95,
+          "median_return_pct": -4.1,
+          "total_pnl": 11864500,
+          "capital_used": 29700000,
+          "capital_return_pct": 39.95,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 142
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 107,
+          "win_rate_pct": 62.62,
+          "avg_return_pct": 42.58,
+          "median_return_pct": 14.19,
+          "total_pnl": 4555710,
+          "capital_used": 10700000,
+          "capital_return_pct": 42.58,
+          "best_return_pct": 372.53,
+          "worst_return_pct": -23.91,
+          "unresolved": 77
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 70,
+          "addon_rate_pct": 36.84,
+          "avg_return_pct": 25.54,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 35.26,
+          "total_pnl": 11864500,
+          "capital_used": 29700000,
+          "capital_return_pct": 39.95
+        },
+        "addon_rate_pct": 36.84,
+        "base_count": 190,
+        "addon_count": 107,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 48.0,
+          "p25": 57.25,
+          "mean": 59.2,
+          "median": 58.0,
+          "p75": 62.75,
+          "max": 68.0,
+          "stdev": 5.17
+        },
+        "win_rate_pct": {
+          "min": 27.08,
+          "p25": 41.43,
+          "mean": 43.11,
+          "median": 43.84,
+          "p75": 46.73,
+          "max": 53.23,
+          "stdev": 6.83
+        },
+        "avg_return_pct": {
+          "min": 17.64,
+          "p25": 30.66,
+          "mean": 35.44,
+          "median": 35.05,
+          "p75": 38.48,
+          "max": 56.52,
+          "stdev": 9.83
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -6.96,
+          "mean": -4.43,
+          "median": -6.08,
+          "p75": -4.39,
+          "max": 5.05,
+          "stdev": 3.79
+        },
+        "capital_return_pct": {
+          "min": 17.64,
+          "p25": 30.66,
+          "mean": 35.44,
+          "median": 35.05,
+          "p75": 38.48,
+          "max": 56.52,
+          "stdev": 9.83
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
+        },
+        "avg_return_pct": {
+          "min": 8.49,
+          "p25": 18.43,
+          "mean": 21.76,
+          "median": 20.29,
+          "p75": 23.55,
+          "max": 41.97,
+          "stdev": 8.37
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.97,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.67,
+          "stdev": 0.1
+        },
+        "capital_return_pct": {
+          "min": 17.64,
+          "p25": 30.66,
+          "mean": 35.44,
+          "median": 35.05,
+          "p75": 38.48,
+          "max": 56.52,
+          "stdev": 9.83
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 9,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.03,
+        "id": "pbv23_max2_band3",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 3%",
+        "max_addons": 2,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 3,
+      "addon_units_per_base": 0.563,
+      "score_return_first": 48.3265
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 258,
+          "win_rate_pct": 43.02,
+          "avg_return_pct": 39.21,
+          "median_return_pct": -6.0,
+          "total_pnl": 10116630,
+          "capital_used": 25800000,
+          "capital_return_pct": 39.21,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 113
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 68,
+          "win_rate_pct": 63.24,
+          "avg_return_pct": 41.29,
+          "median_return_pct": 13.41,
+          "total_pnl": 2807840,
+          "capital_used": 6800000,
+          "capital_return_pct": 41.29,
+          "best_return_pct": 323.18,
+          "worst_return_pct": -23.91,
+          "unresolved": 48
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 68,
+          "addon_rate_pct": 35.79,
+          "avg_return_pct": 29.06,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 35.26,
+          "total_pnl": 10116630,
+          "capital_used": 25800000,
+          "capital_return_pct": 39.21
+        },
+        "addon_rate_pct": 35.79,
+        "base_count": 190,
+        "addon_count": 68,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 44.0,
+          "p25": 50.0,
+          "mean": 51.1,
+          "median": 51.0,
+          "p75": 53.0,
+          "max": 56.0,
+          "stdev": 3.3
+        },
+        "win_rate_pct": {
+          "min": 25.0,
+          "p25": 38.05,
+          "mean": 40.89,
+          "median": 39.45,
+          "p75": 45.65,
+          "max": 52.83,
+          "stdev": 7.1
+        },
+        "avg_return_pct": {
+          "min": 16.6,
+          "p25": 29.18,
+          "mean": 33.04,
+          "median": 33.44,
+          "p75": 36.0,
+          "max": 47.39,
+          "stdev": 8.98
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -5.08,
+          "median": -7.0,
+          "p75": -4.9,
+          "max": 4.78,
+          "stdev": 3.62
+        },
+        "capital_return_pct": {
+          "min": 16.6,
+          "p25": 29.18,
+          "mean": 33.04,
+          "median": 33.44,
+          "p75": 36.0,
+          "max": 47.39,
+          "stdev": 8.98
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
+        },
+        "avg_return_pct": {
+          "min": 9.45,
+          "p25": 20.28,
+          "mean": 24.31,
+          "median": 23.84,
+          "p75": 27.42,
+          "max": 44.93,
+          "stdev": 8.9
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.96,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.64,
+          "stdev": 0.11
+        },
+        "capital_return_pct": {
+          "min": 16.6,
+          "p25": 29.18,
+          "mean": 33.04,
+          "median": 33.44,
+          "p75": 36.0,
+          "max": 47.39,
+          "stdev": 8.98
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 9,
@@ -179,111 +883,111 @@
       },
       "unit_cap": 300,
       "under_cap": true,
-      "cap_room": 0,
-      "addon_units_per_base": 0.345,
-      "score_return_first": 45.819
+      "cap_room": 42,
+      "addon_units_per_base": 0.358,
+      "score_return_first": 45.2975
     },
     {
       "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 1.9%",
       "source": "simulated: PB-V23 cap experiment",
       "summary": {
         "full_units": {
-          "units": 299,
-          "win_rate_pct": 43.14,
-          "avg_return_pct": 39.27,
-          "median_return_pct": -6.87,
-          "total_pnl": 11740850,
-          "capital_used": 29900000,
-          "capital_return_pct": 39.27,
-          "best_return_pct": 1092.59,
+          "units": 257,
+          "win_rate_pct": 42.8,
+          "avg_return_pct": 39.24,
+          "median_return_pct": -6.18,
+          "total_pnl": 10084650,
+          "capital_used": 25700000,
+          "capital_return_pct": 39.24,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -23.91,
-          "unresolved": 130
+          "unresolved": 112
         },
         "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "addon_units": {
-          "units": 76,
-          "win_rate_pct": 64.47,
-          "avg_return_pct": 43.5,
-          "median_return_pct": 14.94,
-          "total_pnl": 3306340,
-          "capital_used": 7600000,
-          "capital_return_pct": 43.5,
-          "best_return_pct": 342.73,
+          "units": 67,
+          "win_rate_pct": 62.69,
+          "avg_return_pct": 41.43,
+          "median_return_pct": 12.68,
+          "total_pnl": 2775860,
+          "capital_used": 6700000,
+          "capital_return_pct": 41.43,
+          "best_return_pct": 323.18,
           "worst_return_pct": -23.91,
-          "unresolved": 53
+          "unresolved": 47
         },
         "full_packages": {
-          "signals": 223,
-          "addon_signals": 76,
-          "addon_rate_pct": 34.08,
-          "avg_return_pct": 29.32,
+          "signals": 190,
+          "addon_signals": 67,
+          "addon_rate_pct": 35.26,
+          "avg_return_pct": 29.12,
           "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 11740850,
-          "capital_used": 29900000,
-          "capital_return_pct": 39.27
+          "win_rate_pct": 35.26,
+          "total_pnl": 10084650,
+          "capital_used": 25700000,
+          "capital_return_pct": 39.24
         },
-        "addon_rate_pct": 34.08,
-        "base_count": 223,
-        "addon_count": 76,
+        "addon_rate_pct": 35.26,
+        "base_count": 190,
+        "addon_count": 67,
         "lifecycle_violations": 0
       },
       "random_unit_stock_test": {
         "units": {
-          "min": 51.0,
-          "p25": 55.75,
-          "mean": 57.8,
-          "median": 58.5,
-          "p75": 60.75,
-          "max": 62.0,
-          "stdev": 3.49
+          "min": 44.0,
+          "p25": 50.0,
+          "mean": 50.9,
+          "median": 51.0,
+          "p75": 52.75,
+          "max": 56.0,
+          "stdev": 3.36
         },
         "win_rate_pct": {
-          "min": 22.64,
-          "p25": 39.99,
-          "mean": 40.63,
-          "median": 41.53,
-          "p75": 45.67,
-          "max": 49.18,
-          "stdev": 7.2
+          "min": 25.0,
+          "p25": 38.05,
+          "mean": 40.69,
+          "median": 39.45,
+          "p75": 45.0,
+          "max": 51.92,
+          "stdev": 6.87
         },
         "avg_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 33.5,
-          "median": 33.92,
-          "p75": 41.58,
-          "max": 52.13,
-          "stdev": 11.0
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 33.02,
+          "median": 33.33,
+          "p75": 36.02,
+          "max": 47.48,
+          "stdev": 8.98
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -5.61,
+          "mean": -5.31,
           "median": -7.0,
-          "p75": -4.85,
-          "max": -0.44,
-          "stdev": 2.28
+          "p75": -4.9,
+          "max": 2.47,
+          "stdev": 3.01
         },
         "capital_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 33.5,
-          "median": 33.92,
-          "p75": 41.58,
-          "max": 52.13,
-          "stdev": 11.0
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 33.02,
+          "median": 33.33,
+          "p75": 36.02,
+          "max": 47.48,
+          "stdev": 8.98
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -291,49 +995,49 @@
       },
       "random_package_stock_test": {
         "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
         },
         "avg_return_pct": {
-          "min": 7.52,
-          "p25": 22.16,
-          "mean": 25.42,
-          "median": 24.09,
-          "p75": 33.03,
-          "max": 42.16,
-          "stdev": 9.96
+          "min": 9.5,
+          "p25": 20.31,
+          "mean": 24.35,
+          "median": 23.93,
+          "p75": 27.42,
+          "max": 44.99,
+          "stdev": 8.89
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.93,
+          "mean": -6.96,
           "median": -7.0,
           "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
+          "max": -6.64,
+          "stdev": 0.11
         },
         "capital_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 33.5,
-          "median": 33.92,
-          "p75": 41.58,
-          "max": 52.13,
-          "stdev": 11.0
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 33.02,
+          "median": 33.33,
+          "p75": 36.02,
+          "max": 47.48,
+          "stdev": 8.98
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 9,
@@ -355,37 +1059,37 @@
       },
       "unit_cap": 300,
       "under_cap": true,
-      "cap_room": 1,
-      "addon_units_per_base": 0.341,
-      "score_return_first": 45.727
+      "cap_room": 43,
+      "addon_units_per_base": 0.353,
+      "score_return_first": 45.2465
     },
     {
       "label": "PB-V23 原始母單池，不加碼",
       "source": "simulated: PB-V23 cap experiment",
       "summary": {
         "full_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "addon_units": {
           "units": 0,
@@ -400,66 +1104,66 @@
           "unresolved": 0
         },
         "full_packages": {
-          "signals": 223,
+          "signals": 190,
           "addon_signals": 0,
           "addon_rate_pct": 0.0,
-          "avg_return_pct": 37.82,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82
+          "win_rate_pct": 35.79,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47
         },
         "addon_rate_pct": 0.0,
-        "base_count": 223,
+        "base_count": 190,
         "addon_count": 0,
         "lifecycle_violations": 0
       },
       "random_unit_stock_test": {
         "units": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.98,
+          "median": 36.11,
+          "p75": 38.81,
+          "max": 42.11,
+          "stdev": 6.42
         },
         "avg_return_pct": {
-          "min": 11.06,
-          "p25": 30.22,
-          "mean": 33.48,
-          "median": 32.53,
-          "p75": 41.16,
-          "max": 47.87,
-          "stdev": 10.3
+          "min": 13.52,
+          "p25": 29.85,
+          "mean": 32.92,
+          "median": 32.66,
+          "p75": 35.18,
+          "max": 49.43,
+          "stdev": 8.91
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.71,
+          "mean": -6.57,
           "median": -7.0,
           "p75": -7.0,
-          "max": -4.1,
-          "stdev": 0.87
+          "max": -4.13,
+          "stdev": 0.92
         },
         "capital_return_pct": {
-          "min": 11.06,
-          "p25": 30.22,
-          "mean": 33.48,
-          "median": 32.53,
-          "p75": 41.16,
-          "max": 47.87,
-          "stdev": 10.3
+          "min": 13.52,
+          "p25": 29.85,
+          "mean": 32.92,
+          "median": 32.66,
+          "p75": 35.18,
+          "max": 49.43,
+          "stdev": 8.91
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -467,49 +1171,49 @@
       },
       "random_package_stock_test": {
         "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.98,
+          "median": 36.11,
+          "p75": 38.81,
+          "max": 42.11,
+          "stdev": 6.42
         },
         "avg_return_pct": {
-          "min": 11.06,
-          "p25": 30.22,
-          "mean": 33.48,
-          "median": 32.53,
-          "p75": 41.16,
-          "max": 47.87,
-          "stdev": 10.3
+          "min": 13.52,
+          "p25": 29.85,
+          "mean": 32.92,
+          "median": 32.66,
+          "p75": 35.18,
+          "max": 49.43,
+          "stdev": 8.91
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.71,
+          "mean": -6.57,
           "median": -7.0,
           "p75": -7.0,
-          "max": -4.1,
-          "stdev": 0.87
+          "max": -4.13,
+          "stdev": 0.92
         },
         "capital_return_pct": {
-          "min": 11.06,
-          "p25": 30.22,
-          "mean": 33.48,
-          "median": 32.53,
-          "p75": 41.16,
-          "max": 47.87,
-          "stdev": 10.3
+          "min": 13.52,
+          "p25": 29.85,
+          "mean": 32.92,
+          "median": 32.66,
+          "p75": 35.18,
+          "max": 49.43,
+          "stdev": 8.91
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -531,111 +1235,111 @@
       },
       "unit_cap": 300,
       "under_cap": true,
-      "cap_room": 77,
+      "cap_room": 110,
       "addon_units_per_base": 0.0,
-      "score_return_first": 45.786
+      "score_return_first": 45.0665
     },
     {
       "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 1.5%",
       "source": "simulated: PB-V23 cap experiment",
       "summary": {
         "full_units": {
-          "units": 289,
-          "win_rate_pct": 42.21,
-          "avg_return_pct": 38.29,
-          "median_return_pct": -7.0,
-          "total_pnl": 11065680,
-          "capital_used": 28900000,
-          "capital_return_pct": 38.29,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -24.13,
-          "unresolved": 123
+          "units": 249,
+          "win_rate_pct": 41.77,
+          "avg_return_pct": 38.81,
+          "median_return_pct": -6.87,
+          "total_pnl": 9663960,
+          "capital_used": 24900000,
+          "capital_return_pct": 38.81,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 106
         },
         "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "addon_units": {
-          "units": 66,
-          "win_rate_pct": 63.64,
-          "avg_return_pct": 39.87,
-          "median_return_pct": 12.36,
-          "total_pnl": 2631170,
-          "capital_used": 6600000,
-          "capital_return_pct": 39.87,
-          "best_return_pct": 337.75,
-          "worst_return_pct": -24.13,
-          "unresolved": 46
+          "units": 59,
+          "win_rate_pct": 61.02,
+          "avg_return_pct": 39.92,
+          "median_return_pct": 10.8,
+          "total_pnl": 2355170,
+          "capital_used": 5900000,
+          "capital_return_pct": 39.92,
+          "best_return_pct": 318.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 41
         },
         "full_packages": {
-          "signals": 223,
-          "addon_signals": 66,
-          "addon_rate_pct": 29.6,
-          "avg_return_pct": 30.14,
+          "signals": 190,
+          "addon_signals": 59,
+          "addon_rate_pct": 31.05,
+          "avg_return_pct": 30.1,
           "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 11065680,
-          "capital_used": 28900000,
-          "capital_return_pct": 38.29
+          "win_rate_pct": 35.26,
+          "total_pnl": 9663960,
+          "capital_used": 24900000,
+          "capital_return_pct": 38.81
         },
-        "addon_rate_pct": 29.6,
-        "base_count": 223,
-        "addon_count": 66,
+        "addon_rate_pct": 31.05,
+        "base_count": 190,
+        "addon_count": 59,
         "lifecycle_violations": 0
       },
       "random_unit_stock_test": {
         "units": {
-          "min": 51.0,
-          "p25": 54.25,
-          "mean": 56.0,
-          "median": 56.5,
-          "p75": 58.75,
-          "max": 60.0,
-          "stdev": 3.13
+          "min": 43.0,
+          "p25": 47.5,
+          "mean": 49.7,
+          "median": 50.5,
+          "p75": 52.0,
+          "max": 54.0,
+          "stdev": 3.1
         },
         "win_rate_pct": {
-          "min": 23.53,
-          "p25": 37.19,
-          "mean": 39.77,
-          "median": 40.34,
-          "p75": 44.17,
-          "max": 48.33,
-          "stdev": 6.79
+          "min": 25.58,
+          "p25": 36.91,
+          "mean": 39.61,
+          "median": 38.67,
+          "p75": 44.46,
+          "max": 50.0,
+          "stdev": 6.65
         },
         "avg_return_pct": {
-          "min": 14.74,
-          "p25": 28.14,
-          "mean": 33.0,
-          "median": 33.8,
-          "p75": 40.97,
-          "max": 48.36,
-          "stdev": 9.97
+          "min": 17.09,
+          "p25": 28.5,
+          "mean": 32.87,
+          "median": 33.16,
+          "p75": 36.22,
+          "max": 47.55,
+          "stdev": 8.94
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -5.62,
+          "mean": -5.56,
           "median": -7.0,
-          "p75": -4.82,
-          "max": -1.19,
-          "stdev": 2.21
+          "p75": -4.85,
+          "max": -0.15,
+          "stdev": 2.37
         },
         "capital_return_pct": {
-          "min": 14.74,
-          "p25": 28.14,
-          "mean": 33.0,
-          "median": 33.8,
-          "p75": 40.97,
-          "max": 48.36,
-          "stdev": 9.97
+          "min": 17.09,
+          "p25": 28.5,
+          "mean": 32.87,
+          "median": 33.16,
+          "p75": 36.22,
+          "max": 47.55,
+          "stdev": 8.94
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -643,52 +1347,52 @@
       },
       "random_package_stock_test": {
         "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
         },
         "avg_return_pct": {
-          "min": 8.35,
-          "p25": 22.56,
-          "mean": 26.06,
-          "median": 25.04,
-          "p75": 32.73,
-          "max": 42.21,
-          "stdev": 9.96
+          "min": 10.35,
+          "p25": 20.77,
+          "mean": 25.09,
+          "median": 24.75,
+          "p75": 28.95,
+          "max": 45.03,
+          "stdev": 8.86
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.93,
+          "mean": -6.96,
           "median": -7.0,
           "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
+          "max": -6.64,
+          "stdev": 0.11
         },
         "capital_return_pct": {
-          "min": 14.74,
-          "p25": 28.14,
-          "mean": 33.0,
-          "median": 33.8,
-          "p75": 40.97,
-          "max": 48.36,
-          "stdev": 9.97
+          "min": 17.09,
+          "p25": 28.5,
+          "mean": 32.87,
+          "median": 33.16,
+          "p75": 36.22,
+          "max": 47.55,
+          "stdev": 8.94
         },
         "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
+        "avg_ge_10_count": 10,
         "win_ge_60_count": 0
       },
       "variant": {
@@ -707,111 +1411,111 @@
       },
       "unit_cap": 300,
       "under_cap": true,
-      "cap_room": 11,
-      "addon_units_per_base": 0.296,
-      "score_return_first": 44.8375
+      "cap_room": 51,
+      "addon_units_per_base": 0.311,
+      "score_return_first": 44.8255
     },
     {
       "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 1.8%",
       "source": "simulated: PB-V23 cap experiment",
       "summary": {
         "full_units": {
-          "units": 296,
-          "win_rate_pct": 42.57,
-          "avg_return_pct": 38.42,
-          "median_return_pct": -7.0,
-          "total_pnl": 11371960,
-          "capital_used": 29600000,
-          "capital_return_pct": 38.42,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -24.13,
-          "unresolved": 127
+          "units": 255,
+          "win_rate_pct": 42.35,
+          "avg_return_pct": 38.9,
+          "median_return_pct": -6.66,
+          "total_pnl": 9920510,
+          "capital_used": 25500000,
+          "capital_return_pct": 38.9,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 110
         },
         "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
           "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
           "worst_return_pct": -13.57,
-          "unresolved": 77
+          "unresolved": 65
         },
         "addon_units": {
-          "units": 73,
-          "win_rate_pct": 63.01,
-          "avg_return_pct": 40.24,
-          "median_return_pct": 13.21,
-          "total_pnl": 2937450,
-          "capital_used": 7300000,
-          "capital_return_pct": 40.24,
-          "best_return_pct": 342.73,
-          "worst_return_pct": -24.13,
-          "unresolved": 50
+          "units": 65,
+          "win_rate_pct": 61.54,
+          "avg_return_pct": 40.18,
+          "median_return_pct": 10.8,
+          "total_pnl": 2611720,
+          "capital_used": 6500000,
+          "capital_return_pct": 40.18,
+          "best_return_pct": 323.18,
+          "worst_return_pct": -23.91,
+          "unresolved": 45
         },
         "full_packages": {
-          "signals": 223,
-          "addon_signals": 73,
-          "addon_rate_pct": 32.74,
-          "avg_return_pct": 29.45,
+          "signals": 190,
+          "addon_signals": 65,
+          "addon_rate_pct": 34.21,
+          "avg_return_pct": 29.17,
           "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 11371960,
-          "capital_used": 29600000,
-          "capital_return_pct": 38.42
+          "win_rate_pct": 35.26,
+          "total_pnl": 9920510,
+          "capital_used": 25500000,
+          "capital_return_pct": 38.9
         },
-        "addon_rate_pct": 32.74,
-        "base_count": 223,
-        "addon_count": 73,
+        "addon_rate_pct": 34.21,
+        "base_count": 190,
+        "addon_count": 65,
         "lifecycle_violations": 0
       },
       "random_unit_stock_test": {
         "units": {
-          "min": 51.0,
-          "p25": 55.5,
-          "mean": 57.4,
-          "median": 58.0,
-          "p75": 59.75,
-          "max": 62.0,
-          "stdev": 3.32
+          "min": 44.0,
+          "p25": 49.25,
+          "mean": 50.7,
+          "median": 51.0,
+          "p75": 52.75,
+          "max": 55.0,
+          "stdev": 3.26
         },
         "win_rate_pct": {
-          "min": 22.64,
-          "p25": 38.87,
-          "mean": 40.22,
-          "median": 40.69,
-          "p75": 45.67,
-          "max": 49.18,
-          "stdev": 7.21
+          "min": 25.0,
+          "p25": 38.05,
+          "mean": 40.45,
+          "median": 38.9,
+          "p75": 45.0,
+          "max": 51.92,
+          "stdev": 6.96
         },
         "avg_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 32.81,
-          "median": 33.61,
-          "p75": 39.63,
-          "max": 49.45,
-          "stdev": 10.22
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 32.84,
+          "median": 32.94,
+          "p75": 35.35,
+          "max": 47.48,
+          "stdev": 8.94
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -5.63,
+          "mean": -5.31,
           "median": -7.0,
-          "p75": -4.98,
-          "max": -0.44,
-          "stdev": 2.27
+          "p75": -4.92,
+          "max": 2.47,
+          "stdev": 3.01
         },
         "capital_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 32.81,
-          "median": 33.61,
-          "p75": 39.63,
-          "max": 49.45,
-          "stdev": 10.22
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 32.84,
+          "median": 32.94,
+          "p75": 35.35,
+          "max": 47.48,
+          "stdev": 8.94
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 10,
@@ -819,49 +1523,49 @@
       },
       "random_package_stock_test": {
         "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
         },
         "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 33.44,
+          "median": 34.72,
+          "p75": 36.84,
+          "max": 42.11,
+          "stdev": 6.19
         },
         "avg_return_pct": {
-          "min": 7.52,
-          "p25": 22.16,
-          "mean": 25.53,
-          "median": 24.09,
-          "p75": 33.39,
-          "max": 42.16,
-          "stdev": 10.06
+          "min": 9.5,
+          "p25": 20.31,
+          "mean": 24.38,
+          "median": 23.93,
+          "p75": 27.49,
+          "max": 44.99,
+          "stdev": 8.89
         },
         "median_return_pct": {
           "min": -7.0,
           "p25": -7.0,
-          "mean": -6.93,
+          "mean": -6.96,
           "median": -7.0,
           "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
+          "max": -6.64,
+          "stdev": 0.11
         },
         "capital_return_pct": {
-          "min": 13.73,
-          "p25": 29.13,
-          "mean": 32.81,
-          "median": 33.61,
-          "p75": 39.63,
-          "max": 49.45,
-          "stdev": 10.22
+          "min": 16.69,
+          "p25": 29.12,
+          "mean": 32.84,
+          "median": 32.94,
+          "p75": 35.35,
+          "max": 47.48,
+          "stdev": 8.94
         },
         "pass_60win_10avg_count": 0,
         "avg_ge_10_count": 9,
@@ -883,9 +1587,361 @@
       },
       "unit_cap": 300,
       "under_cap": true,
-      "cap_room": 4,
-      "addon_units_per_base": 0.327,
-      "score_return_first": 45.0165
+      "cap_room": 45,
+      "addon_units_per_base": 0.342,
+      "score_return_first": 45.0545
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 2%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 288,
+          "win_rate_pct": 44.1,
+          "avg_return_pct": 38.52,
+          "median_return_pct": -4.24,
+          "total_pnl": 11094270,
+          "capital_used": 28800000,
+          "capital_return_pct": 38.52,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 136
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 98,
+          "win_rate_pct": 60.2,
+          "avg_return_pct": 38.63,
+          "median_return_pct": 10.19,
+          "total_pnl": 3785480,
+          "capital_used": 9800000,
+          "capital_return_pct": 38.63,
+          "best_return_pct": 323.18,
+          "worst_return_pct": -23.91,
+          "unresolved": 71
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 68,
+          "addon_rate_pct": 35.79,
+          "avg_return_pct": 25.3,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 34.74,
+          "total_pnl": 11094270,
+          "capital_used": 28800000,
+          "capital_return_pct": 38.52
+        },
+        "addon_rate_pct": 35.79,
+        "base_count": 190,
+        "addon_count": 98,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 46.0,
+          "p25": 54.25,
+          "mean": 56.9,
+          "median": 56.5,
+          "p75": 60.0,
+          "max": 65.0,
+          "stdev": 5.19
+        },
+        "win_rate_pct": {
+          "min": 26.09,
+          "p25": 39.71,
+          "mean": 41.65,
+          "median": 42.27,
+          "p75": 44.3,
+          "max": 53.33,
+          "stdev": 6.59
+        },
+        "avg_return_pct": {
+          "min": 17.93,
+          "p25": 29.05,
+          "mean": 32.51,
+          "median": 31.5,
+          "p75": 37.88,
+          "max": 48.42,
+          "stdev": 9.06
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -4.62,
+          "median": -5.89,
+          "p75": -4.29,
+          "max": 5.05,
+          "stdev": 3.53
+        },
+        "capital_return_pct": {
+          "min": 17.93,
+          "p25": 29.05,
+          "mean": 32.51,
+          "median": 31.5,
+          "p75": 37.88,
+          "max": 48.42,
+          "stdev": 9.06
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 32.4,
+          "median": 33.77,
+          "p75": 36.66,
+          "max": 39.47,
+          "stdev": 5.67
+        },
+        "avg_return_pct": {
+          "min": 8.79,
+          "p25": 16.45,
+          "mean": 21.04,
+          "median": 20.95,
+          "p75": 22.94,
+          "max": 42.5,
+          "stdev": 8.68
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.97,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.67,
+          "stdev": 0.1
+        },
+        "capital_return_pct": {
+          "min": 17.93,
+          "p25": 29.05,
+          "mean": 32.51,
+          "median": 31.5,
+          "p75": 37.88,
+          "max": 48.42,
+          "stdev": 9.06
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 9,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.02,
+        "id": "pbv23_max2_band2",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 2%",
+        "max_addons": 2,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 12,
+      "addon_units_per_base": 0.516,
+      "score_return_first": 44.76
+    },
+    {
+      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 1.5%",
+      "source": "simulated: PB-V23 cap experiment",
+      "summary": {
+        "full_units": {
+          "units": 273,
+          "win_rate_pct": 42.49,
+          "avg_return_pct": 37.26,
+          "median_return_pct": -5.41,
+          "total_pnl": 10172250,
+          "capital_used": 27300000,
+          "capital_return_pct": 37.26,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 122
+        },
+        "base_units": {
+          "units": 190,
+          "win_rate_pct": 35.79,
+          "avg_return_pct": 38.47,
+          "median_return_pct": -7.0,
+          "total_pnl": 7308790,
+          "capital_used": 19000000,
+          "capital_return_pct": 38.47,
+          "best_return_pct": 1065.43,
+          "worst_return_pct": -13.57,
+          "unresolved": 65
+        },
+        "addon_units": {
+          "units": 83,
+          "win_rate_pct": 57.83,
+          "avg_return_pct": 34.5,
+          "median_return_pct": 7.18,
+          "total_pnl": 2863460,
+          "capital_used": 8300000,
+          "capital_return_pct": 34.5,
+          "best_return_pct": 318.43,
+          "worst_return_pct": -23.91,
+          "unresolved": 57
+        },
+        "full_packages": {
+          "signals": 190,
+          "addon_signals": 59,
+          "addon_rate_pct": 31.05,
+          "avg_return_pct": 26.95,
+          "median_return_pct": -7.0,
+          "win_rate_pct": 34.74,
+          "total_pnl": 10172250,
+          "capital_used": 27300000,
+          "capital_return_pct": 37.26
+        },
+        "addon_rate_pct": 31.05,
+        "base_count": 190,
+        "addon_count": 83,
+        "lifecycle_violations": 0
+      },
+      "random_unit_stock_test": {
+        "units": {
+          "min": 43.0,
+          "p25": 51.75,
+          "mean": 54.1,
+          "median": 54.5,
+          "p75": 57.75,
+          "max": 60.0,
+          "stdev": 5.03
+        },
+        "win_rate_pct": {
+          "min": 25.58,
+          "p25": 37.36,
+          "mean": 40.24,
+          "median": 39.89,
+          "p75": 43.56,
+          "max": 51.72,
+          "stdev": 6.59
+        },
+        "avg_return_pct": {
+          "min": 17.09,
+          "p25": 28.24,
+          "mean": 32.13,
+          "median": 30.66,
+          "p75": 36.66,
+          "max": 49.7,
+          "stdev": 9.37
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -5.2,
+          "median": -7.0,
+          "p75": -4.54,
+          "max": 2.47,
+          "stdev": 2.92
+        },
+        "capital_return_pct": {
+          "min": 17.09,
+          "p25": 28.24,
+          "mean": 32.13,
+          "median": 30.66,
+          "p75": 36.66,
+          "max": 49.7,
+          "stdev": 9.37
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "random_package_stock_test": {
+        "signals": {
+          "min": 36.0,
+          "p25": 37.25,
+          "mean": 38.0,
+          "median": 38.0,
+          "p75": 38.75,
+          "max": 40.0,
+          "stdev": 1.34
+        },
+        "win_rate_pct": {
+          "min": 18.92,
+          "p25": 30.19,
+          "mean": 32.4,
+          "median": 33.77,
+          "p75": 36.66,
+          "max": 39.47,
+          "stdev": 5.67
+        },
+        "avg_return_pct": {
+          "min": 10.35,
+          "p25": 18.66,
+          "mean": 22.82,
+          "median": 22.18,
+          "p75": 25.26,
+          "max": 43.24,
+          "stdev": 8.36
+        },
+        "median_return_pct": {
+          "min": -7.0,
+          "p25": -7.0,
+          "mean": -6.97,
+          "median": -7.0,
+          "p75": -7.0,
+          "max": -6.67,
+          "stdev": 0.1
+        },
+        "capital_return_pct": {
+          "min": 17.09,
+          "p25": 28.24,
+          "mean": 32.13,
+          "median": 30.66,
+          "p75": 36.66,
+          "max": 49.7,
+          "stdev": 9.37
+        },
+        "pass_60win_10avg_count": 0,
+        "avg_ge_10_count": 10,
+        "win_ge_60_count": 0
+      },
+      "variant": {
+        "entry_policy": "retest",
+        "delay_days": 0,
+        "min_wait": 2,
+        "max_wait": 8,
+        "ma20_band_pct": 0.015,
+        "id": "pbv23_max2_band15",
+        "execute": "next_open",
+        "catastrophic_close_pct": 0.15,
+        "require_confluence": true,
+        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 1.5%",
+        "max_addons": 2,
+        "min_spacing": 5
+      },
+      "unit_cap": 300,
+      "under_cap": true,
+      "cap_room": 27,
+      "addon_units_per_base": 0.437,
+      "score_return_first": 44.026
     },
     {
       "label": "V9+ weekly-core + corrected V23 加碼（現有低頻對照）",
@@ -1372,1165 +2428,109 @@
       "cap_room": 51,
       "addon_units_per_base": 0.258,
       "score_return_first": 10.108
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 312,
-          "win_rate_pct": 43.91,
-          "avg_return_pct": 41.79,
-          "median_return_pct": -6.0,
-          "total_pnl": 13039670,
-          "capital_used": 31200000,
-          "capital_return_pct": 41.79,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -28.37,
-          "unresolved": 140
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 89,
-          "win_rate_pct": 64.04,
-          "avg_return_pct": 51.74,
-          "median_return_pct": 14.7,
-          "total_pnl": 4605160,
-          "capital_used": 8900000,
-          "capital_return_pct": 51.74,
-          "best_return_pct": 661.83,
-          "worst_return_pct": -28.37,
-          "unresolved": 63
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 89,
-          "addon_rate_pct": 39.91,
-          "avg_return_pct": 28.08,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 35.43,
-          "total_pnl": 13039670,
-          "capital_used": 31200000,
-          "capital_return_pct": 41.79
-        },
-        "addon_rate_pct": 39.91,
-        "base_count": 223,
-        "addon_count": 89,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 54.0,
-          "p25": 58.0,
-          "mean": 60.8,
-          "median": 62.0,
-          "p75": 63.75,
-          "max": 65.0,
-          "stdev": 3.6
-        },
-        "win_rate_pct": {
-          "min": 26.79,
-          "p25": 39.84,
-          "mean": 41.97,
-          "median": 42.87,
-          "p75": 45.68,
-          "max": 50.0,
-          "stdev": 6.15
-        },
-        "avg_return_pct": {
-          "min": 14.45,
-          "p25": 33.05,
-          "mean": 37.73,
-          "median": 36.44,
-          "p75": 44.96,
-          "max": 58.04,
-          "stdev": 12.08
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -5.27,
-          "median": -7.0,
-          "p75": -4.39,
-          "max": 2.08,
-          "stdev": 2.74
-        },
-        "capital_return_pct": {
-          "min": 14.45,
-          "p25": 33.05,
-          "mean": 37.73,
-          "median": 36.44,
-          "p75": 44.96,
-          "max": 58.04,
-          "stdev": 12.08
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 31.99,
-          "mean": 34.13,
-          "median": 33.3,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.68
-        },
-        "avg_return_pct": {
-          "min": 6.3,
-          "p25": 22.65,
-          "mean": 25.34,
-          "median": 23.41,
-          "p75": 32.43,
-          "max": 40.22,
-          "stdev": 9.49
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.89,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -5.89,
-          "stdev": 0.33
-        },
-        "capital_return_pct": {
-          "min": 14.45,
-          "p25": 33.05,
-          "mean": 37.73,
-          "median": 36.44,
-          "p75": 44.96,
-          "max": 58.04,
-          "stdev": 12.08
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.06,
-        "id": "pbv23_max1_band6",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
-        "max_addons": 1,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -12,
-      "addon_units_per_base": 0.399,
-      "score_return_first": 51.396
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 303,
-          "win_rate_pct": 44.22,
-          "avg_return_pct": 40.66,
-          "median_return_pct": -6.18,
-          "total_pnl": 12319610,
-          "capital_used": 30300000,
-          "capital_return_pct": 40.66,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -21.71,
-          "unresolved": 135
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 80,
-          "win_rate_pct": 67.5,
-          "avg_return_pct": 48.56,
-          "median_return_pct": 19.07,
-          "total_pnl": 3885100,
-          "capital_used": 8000000,
-          "capital_return_pct": 48.56,
-          "best_return_pct": 372.53,
-          "worst_return_pct": -21.71,
-          "unresolved": 58
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 80,
-          "addon_rate_pct": 35.87,
-          "avg_return_pct": 29.47,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 35.87,
-          "total_pnl": 12319610,
-          "capital_used": 30300000,
-          "capital_return_pct": 40.66
-        },
-        "addon_rate_pct": 35.87,
-        "base_count": 223,
-        "addon_count": 80,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 53.0,
-          "p25": 55.75,
-          "mean": 59.1,
-          "median": 61.0,
-          "p75": 61.75,
-          "max": 64.0,
-          "stdev": 3.65
-        },
-        "win_rate_pct": {
-          "min": 24.07,
-          "p25": 41.69,
-          "mean": 42.85,
-          "median": 44.26,
-          "p75": 48.09,
-          "max": 53.12,
-          "stdev": 7.93
-        },
-        "avg_return_pct": {
-          "min": 14.12,
-          "p25": 33.06,
-          "mean": 37.17,
-          "median": 38.39,
-          "p75": 42.65,
-          "max": 57.77,
-          "stdev": 11.29
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -4.47,
-          "median": -7.0,
-          "p75": -2.1,
-          "max": 2.21,
-          "stdev": 3.33
-        },
-        "capital_return_pct": {
-          "min": 14.12,
-          "p25": 33.06,
-          "mean": 37.17,
-          "median": 38.39,
-          "p75": 42.65,
-          "max": 57.77,
-          "stdev": 11.29
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.58,
-          "median": 34.06,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.56
-        },
-        "avg_return_pct": {
-          "min": 7.25,
-          "p25": 23.04,
-          "mean": 26.28,
-          "median": 24.62,
-          "p75": 32.47,
-          "max": 42.2,
-          "stdev": 9.79
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.93,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
-        },
-        "capital_return_pct": {
-          "min": 14.12,
-          "p25": 33.06,
-          "mean": 37.17,
-          "median": 38.39,
-          "p75": 42.65,
-          "max": 57.77,
-          "stdev": 11.29
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.03,
-        "id": "pbv23_max1_band3",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
-        "max_addons": 1,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -3,
-      "addon_units_per_base": 0.359,
-      "score_return_first": 50.8835
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 4%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 305,
-          "win_rate_pct": 44.26,
-          "avg_return_pct": 40.06,
-          "median_return_pct": -6.18,
-          "total_pnl": 12217050,
-          "capital_used": 30500000,
-          "capital_return_pct": 40.06,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -28.37,
-          "unresolved": 135
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 82,
-          "win_rate_pct": 67.07,
-          "avg_return_pct": 46.13,
-          "median_return_pct": 18.62,
-          "total_pnl": 3782540,
-          "capital_used": 8200000,
-          "capital_return_pct": 46.13,
-          "best_return_pct": 361.61,
-          "worst_return_pct": -28.37,
-          "unresolved": 58
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 82,
-          "addon_rate_pct": 36.77,
-          "avg_return_pct": 29.49,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 35.43,
-          "total_pnl": 12217050,
-          "capital_used": 30500000,
-          "capital_return_pct": 40.06
-        },
-        "addon_rate_pct": 36.77,
-        "base_count": 223,
-        "addon_count": 82,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 54.0,
-          "p25": 56.0,
-          "mean": 59.2,
-          "median": 61.0,
-          "p75": 61.0,
-          "max": 63.0,
-          "stdev": 3.12
-        },
-        "win_rate_pct": {
-          "min": 25.45,
-          "p25": 42.43,
-          "mean": 42.55,
-          "median": 42.62,
-          "p75": 46.14,
-          "max": 52.38,
-          "stdev": 7.1
-        },
-        "avg_return_pct": {
-          "min": 14.49,
-          "p25": 32.74,
-          "mean": 36.88,
-          "median": 36.43,
-          "p75": 42.3,
-          "max": 59.54,
-          "stdev": 11.27
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -4.34,
-          "median": -7.0,
-          "p75": -4.19,
-          "max": 4.21,
-          "stdev": 4.19
-        },
-        "capital_return_pct": {
-          "min": 14.49,
-          "p25": 32.74,
-          "mean": 36.88,
-          "median": 36.43,
-          "p75": 42.3,
-          "max": 59.54,
-          "stdev": 11.27
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 31.99,
-          "mean": 34.13,
-          "median": 33.3,
-          "p75": 39.78,
-          "max": 41.46,
-          "stdev": 6.68
-        },
-        "avg_return_pct": {
-          "min": 7.25,
-          "p25": 23.89,
-          "mean": 26.81,
-          "median": 25.06,
-          "p75": 33.04,
-          "max": 42.38,
-          "stdev": 9.9
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.89,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -5.89,
-          "stdev": 0.33
-        },
-        "capital_return_pct": {
-          "min": 14.49,
-          "p25": 32.74,
-          "mean": 36.88,
-          "median": 36.43,
-          "p75": 42.3,
-          "max": 59.54,
-          "stdev": 11.27
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.04,
-        "id": "pbv23_max1_band4",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 4%",
-        "max_addons": 1,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -5,
-      "addon_units_per_base": 0.368,
-      "score_return_first": 50.4665
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 3%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 344,
-          "win_rate_pct": 45.93,
-          "avg_return_pct": 40.2,
-          "median_return_pct": -4.2,
-          "total_pnl": 13829200,
-          "capital_used": 34400000,
-          "capital_return_pct": 40.2,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -23.91,
-          "unresolved": 165
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 121,
-          "win_rate_pct": 64.46,
-          "avg_return_pct": 44.58,
-          "median_return_pct": 14.29,
-          "total_pnl": 5394690,
-          "capital_used": 12100000,
-          "capital_return_pct": 44.58,
-          "best_return_pct": 372.53,
-          "worst_return_pct": -23.91,
-          "unresolved": 88
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 80,
-          "addon_rate_pct": 35.87,
-          "avg_return_pct": 25.9,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 35.43,
-          "total_pnl": 13829200,
-          "capital_used": 34400000,
-          "capital_return_pct": 40.2
-        },
-        "addon_rate_pct": 35.87,
-        "base_count": 223,
-        "addon_count": 121,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 57.0,
-          "p25": 62.0,
-          "mean": 67.0,
-          "median": 69.0,
-          "p75": 71.0,
-          "max": 73.0,
-          "stdev": 5.44
-        },
-        "win_rate_pct": {
-          "min": 24.56,
-          "p25": 42.42,
-          "mean": 43.83,
-          "median": 45.74,
-          "p75": 48.5,
-          "max": 53.42,
-          "stdev": 8.19
-        },
-        "avg_return_pct": {
-          "min": 14.85,
-          "p25": 30.96,
-          "mean": 36.26,
-          "median": 36.19,
-          "p75": 40.37,
-          "max": 60.25,
-          "stdev": 11.86
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -6.92,
-          "mean": -3.73,
-          "median": -4.34,
-          "p75": -2.12,
-          "max": 3.55,
-          "stdev": 3.44
-        },
-        "capital_return_pct": {
-          "min": 14.85,
-          "p25": 30.96,
-          "mean": 36.26,
-          "median": 36.19,
-          "p75": 40.37,
-          "max": 60.25,
-          "stdev": 11.86
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 32.75,
-          "mean": 34.09,
-          "median": 34.06,
-          "p75": 39.1,
-          "max": 40.91,
-          "stdev": 6.46
-        },
-        "avg_return_pct": {
-          "min": 6.67,
-          "p25": 19.72,
-          "mean": 22.85,
-          "median": 21.17,
-          "p75": 29.77,
-          "max": 39.65,
-          "stdev": 9.33
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.93,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
-        },
-        "capital_return_pct": {
-          "min": 14.85,
-          "p25": 30.96,
-          "mean": 36.26,
-          "median": 36.19,
-          "p75": 40.37,
-          "max": 60.25,
-          "stdev": 11.86
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.03,
-        "id": "pbv23_max2_band3",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 3%",
-        "max_addons": 2,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -44,
-      "addon_units_per_base": 0.543,
-      "score_return_first": 49.2875
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 2%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 334,
-          "win_rate_pct": 44.91,
-          "avg_return_pct": 39.02,
-          "median_return_pct": -4.35,
-          "total_pnl": 13032170,
-          "capital_used": 33400000,
-          "capital_return_pct": 39.02,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -23.91,
-          "unresolved": 159
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 111,
-          "win_rate_pct": 63.06,
-          "avg_return_pct": 41.42,
-          "median_return_pct": 13.12,
-          "total_pnl": 4597660,
-          "capital_used": 11100000,
-          "capital_return_pct": 41.42,
-          "best_return_pct": 342.73,
-          "worst_return_pct": -23.91,
-          "unresolved": 82
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 77,
-          "addon_rate_pct": 34.53,
-          "avg_return_pct": 26.01,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 34.98,
-          "total_pnl": 13032170,
-          "capital_used": 33400000,
-          "capital_return_pct": 39.02
-        },
-        "addon_rate_pct": 34.53,
-        "base_count": 223,
-        "addon_count": 111,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 55.0,
-          "p25": 60.25,
-          "mean": 64.0,
-          "median": 64.5,
-          "p75": 68.75,
-          "max": 70.0,
-          "stdev": 5.1
-        },
-        "win_rate_pct": {
-          "min": 23.64,
-          "p25": 41.05,
-          "mean": 42.05,
-          "median": 42.98,
-          "p75": 46.34,
-          "max": 51.43,
-          "stdev": 7.61
-        },
-        "avg_return_pct": {
-          "min": 14.91,
-          "p25": 28.3,
-          "mean": 33.25,
-          "median": 32.52,
-          "p75": 40.34,
-          "max": 52.54,
-          "stdev": 11.27
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -4.12,
-          "median": -4.29,
-          "p75": -2.33,
-          "max": 1.0,
-          "stdev": 2.84
-        },
-        "capital_return_pct": {
-          "min": 14.91,
-          "p25": 28.3,
-          "mean": 33.25,
-          "median": 32.52,
-          "p75": 40.34,
-          "max": 52.54,
-          "stdev": 11.27
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 31.0,
-          "mean": 33.17,
-          "median": 34.06,
-          "p75": 36.87,
-          "max": 40.0,
-          "stdev": 6.0
-        },
-        "avg_return_pct": {
-          "min": 6.92,
-          "p25": 18.58,
-          "mean": 22.57,
-          "median": 21.95,
-          "p75": 27.16,
-          "max": 40.62,
-          "stdev": 9.67
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.93,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
-        },
-        "capital_return_pct": {
-          "min": 14.91,
-          "p25": 28.3,
-          "mean": 33.25,
-          "median": 32.52,
-          "p75": 40.34,
-          "max": 52.54,
-          "stdev": 11.27
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.02,
-        "id": "pbv23_max2_band2",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 2%",
-        "max_addons": 2,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -34,
-      "addon_units_per_base": 0.498,
-      "score_return_first": 45.2575
-    },
-    {
-      "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 1.5%",
-      "source": "simulated: PB-V23 cap experiment",
-      "summary": {
-        "full_units": {
-          "units": 317,
-          "win_rate_pct": 43.53,
-          "avg_return_pct": 37.38,
-          "median_return_pct": -5.19,
-          "total_pnl": 11848960,
-          "capital_used": 31700000,
-          "capital_return_pct": 37.38,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -24.13,
-          "unresolved": 144
-        },
-        "base_units": {
-          "units": 223,
-          "win_rate_pct": 35.87,
-          "avg_return_pct": 37.82,
-          "median_return_pct": -7.0,
-          "total_pnl": 8434510,
-          "capital_used": 22300000,
-          "capital_return_pct": 37.82,
-          "best_return_pct": 1092.59,
-          "worst_return_pct": -13.57,
-          "unresolved": 77
-        },
-        "addon_units": {
-          "units": 94,
-          "win_rate_pct": 61.7,
-          "avg_return_pct": 36.32,
-          "median_return_pct": 9.71,
-          "total_pnl": 3414450,
-          "capital_used": 9400000,
-          "capital_return_pct": 36.32,
-          "best_return_pct": 337.75,
-          "worst_return_pct": -24.13,
-          "unresolved": 67
-        },
-        "full_packages": {
-          "signals": 223,
-          "addon_signals": 66,
-          "addon_rate_pct": 29.6,
-          "avg_return_pct": 27.44,
-          "median_return_pct": -7.0,
-          "win_rate_pct": 34.98,
-          "total_pnl": 11848960,
-          "capital_used": 31700000,
-          "capital_return_pct": 37.38
-        },
-        "addon_rate_pct": 29.6,
-        "base_count": 223,
-        "addon_count": 94,
-        "lifecycle_violations": 0
-      },
-      "random_unit_stock_test": {
-        "units": {
-          "min": 51.0,
-          "p25": 57.25,
-          "mean": 60.6,
-          "median": 62.0,
-          "p75": 64.5,
-          "max": 67.0,
-          "stdev": 4.94
-        },
-        "win_rate_pct": {
-          "min": 23.53,
-          "p25": 38.87,
-          "mean": 40.91,
-          "median": 41.12,
-          "p75": 45.0,
-          "max": 50.77,
-          "stdev": 7.57
-        },
-        "avg_return_pct": {
-          "min": 14.74,
-          "p25": 27.41,
-          "mean": 32.59,
-          "median": 32.91,
-          "p75": 40.21,
-          "max": 50.54,
-          "stdev": 10.48
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -4.76,
-          "median": -6.28,
-          "p75": -3.75,
-          "max": 0.44,
-          "stdev": 2.83
-        },
-        "capital_return_pct": {
-          "min": 14.74,
-          "p25": 27.41,
-          "mean": 32.59,
-          "median": 32.91,
-          "p75": 40.21,
-          "max": 50.54,
-          "stdev": 10.48
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 10,
-        "win_ge_60_count": 0
-      },
-      "random_package_stock_test": {
-        "signals": {
-          "min": 40.0,
-          "p25": 41.5,
-          "mean": 43.5,
-          "median": 44.0,
-          "p75": 45.0,
-          "max": 47.0,
-          "stdev": 2.33
-        },
-        "win_rate_pct": {
-          "min": 17.78,
-          "p25": 31.0,
-          "mean": 33.17,
-          "median": 34.06,
-          "p75": 36.87,
-          "max": 40.0,
-          "stdev": 6.0
-        },
-        "avg_return_pct": {
-          "min": 8.35,
-          "p25": 20.76,
-          "mean": 24.19,
-          "median": 23.23,
-          "p75": 29.12,
-          "max": 41.28,
-          "stdev": 9.38
-        },
-        "median_return_pct": {
-          "min": -7.0,
-          "p25": -7.0,
-          "mean": -6.93,
-          "median": -7.0,
-          "p75": -7.0,
-          "max": -6.35,
-          "stdev": 0.2
-        },
-        "capital_return_pct": {
-          "min": 14.74,
-          "p25": 27.41,
-          "mean": 32.59,
-          "median": 32.91,
-          "p75": 40.21,
-          "max": 50.54,
-          "stdev": 10.48
-        },
-        "pass_60win_10avg_count": 0,
-        "avg_ge_10_count": 9,
-        "win_ge_60_count": 0
-      },
-      "variant": {
-        "entry_policy": "retest",
-        "delay_days": 0,
-        "min_wait": 2,
-        "max_wait": 8,
-        "ma20_band_pct": 0.015,
-        "id": "pbv23_max2_band15",
-        "execute": "next_open",
-        "catastrophic_close_pct": 0.15,
-        "require_confluence": true,
-        "label": "PB-V23 原始母單池，最多加碼2次，MA20 band 1.5%",
-        "max_addons": 2,
-        "min_spacing": 5
-      },
-      "unit_cap": 300,
-      "under_cap": false,
-      "cap_room": -17,
-      "addon_units_per_base": 0.422,
-      "score_return_first": 44.229
     }
   ],
   "best_under_cap_return_first": {
-    "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
+    "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
     "source": "simulated: PB-V23 cap experiment",
     "summary": {
       "full_units": {
-        "units": 300,
-        "win_rate_pct": 43.33,
-        "avg_return_pct": 39.25,
-        "median_return_pct": -6.77,
-        "total_pnl": 11774340,
-        "capital_used": 30000000,
-        "capital_return_pct": 39.25,
-        "best_return_pct": 1092.59,
-        "worst_return_pct": -23.91,
-        "unresolved": 131
+        "units": 268,
+        "win_rate_pct": 44.4,
+        "avg_return_pct": 42.2,
+        "median_return_pct": -5.33,
+        "total_pnl": 11308450,
+        "capital_used": 26800000,
+        "capital_return_pct": 42.2,
+        "best_return_pct": 1065.43,
+        "worst_return_pct": -23.64,
+        "unresolved": 120
       },
       "base_units": {
-        "units": 223,
-        "win_rate_pct": 35.87,
-        "avg_return_pct": 37.82,
+        "units": 190,
+        "win_rate_pct": 35.79,
+        "avg_return_pct": 38.47,
         "median_return_pct": -7.0,
-        "total_pnl": 8434510,
-        "capital_used": 22300000,
-        "capital_return_pct": 37.82,
-        "best_return_pct": 1092.59,
+        "total_pnl": 7308790,
+        "capital_used": 19000000,
+        "capital_return_pct": 38.47,
+        "best_return_pct": 1065.43,
         "worst_return_pct": -13.57,
-        "unresolved": 77
+        "unresolved": 65
       },
       "addon_units": {
-        "units": 77,
-        "win_rate_pct": 64.94,
-        "avg_return_pct": 43.37,
-        "median_return_pct": 15.14,
-        "total_pnl": 3339830,
-        "capital_used": 7700000,
-        "capital_return_pct": 43.37,
-        "best_return_pct": 342.73,
-        "worst_return_pct": -23.91,
-        "unresolved": 54
+        "units": 78,
+        "win_rate_pct": 65.38,
+        "avg_return_pct": 51.28,
+        "median_return_pct": 15.07,
+        "total_pnl": 3999660,
+        "capital_used": 7800000,
+        "capital_return_pct": 51.28,
+        "best_return_pct": 644.48,
+        "worst_return_pct": -23.64,
+        "unresolved": 55
       },
       "full_packages": {
-        "signals": 223,
-        "addon_signals": 77,
-        "addon_rate_pct": 34.53,
-        "avg_return_pct": 29.28,
+        "signals": 190,
+        "addon_signals": 78,
+        "addon_rate_pct": 41.05,
+        "avg_return_pct": 28.04,
         "median_return_pct": -7.0,
-        "win_rate_pct": 35.87,
-        "total_pnl": 11774340,
-        "capital_used": 30000000,
-        "capital_return_pct": 39.25
+        "win_rate_pct": 34.74,
+        "total_pnl": 11308450,
+        "capital_used": 26800000,
+        "capital_return_pct": 42.2
       },
-      "addon_rate_pct": 34.53,
-      "base_count": 223,
-      "addon_count": 77,
+      "addon_rate_pct": 41.05,
+      "base_count": 190,
+      "addon_count": 78,
       "lifecycle_violations": 0
     },
     "random_unit_stock_test": {
       "units": {
-        "min": 52.0,
-        "p25": 55.75,
-        "mean": 58.0,
-        "median": 58.5,
-        "p75": 60.75,
-        "max": 62.0,
-        "stdev": 3.41
+        "min": 46.0,
+        "p25": 52.25,
+        "mean": 53.2,
+        "median": 54.0,
+        "p75": 55.75,
+        "max": 57.0,
+        "stdev": 3.28
       },
       "win_rate_pct": {
-        "min": 22.64,
-        "p25": 39.99,
-        "mean": 40.81,
-        "median": 41.53,
-        "p75": 45.67,
-        "max": 50.0,
-        "stdev": 7.4
+        "min": 30.43,
+        "p25": 38.03,
+        "mean": 41.8,
+        "median": 41.33,
+        "p75": 46.6,
+        "max": 50.91,
+        "stdev": 5.7
       },
       "avg_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
       },
       "median_return_pct": {
         "min": -7.0,
         "p25": -7.0,
-        "mean": -5.29,
-        "median": -7.0,
-        "p75": -4.2,
-        "max": 0.22,
-        "stdev": 2.4
+        "mean": -4.89,
+        "median": -6.7,
+        "p75": -4.38,
+        "max": 4.78,
+        "stdev": 3.49
       },
       "capital_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
       },
       "pass_60win_10avg_count": 0,
       "avg_ge_10_count": 10,
@@ -2538,404 +2538,52 @@
     },
     "random_package_stock_test": {
       "signals": {
-        "min": 40.0,
-        "p25": 41.5,
-        "mean": 43.5,
-        "median": 44.0,
-        "p75": 45.0,
-        "max": 47.0,
-        "stdev": 2.33
+        "min": 36.0,
+        "p25": 37.25,
+        "mean": 38.0,
+        "median": 38.0,
+        "p75": 38.75,
+        "max": 40.0,
+        "stdev": 1.34
       },
       "win_rate_pct": {
-        "min": 17.78,
-        "p25": 32.75,
-        "mean": 34.58,
-        "median": 34.06,
-        "p75": 39.78,
-        "max": 41.46,
-        "stdev": 6.56
+        "min": 18.92,
+        "p25": 30.19,
+        "mean": 32.93,
+        "median": 33.77,
+        "p75": 36.66,
+        "max": 42.11,
+        "stdev": 6.27
       },
       "avg_return_pct": {
-        "min": 7.48,
-        "p25": 22.12,
-        "mean": 25.38,
-        "median": 24.02,
-        "p75": 33.04,
-        "max": 42.11,
-        "stdev": 9.97
+        "min": 8.56,
+        "p25": 21.96,
+        "mean": 24.43,
+        "median": 22.71,
+        "p75": 26.5,
+        "max": 38.77,
+        "stdev": 7.85
       },
       "median_return_pct": {
         "min": -7.0,
         "p25": -7.0,
-        "mean": -6.93,
+        "mean": -6.86,
         "median": -7.0,
         "p75": -7.0,
-        "max": -6.35,
-        "stdev": 0.2
+        "max": -6.12,
+        "stdev": 0.3
       },
       "capital_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
       },
       "pass_60win_10avg_count": 0,
       "avg_ge_10_count": 9,
-      "win_ge_60_count": 0
-    },
-    "variant": {
-      "entry_policy": "retest",
-      "delay_days": 0,
-      "min_wait": 2,
-      "max_wait": 8,
-      "ma20_band_pct": 0.02,
-      "id": "pbv23_max1_band2",
-      "execute": "next_open",
-      "catastrophic_close_pct": 0.15,
-      "require_confluence": true,
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
-      "max_addons": 1,
-      "min_spacing": 5
-    },
-    "unit_cap": 300,
-    "under_cap": true,
-    "cap_room": 0,
-    "addon_units_per_base": 0.345,
-    "score_return_first": 45.819
-  },
-  "best_under_cap_random_unit_avg": {
-    "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
-    "source": "simulated: PB-V23 cap experiment",
-    "summary": {
-      "full_units": {
-        "units": 300,
-        "win_rate_pct": 43.33,
-        "avg_return_pct": 39.25,
-        "median_return_pct": -6.77,
-        "total_pnl": 11774340,
-        "capital_used": 30000000,
-        "capital_return_pct": 39.25,
-        "best_return_pct": 1092.59,
-        "worst_return_pct": -23.91,
-        "unresolved": 131
-      },
-      "base_units": {
-        "units": 223,
-        "win_rate_pct": 35.87,
-        "avg_return_pct": 37.82,
-        "median_return_pct": -7.0,
-        "total_pnl": 8434510,
-        "capital_used": 22300000,
-        "capital_return_pct": 37.82,
-        "best_return_pct": 1092.59,
-        "worst_return_pct": -13.57,
-        "unresolved": 77
-      },
-      "addon_units": {
-        "units": 77,
-        "win_rate_pct": 64.94,
-        "avg_return_pct": 43.37,
-        "median_return_pct": 15.14,
-        "total_pnl": 3339830,
-        "capital_used": 7700000,
-        "capital_return_pct": 43.37,
-        "best_return_pct": 342.73,
-        "worst_return_pct": -23.91,
-        "unresolved": 54
-      },
-      "full_packages": {
-        "signals": 223,
-        "addon_signals": 77,
-        "addon_rate_pct": 34.53,
-        "avg_return_pct": 29.28,
-        "median_return_pct": -7.0,
-        "win_rate_pct": 35.87,
-        "total_pnl": 11774340,
-        "capital_used": 30000000,
-        "capital_return_pct": 39.25
-      },
-      "addon_rate_pct": 34.53,
-      "base_count": 223,
-      "addon_count": 77,
-      "lifecycle_violations": 0
-    },
-    "random_unit_stock_test": {
-      "units": {
-        "min": 52.0,
-        "p25": 55.75,
-        "mean": 58.0,
-        "median": 58.5,
-        "p75": 60.75,
-        "max": 62.0,
-        "stdev": 3.41
-      },
-      "win_rate_pct": {
-        "min": 22.64,
-        "p25": 39.99,
-        "mean": 40.81,
-        "median": 41.53,
-        "p75": 45.67,
-        "max": 50.0,
-        "stdev": 7.4
-      },
-      "avg_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
-      },
-      "median_return_pct": {
-        "min": -7.0,
-        "p25": -7.0,
-        "mean": -5.29,
-        "median": -7.0,
-        "p75": -4.2,
-        "max": 0.22,
-        "stdev": 2.4
-      },
-      "capital_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
-      },
-      "pass_60win_10avg_count": 0,
-      "avg_ge_10_count": 10,
-      "win_ge_60_count": 0
-    },
-    "random_package_stock_test": {
-      "signals": {
-        "min": 40.0,
-        "p25": 41.5,
-        "mean": 43.5,
-        "median": 44.0,
-        "p75": 45.0,
-        "max": 47.0,
-        "stdev": 2.33
-      },
-      "win_rate_pct": {
-        "min": 17.78,
-        "p25": 32.75,
-        "mean": 34.58,
-        "median": 34.06,
-        "p75": 39.78,
-        "max": 41.46,
-        "stdev": 6.56
-      },
-      "avg_return_pct": {
-        "min": 7.48,
-        "p25": 22.12,
-        "mean": 25.38,
-        "median": 24.02,
-        "p75": 33.04,
-        "max": 42.11,
-        "stdev": 9.97
-      },
-      "median_return_pct": {
-        "min": -7.0,
-        "p25": -7.0,
-        "mean": -6.93,
-        "median": -7.0,
-        "p75": -7.0,
-        "max": -6.35,
-        "stdev": 0.2
-      },
-      "capital_return_pct": {
-        "min": 13.66,
-        "p25": 29.31,
-        "mean": 33.52,
-        "median": 34.03,
-        "p75": 41.51,
-        "max": 52.15,
-        "stdev": 11.0
-      },
-      "pass_60win_10avg_count": 0,
-      "avg_ge_10_count": 9,
-      "win_ge_60_count": 0
-    },
-    "variant": {
-      "entry_policy": "retest",
-      "delay_days": 0,
-      "min_wait": 2,
-      "max_wait": 8,
-      "ma20_band_pct": 0.02,
-      "id": "pbv23_max1_band2",
-      "execute": "next_open",
-      "catastrophic_close_pct": 0.15,
-      "require_confluence": true,
-      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 2%",
-      "max_addons": 1,
-      "min_spacing": 5
-    },
-    "unit_cap": 300,
-    "under_cap": true,
-    "cap_room": 0,
-    "addon_units_per_base": 0.345,
-    "score_return_first": 45.819
-  },
-  "best_under_cap_random_unit_p25": {
-    "label": "PB-V23 原始母單池，不加碼",
-    "source": "simulated: PB-V23 cap experiment",
-    "summary": {
-      "full_units": {
-        "units": 223,
-        "win_rate_pct": 35.87,
-        "avg_return_pct": 37.82,
-        "median_return_pct": -7.0,
-        "total_pnl": 8434510,
-        "capital_used": 22300000,
-        "capital_return_pct": 37.82,
-        "best_return_pct": 1092.59,
-        "worst_return_pct": -13.57,
-        "unresolved": 77
-      },
-      "base_units": {
-        "units": 223,
-        "win_rate_pct": 35.87,
-        "avg_return_pct": 37.82,
-        "median_return_pct": -7.0,
-        "total_pnl": 8434510,
-        "capital_used": 22300000,
-        "capital_return_pct": 37.82,
-        "best_return_pct": 1092.59,
-        "worst_return_pct": -13.57,
-        "unresolved": 77
-      },
-      "addon_units": {
-        "units": 0,
-        "win_rate_pct": 0.0,
-        "avg_return_pct": 0.0,
-        "median_return_pct": 0.0,
-        "total_pnl": 0,
-        "capital_used": 0,
-        "capital_return_pct": 0.0,
-        "best_return_pct": 0.0,
-        "worst_return_pct": 0.0,
-        "unresolved": 0
-      },
-      "full_packages": {
-        "signals": 223,
-        "addon_signals": 0,
-        "addon_rate_pct": 0.0,
-        "avg_return_pct": 37.82,
-        "median_return_pct": -7.0,
-        "win_rate_pct": 35.87,
-        "total_pnl": 8434510,
-        "capital_used": 22300000,
-        "capital_return_pct": 37.82
-      },
-      "addon_rate_pct": 0.0,
-      "base_count": 223,
-      "addon_count": 0,
-      "lifecycle_violations": 0
-    },
-    "random_unit_stock_test": {
-      "units": {
-        "min": 40.0,
-        "p25": 41.5,
-        "mean": 43.5,
-        "median": 44.0,
-        "p75": 45.0,
-        "max": 47.0,
-        "stdev": 2.33
-      },
-      "win_rate_pct": {
-        "min": 17.78,
-        "p25": 32.75,
-        "mean": 34.58,
-        "median": 34.06,
-        "p75": 39.78,
-        "max": 41.46,
-        "stdev": 6.56
-      },
-      "avg_return_pct": {
-        "min": 11.06,
-        "p25": 30.22,
-        "mean": 33.48,
-        "median": 32.53,
-        "p75": 41.16,
-        "max": 47.87,
-        "stdev": 10.3
-      },
-      "median_return_pct": {
-        "min": -7.0,
-        "p25": -7.0,
-        "mean": -6.71,
-        "median": -7.0,
-        "p75": -7.0,
-        "max": -4.1,
-        "stdev": 0.87
-      },
-      "capital_return_pct": {
-        "min": 11.06,
-        "p25": 30.22,
-        "mean": 33.48,
-        "median": 32.53,
-        "p75": 41.16,
-        "max": 47.87,
-        "stdev": 10.3
-      },
-      "pass_60win_10avg_count": 0,
-      "avg_ge_10_count": 10,
-      "win_ge_60_count": 0
-    },
-    "random_package_stock_test": {
-      "signals": {
-        "min": 40.0,
-        "p25": 41.5,
-        "mean": 43.5,
-        "median": 44.0,
-        "p75": 45.0,
-        "max": 47.0,
-        "stdev": 2.33
-      },
-      "win_rate_pct": {
-        "min": 17.78,
-        "p25": 32.75,
-        "mean": 34.58,
-        "median": 34.06,
-        "p75": 39.78,
-        "max": 41.46,
-        "stdev": 6.56
-      },
-      "avg_return_pct": {
-        "min": 11.06,
-        "p25": 30.22,
-        "mean": 33.48,
-        "median": 32.53,
-        "p75": 41.16,
-        "max": 47.87,
-        "stdev": 10.3
-      },
-      "median_return_pct": {
-        "min": -7.0,
-        "p25": -7.0,
-        "mean": -6.71,
-        "median": -7.0,
-        "p75": -7.0,
-        "max": -4.1,
-        "stdev": 0.87
-      },
-      "capital_return_pct": {
-        "min": 11.06,
-        "p25": 30.22,
-        "mean": 33.48,
-        "median": 32.53,
-        "p75": 41.16,
-        "max": 47.87,
-        "stdev": 10.3
-      },
-      "pass_60win_10avg_count": 0,
-      "avg_ge_10_count": 10,
       "win_ge_60_count": 0
     },
     "variant": {
@@ -2944,18 +2592,370 @@
       "min_wait": 2,
       "max_wait": 8,
       "ma20_band_pct": 0.06,
-      "id": "pbv23_no_addon",
+      "id": "pbv23_max1_band6",
       "execute": "next_open",
       "catastrophic_close_pct": 0.15,
       "require_confluence": true,
-      "label": "PB-V23 原始母單池，不加碼",
-      "max_addons": 0,
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
+      "max_addons": 1,
       "min_spacing": 5
     },
     "unit_cap": 300,
     "under_cap": true,
-    "cap_room": 77,
-    "addon_units_per_base": 0.0,
-    "score_return_first": 45.786
+    "cap_room": 32,
+    "addon_units_per_base": 0.411,
+    "score_return_first": 50.388
+  },
+  "best_under_cap_random_unit_avg": {
+    "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
+    "source": "simulated: PB-V23 cap experiment",
+    "summary": {
+      "full_units": {
+        "units": 268,
+        "win_rate_pct": 44.4,
+        "avg_return_pct": 42.2,
+        "median_return_pct": -5.33,
+        "total_pnl": 11308450,
+        "capital_used": 26800000,
+        "capital_return_pct": 42.2,
+        "best_return_pct": 1065.43,
+        "worst_return_pct": -23.64,
+        "unresolved": 120
+      },
+      "base_units": {
+        "units": 190,
+        "win_rate_pct": 35.79,
+        "avg_return_pct": 38.47,
+        "median_return_pct": -7.0,
+        "total_pnl": 7308790,
+        "capital_used": 19000000,
+        "capital_return_pct": 38.47,
+        "best_return_pct": 1065.43,
+        "worst_return_pct": -13.57,
+        "unresolved": 65
+      },
+      "addon_units": {
+        "units": 78,
+        "win_rate_pct": 65.38,
+        "avg_return_pct": 51.28,
+        "median_return_pct": 15.07,
+        "total_pnl": 3999660,
+        "capital_used": 7800000,
+        "capital_return_pct": 51.28,
+        "best_return_pct": 644.48,
+        "worst_return_pct": -23.64,
+        "unresolved": 55
+      },
+      "full_packages": {
+        "signals": 190,
+        "addon_signals": 78,
+        "addon_rate_pct": 41.05,
+        "avg_return_pct": 28.04,
+        "median_return_pct": -7.0,
+        "win_rate_pct": 34.74,
+        "total_pnl": 11308450,
+        "capital_used": 26800000,
+        "capital_return_pct": 42.2
+      },
+      "addon_rate_pct": 41.05,
+      "base_count": 190,
+      "addon_count": 78,
+      "lifecycle_violations": 0
+    },
+    "random_unit_stock_test": {
+      "units": {
+        "min": 46.0,
+        "p25": 52.25,
+        "mean": 53.2,
+        "median": 54.0,
+        "p75": 55.75,
+        "max": 57.0,
+        "stdev": 3.28
+      },
+      "win_rate_pct": {
+        "min": 30.43,
+        "p25": 38.03,
+        "mean": 41.8,
+        "median": 41.33,
+        "p75": 46.6,
+        "max": 50.91,
+        "stdev": 5.7
+      },
+      "avg_return_pct": {
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
+      },
+      "median_return_pct": {
+        "min": -7.0,
+        "p25": -7.0,
+        "mean": -4.89,
+        "median": -6.7,
+        "p75": -4.38,
+        "max": 4.78,
+        "stdev": 3.49
+      },
+      "capital_return_pct": {
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
+      },
+      "pass_60win_10avg_count": 0,
+      "avg_ge_10_count": 10,
+      "win_ge_60_count": 0
+    },
+    "random_package_stock_test": {
+      "signals": {
+        "min": 36.0,
+        "p25": 37.25,
+        "mean": 38.0,
+        "median": 38.0,
+        "p75": 38.75,
+        "max": 40.0,
+        "stdev": 1.34
+      },
+      "win_rate_pct": {
+        "min": 18.92,
+        "p25": 30.19,
+        "mean": 32.93,
+        "median": 33.77,
+        "p75": 36.66,
+        "max": 42.11,
+        "stdev": 6.27
+      },
+      "avg_return_pct": {
+        "min": 8.56,
+        "p25": 21.96,
+        "mean": 24.43,
+        "median": 22.71,
+        "p75": 26.5,
+        "max": 38.77,
+        "stdev": 7.85
+      },
+      "median_return_pct": {
+        "min": -7.0,
+        "p25": -7.0,
+        "mean": -6.86,
+        "median": -7.0,
+        "p75": -7.0,
+        "max": -6.12,
+        "stdev": 0.3
+      },
+      "capital_return_pct": {
+        "min": 18.17,
+        "p25": 32.08,
+        "mean": 37.07,
+        "median": 35.61,
+        "p75": 37.99,
+        "max": 56.46,
+        "stdev": 10.33
+      },
+      "pass_60win_10avg_count": 0,
+      "avg_ge_10_count": 9,
+      "win_ge_60_count": 0
+    },
+    "variant": {
+      "entry_policy": "retest",
+      "delay_days": 0,
+      "min_wait": 2,
+      "max_wait": 8,
+      "ma20_band_pct": 0.06,
+      "id": "pbv23_max1_band6",
+      "execute": "next_open",
+      "catastrophic_close_pct": 0.15,
+      "require_confluence": true,
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 6%",
+      "max_addons": 1,
+      "min_spacing": 5
+    },
+    "unit_cap": 300,
+    "under_cap": true,
+    "cap_room": 32,
+    "addon_units_per_base": 0.411,
+    "score_return_first": 50.388
+  },
+  "best_under_cap_random_unit_p25": {
+    "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
+    "source": "simulated: PB-V23 cap experiment",
+    "summary": {
+      "full_units": {
+        "units": 260,
+        "win_rate_pct": 43.85,
+        "avg_return_pct": 40.75,
+        "median_return_pct": -5.19,
+        "total_pnl": 10595670,
+        "capital_used": 26000000,
+        "capital_return_pct": 40.75,
+        "best_return_pct": 1065.43,
+        "worst_return_pct": -18.42,
+        "unresolved": 116
+      },
+      "base_units": {
+        "units": 190,
+        "win_rate_pct": 35.79,
+        "avg_return_pct": 38.47,
+        "median_return_pct": -7.0,
+        "total_pnl": 7308790,
+        "capital_used": 19000000,
+        "capital_return_pct": 38.47,
+        "best_return_pct": 1065.43,
+        "worst_return_pct": -13.57,
+        "unresolved": 65
+      },
+      "addon_units": {
+        "units": 70,
+        "win_rate_pct": 65.71,
+        "avg_return_pct": 46.96,
+        "median_return_pct": 14.85,
+        "total_pnl": 3286880,
+        "capital_used": 7000000,
+        "capital_return_pct": 46.96,
+        "best_return_pct": 372.53,
+        "worst_return_pct": -18.42,
+        "unresolved": 51
+      },
+      "full_packages": {
+        "signals": 190,
+        "addon_signals": 70,
+        "addon_rate_pct": 36.84,
+        "avg_return_pct": 29.62,
+        "median_return_pct": -7.0,
+        "win_rate_pct": 35.26,
+        "total_pnl": 10595670,
+        "capital_used": 26000000,
+        "capital_return_pct": 40.75
+      },
+      "addon_rate_pct": 36.84,
+      "base_count": 190,
+      "addon_count": 70,
+      "lifecycle_violations": 0
+    },
+    "random_unit_stock_test": {
+      "units": {
+        "min": 45.0,
+        "p25": 50.25,
+        "mean": 51.8,
+        "median": 51.5,
+        "p75": 54.0,
+        "max": 57.0,
+        "stdev": 3.25
+      },
+      "win_rate_pct": {
+        "min": 26.67,
+        "p25": 38.72,
+        "mean": 42.1,
+        "median": 41.53,
+        "p75": 46.48,
+        "max": 53.7,
+        "stdev": 7.0
+      },
+      "avg_return_pct": {
+        "min": 16.99,
+        "p25": 32.71,
+        "mean": 36.34,
+        "median": 36.87,
+        "p75": 38.31,
+        "max": 52.34,
+        "stdev": 9.16
+      },
+      "median_return_pct": {
+        "min": -7.0,
+        "p25": -7.0,
+        "mean": -4.8,
+        "median": -7.0,
+        "p75": -4.82,
+        "max": 5.05,
+        "stdev": 3.93
+      },
+      "capital_return_pct": {
+        "min": 16.99,
+        "p25": 32.71,
+        "mean": 36.34,
+        "median": 36.87,
+        "p75": 38.31,
+        "max": 52.34,
+        "stdev": 9.16
+      },
+      "pass_60win_10avg_count": 0,
+      "avg_ge_10_count": 10,
+      "win_ge_60_count": 0
+    },
+    "random_package_stock_test": {
+      "signals": {
+        "min": 36.0,
+        "p25": 37.25,
+        "mean": 38.0,
+        "median": 38.0,
+        "p75": 38.75,
+        "max": 40.0,
+        "stdev": 1.34
+      },
+      "win_rate_pct": {
+        "min": 18.92,
+        "p25": 30.19,
+        "mean": 33.44,
+        "median": 34.72,
+        "p75": 36.84,
+        "max": 42.11,
+        "stdev": 6.19
+      },
+      "avg_return_pct": {
+        "min": 9.18,
+        "p25": 22.26,
+        "mean": 25.52,
+        "median": 24.49,
+        "p75": 26.44,
+        "max": 45.02,
+        "stdev": 8.78
+      },
+      "median_return_pct": {
+        "min": -7.0,
+        "p25": -7.0,
+        "mean": -6.96,
+        "median": -7.0,
+        "p75": -7.0,
+        "max": -6.64,
+        "stdev": 0.11
+      },
+      "capital_return_pct": {
+        "min": 16.99,
+        "p25": 32.71,
+        "mean": 36.34,
+        "median": 36.87,
+        "p75": 38.31,
+        "max": 52.34,
+        "stdev": 9.16
+      },
+      "pass_60win_10avg_count": 0,
+      "avg_ge_10_count": 9,
+      "win_ge_60_count": 0
+    },
+    "variant": {
+      "entry_policy": "retest",
+      "delay_days": 0,
+      "min_wait": 2,
+      "max_wait": 8,
+      "ma20_band_pct": 0.03,
+      "id": "pbv23_max1_band3",
+      "execute": "next_open",
+      "catastrophic_close_pct": 0.15,
+      "require_confluence": true,
+      "label": "PB-V23 原始母單池，最多加碼1次，MA20 band 3%",
+      "max_addons": 1,
+      "min_spacing": 5
+    },
+    "unit_cap": 300,
+    "under_cap": true,
+    "cap_room": 40,
+    "addon_units_per_base": 0.368,
+    "score_return_first": 49.8935
   }
 }
