@@ -132,8 +132,10 @@ def run() -> dict[str, Any]:
     units = backtest.get("units", [])
     packages = backtest.get("packages", [])
     unresolved_units = [compact_unit(row) for row in units if row.get("unresolved")]
+    realized_units = [compact_unit(row) for row in units if not row.get("unresolved")]
     unresolved_packages = [compact_package(row) for row in packages if row.get("unresolved")]
     unresolved_units.sort(key=lambda row: (float(row.get("return_pct") or 0), str(row.get("signal_date") or "")), reverse=True)
+    realized_units.sort(key=lambda row: (str(row.get("exit_date") or ""), float(row.get("pnl") or 0)), reverse=True)
     unresolved_packages.sort(key=lambda row: (float(row.get("package_return_pct") or 0), str(row.get("signal_date") or "")), reverse=True)
 
     pullback_radar = [compact_daily_signal(row) for row in (top_lists.get("pullback") or [])]
@@ -147,8 +149,8 @@ def run() -> dict[str, Any]:
             "title": f"{STRATEGY_NAME} {STRATEGY_CODE}",
             "status": "Forward paper-trading candidate; not production-ready.",
             "description": "固定 V9+ 股池與 weekly_core 母單出場，使用 PB-V23 MA20 retest 加碼邏輯，目標是追蹤主升段回檔後的大波段機會。",
-            "entry_rule": "ABC 快速回檔｜不限大盤｜不限週線｜月線趨勢多頭｜貼近 MA20｜每日全部收",
-            "addon_rule": "MA20 retest 加碼；最多 5 次；間隔至少 5 日；結構共振停損；15% close-based catastrophic stop。",
+            "entry_rule": "ABC 快速回檔｜不限大盤｜不限週線｜月線趨勢多頭｜貼近 MA20｜每日全部收；同股母單未出場不得重複開母單，且前 10 個交易日內已有同股買進則跳過。",
+            "addon_rule": "母單仍持有時才允許 MA20 retest 加碼；加碼日前 10 個交易日內不得已有同股買進或買進候選訊號；最多 5 次；加碼單用結構共振停損與 15% close-based catastrophic stop；母單停損維持 7%；母單出場時仍在場的加碼單同步出場。",
         },
         "backtest": {
             "no_addon_full": compact_summary(no_addon.get("full_summary")),
@@ -165,6 +167,7 @@ def run() -> dict[str, Any]:
             "formal_forward_note": "The page is ready for forward tracking. Exact MWP-A daily triggers will be appended here after the V9+ exact scanner is wired into daily sync.",
             "daily_pullback_radar_candidates": pullback_radar,
             "historical_unresolved_units": unresolved_units,
+            "historical_realized_units": realized_units,
             "historical_unresolved_packages": unresolved_packages,
         },
         "source_reports": {
@@ -185,6 +188,7 @@ def main() -> None:
         "tracking_counts": {
             "daily_pullback_radar": len(payload["tracking"]["daily_pullback_radar_candidates"]),
             "historical_unresolved_units": len(payload["tracking"]["historical_unresolved_units"]),
+            "historical_realized_units": len(payload["tracking"]["historical_realized_units"]),
             "historical_unresolved_packages": len(payload["tracking"]["historical_unresolved_packages"]),
             "formal_forward_records": len(payload["tracking"]["formal_forward_records"]),
         },

@@ -1,8 +1,8 @@
 # PB-V18-all-scores-v23-addon
 
-Full units: 678｜56.78%｜25.12%｜中位 1.28%｜未實現 334
-Stock test units: 114｜52.63%｜9.83%｜中位 1.15%｜未實現 59
-Add-on units: 456｜60.75%｜34.39%｜中位 9.41%｜未實現 327
-Full packages: 222｜54.95%｜17.02%｜中位 1.41%
-Stock test packages: 39｜46.15%｜5.32%｜中位 -0.52%
-Random stock test mean: trades 137.4, win 57.13%, avg 24.42%, pass 5/10
+Full units: 249｜48.19%｜6.26%｜中位 -0.79%｜未實現 14
+Stock test units: 43｜46.51%｜3.75%｜中位 -7.75%｜未實現 6
+Add-on units: 51｜45.10%｜7.50%｜中位 -2.77%｜未實現 7
+Full packages: 198｜42.93%｜3.35%｜中位 -4.17%
+Stock test packages: 37｜37.84%｜1.32%｜中位 -7.75%
+Random stock test mean: trades 50.6, win 50.38%, avg 6.21%, pass 0/10

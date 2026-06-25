@@ -92,6 +92,10 @@ $mwpSource = Join-Path $rootPath "mwp_a_strategy.html"
 $mwpTarget = Join-Path $sitePath "mwp_a_strategy.html"
 Copy-FileIfExists -Source $mwpSource -Destination $mwpTarget
 
+$mwpRealizedSource = Join-Path $rootPath "mwp_a_realized_pnl.html"
+$mwpRealizedTarget = Join-Path $sitePath "mwp_a_realized_pnl.html"
+Copy-FileIfExists -Source $mwpRealizedSource -Destination $mwpRealizedTarget
+
 $reportsSource = Join-Path $rootPath "reports"
 if (Test-Path -LiteralPath $reportsSource) {
     $reportsTarget = Join-Path $sitePath "reports"
@@ -122,6 +126,10 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_v18_deploy_compare.json",
         "pullback_v9_fixed_random_splits.json",
         "pullback_v9_fixed_addon_random_splits.json",
+        "mwp_addon_strategy_comparison.json",
+        "mwp_addon_unit_cap_experiment.json",
+        "mwp_technical_filter_experiment.json",
+        "mwp_c_return_first_capped.json",
         "mwp_a_strategy_tracking.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
@@ -158,7 +166,15 @@ if (Test-Path -LiteralPath $reportsSource) {
         "pullback_v9_fixed_random_splits.html",
         "pullback_v9_fixed_random_splits.md",
         "pullback_v9_fixed_addon_random_splits.html",
-        "pullback_v9_fixed_addon_random_splits.md"
+        "pullback_v9_fixed_addon_random_splits.md",
+        "mwp_addon_strategy_comparison.html",
+        "mwp_addon_strategy_comparison.md",
+        "mwp_addon_unit_cap_experiment.html",
+        "mwp_addon_unit_cap_experiment.md",
+        "mwp_technical_filter_experiment.html",
+        "mwp_technical_filter_experiment.md",
+        "mwp_c_return_first_capped.html",
+        "mwp_c_return_first_capped.md"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
     }

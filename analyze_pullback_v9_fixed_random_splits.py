@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from analyze_pullback_multitimeframe_search import enrich_trades, rule_label, select
+from analyze_pullback_technical_phenotypes import find_series, make_series_map
 from analyze_pullback_plus_independent_versions import (
     INDEPENDENT_EXIT_LABELS,
     V9_ENTRY_RULE,
@@ -17,6 +18,8 @@ from analyze_pullback_plus_independent_versions import (
     target_summary,
 )
 from analyze_pullback_plus_random_splits import SEEDS, random_stock_groups, strategy_stats, stock_key
+from pullback_lifecycle_filters import filter_same_stock_mother_entries
+from run_market_backtest import csv_files
 
 REPORT_DIR = Path("reports")
 OUT_JSON = REPORT_DIR / "pullback_v9_fixed_random_splits.json"
@@ -60,12 +63,25 @@ def build_fixed_v9_rows() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         for row in independent_exits[FIXED_EXIT_STYLE]
         if (row["signal_date"], row["market"], row["stock_no"]) in selected_keys
     ]
+    raw_row_count = len(rows)
+    series = make_series_map(csv_files())
+    rows, lifecycle_diagnostics = filter_same_stock_mother_entries(rows, series, find_series, cooldown_trading_days=10)
     metadata = {
         "entry_rule": V9_ENTRY_RULE,
         "entry_label": rule_label(V9_ENTRY_RULE),
         "exit_style": FIXED_EXIT_STYLE,
         "exit_label": INDEPENDENT_EXIT_LABELS[FIXED_EXIT_STYLE],
         "trades": len(rows),
+        "raw_trades_before_lifecycle_filter": raw_row_count,
+        "lifecycle_filter": {
+            "rule": "Reject same-stock mother/base entries while a prior mother is still open, or when another accepted same-stock buy occurred in the prior 10 trading days.",
+            "input_rows": lifecycle_diagnostics["input_rows"],
+            "accepted_rows": lifecycle_diagnostics["accepted_rows"],
+            "rejected_rows": lifecycle_diagnostics["rejected_rows"],
+            "cooldown_trading_days": lifecycle_diagnostics["cooldown_trading_days"],
+            "rejection_counts": lifecycle_diagnostics["rejection_counts"],
+            "rejected_examples": lifecycle_diagnostics["rejected_examples"],
+        },
         "stocks": len({stock_key(row) for row in rows}),
         "signal_date_start": min(row["signal_date"] for row in rows) if rows else None,
         "signal_date_end": max(row["signal_date"] for row in rows) if rows else None,

@@ -18,6 +18,7 @@ from analyze_pullback_plus_independent_versions import V9_ENTRY_RULE, compute_in
 from analyze_pullback_technical_phenotypes import find_series, make_series_map
 from analyze_pullback_v18_unlimited import build_v18_candidate_exits
 from analyze_pullback_pb_v18_finite_capital import STRESS_SLIPPAGE_EACH_SIDE_PCT, adjusted_rows
+from pullback_lifecycle_filters import filter_same_stock_mother_entries
 from run_market_backtest import csv_files, read_rows
 
 REPORT_DIR = Path("reports")
@@ -49,18 +50,42 @@ def v9_plus_base_rows() -> list[dict[str, Any]]:
         row for row in independent["weekly_core"]
         if (row["signal_date"], row["market"], row["stock_no"]) in selected_keys
     ]
+    raw_buy_dates_by_stock: dict[tuple[str, str], list[str]] = {}
     for row in rows:
+        raw_buy_dates_by_stock.setdefault((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), []).append(str(row.get("entry_date")))
+    series = make_series_map(csv_files())
+    rows, lifecycle_diagnostics = filter_same_stock_mother_entries(rows, series, find_series, cooldown_trading_days=10)
+    for row in rows:
+        row["same_stock_buy_signal_entry_dates"] = sorted(set(raw_buy_dates_by_stock.get((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), [])))
         row["base_framework"] = "V9+ weekly_core"
-        row["base_framework_note"] = "V9+ deterministic entry cohort with weekly-core independent mother exit"
+        row["base_framework_note"] = "V9+ deterministic entry cohort with weekly-core independent mother exit; same-stock duplicate mothers are blocked while active and within 10 trading days of a prior buy; add-ons are also blocked if any same-stock buy signal appeared in the prior 10 trading days"
+        row["lifecycle_filter_summary"] = {
+            "input_rows": lifecycle_diagnostics["input_rows"],
+            "accepted_rows": lifecycle_diagnostics["accepted_rows"],
+            "rejected_rows": lifecycle_diagnostics["rejected_rows"],
+            "cooldown_trading_days": lifecycle_diagnostics["cooldown_trading_days"],
+        }
     return rows
 
 
 def v18_unlimited_base_rows() -> list[dict[str, Any]]:
     gross_rows = build_v18_candidate_exits()
     stress_rows = adjusted_rows(gross_rows, STRESS_SLIPPAGE_EACH_SIDE_PCT)
+    raw_buy_dates_by_stock: dict[tuple[str, str], list[str]] = {}
+    for row in stress_rows:
+        raw_buy_dates_by_stock.setdefault((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), []).append(str(row.get("entry_date")))
+    series = make_series_map(csv_files())
+    stress_rows, lifecycle_diagnostics = filter_same_stock_mother_entries(stress_rows, series, find_series, cooldown_trading_days=10)
     for row in stress_rows:
         row["base_framework"] = "V18+ no-limit stress"
-        row["base_framework_note"] = "V18 candidate pool without finite-capital/position/day-entry constraints; V17 runner exit with V18 stress costs"
+        row["base_framework_note"] = "V18 candidate pool without finite-capital/position/day-entry constraints; V17 runner exit with V18 stress costs; same-stock duplicate mothers are blocked while active and within 10 trading days of a prior buy; add-ons are also blocked if any same-stock buy signal appeared in the prior 10 trading days"
+        row["same_stock_buy_signal_entry_dates"] = sorted(set(raw_buy_dates_by_stock.get((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), [])))
+        row["lifecycle_filter_summary"] = {
+            "input_rows": lifecycle_diagnostics["input_rows"],
+            "accepted_rows": lifecycle_diagnostics["accepted_rows"],
+            "rejected_rows": lifecycle_diagnostics["rejected_rows"],
+            "cooldown_trading_days": lifecycle_diagnostics["cooldown_trading_days"],
+        }
     return stress_rows
 
 
@@ -116,6 +141,7 @@ def simulate_framework(
             base_unit["pnl"] = round(float(base_unit["return_pct"]) / 100 * POSITION_SIZE)
         units.append(base_unit)
 
+        base_exit_index = dates.get(str(base_unit.get("exit_date")), len(rows) - 1)
         addon_units = scan_addons(
             source,
             rows,
@@ -126,6 +152,8 @@ def simulate_framework(
             benchmark_rows,
             benchmark_dates,
             FOCUS_VARIANT,
+            base_exit_index,
+            base_unit,
         )
         if stress_addons:
             addon_units = apply_stress_to_addons(addon_units)
@@ -236,7 +264,7 @@ def run() -> dict[str, Any]:
         "version": VERSION,
         "methodology": {
             "goal": "Add PB-V23-style add-ons to V9+ and V18+ no-limit base frameworks and compare with PB-V23.",
-            "addon_logic": "Same as PB-V23 focus variant: PB-V20 MA20-retest add-on timing, max5 spacing5, scan to available data end, PB-V22 loose confluence structural stop, next-open execution after close-based break, 15% close-based catastrophic line.",
+            "addon_logic": "Corrected PB-V23 focus variant: PB-V20 MA20-retest add-on timing, max5 spacing5, add-ons only while the mother/base unit is still open, add-on entries are blocked by same-stock 10-trading-day buy/buy-signal cooldown, PB-V22 loose confluence structural stop, next-open execution after close-based break, 15% close-based catastrophic line for add-ons only, and any still-open add-on is force-closed when the mother/base unit exits.",
             "v9_base": "V9+ deterministic entry cohort using weekly-core independent mother exit. Gross return, no extra costs applied.",
             "v18_base": "V18+ no-limit candidate pool using V17 runner mother exit and V18 fee/tax/slippage stress. Add-ons also receive the same stress adjustment.",
             "split": {"validation_start": validation_start, "test_start": test_start},

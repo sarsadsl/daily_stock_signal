@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MWP-A 已/未實現損益</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --panel: #ffffff;
+      --ink: #152033;
+      --muted: #66758c;
+      --line: #dbe3ef;
+      --soft: #edf3fb;
+      --red: #d92d43;
+      --green: #0f8a62;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --amber: #c98212;
+      --violet: #7c3aed;
+      --shadow: 0 18px 42px rgba(21, 32, 51, 0.1);
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f141b;
+      --panel: #151b24;
+      --ink: #e8eef6;
+      --muted: #9aa7b8;
+      --line: #2d3747;
+      --soft: #1d2531;
+      --red: #ff6b7a;
+      --green: #2dd4a3;
+      --blue: #7aa2ff;
+      --teal: #34d5c3;
+      --amber: #f2b84b;
+      --violet: #a78bfa;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+    }
+    * { box-sizing: border-box; }
+    * { scrollbar-width: thin; scrollbar-color: #5b7cfa #e7edf6; }
+    :root[data-theme="dark"] * { scrollbar-color: #64748b #111720; }
+    *::-webkit-scrollbar { width: 12px; height: 12px; }
+    *::-webkit-scrollbar-track { background: #e7edf6; border-radius: 999px; }
+    *::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #5b7cfa, #0f766e); border: 3px solid #e7edf6; border-radius: 999px; }
+    html { min-height: 100%; overflow-x: hidden; scrollbar-gutter: stable; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(21, 32, 51, 0.13) 1px, transparent 1.7px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(15, 118, 110, 0.08) 42%, rgba(217, 45, 67, 0.08)),
+        linear-gradient(180deg, #f8fbff 0, var(--bg) 360px);
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+    }
+    :root[data-theme="dark"] body {
+      background:
+        radial-gradient(circle at 1px 1px, rgba(232, 238, 246, 0.16) 1px, transparent 1.8px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(217, 45, 67, 0.1), rgba(15, 138, 98, 0.08) 42%, rgba(37, 99, 235, 0.1)),
+        linear-gradient(180deg, #111720 0, var(--bg) 360px);
+    }
+    button { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    .app { min-height: 100vh; padding-bottom: 24px; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(560px, 1.4fr);
+      gap: 16px;
+      align-items: start;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(219, 227, 239, 0.9);
+      background: rgba(249, 252, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+    :root[data-theme="dark"] .topbar { background: rgba(17, 23, 32, 0.92); border-color: rgba(45, 55, 71, 0.92); }
+    .brand h1 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 24px; line-height: 1.2; }
+    .brand h1::before { content: ""; width: 12px; height: 32px; border-radius: 999px; background: linear-gradient(180deg, var(--red), var(--teal)); box-shadow: 0 0 0 6px rgba(15, 118, 110, 0.08); }
+    .brand .meta { margin-top: 6px; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 4px; border: 1px solid rgba(219, 227, 239, 0.9); border-radius: 10px; background: rgba(255, 255, 255, 0.74); }
+    :root[data-theme="dark"] .actions { background: rgba(21, 27, 36, 0.72); border-color: var(--line); }
+    .mode-button, .primary-button, .icon-button {
+      height: 38px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: 0 6px 16px rgba(21, 32, 51, 0.04);
+      display: inline-grid;
+      place-items: center;
+      min-width: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    :root[data-theme="dark"] .mode-button, :root[data-theme="dark"] .icon-button { background: #1d2531; border-color: var(--line); }
+    .primary-button { background: linear-gradient(135deg, #174ea6, #0f766e); color: #fff; font-weight: 800; min-width: 132px; }
+    .mode-button.active { color: var(--blue); border-color: #9bbcff; background: #edf4ff; }
+    :root[data-theme="dark"] .mode-button.active { background: rgba(122, 162, 255, 0.14); border-color: rgba(122, 162, 255, 0.5); }
+    .theme-button { min-width: 84px; color: #0f4c81; background: #eef7ff; border-color: #cfe0ff; font-weight: 800; }
+    .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 18px 20px 0; }
+    .metric, .panel, .side-card { border: 1px solid rgba(219, 227, 239, 0.92); background: rgba(255, 255, 255, 0.88); box-shadow: var(--shadow); }
+    :root[data-theme="dark"] .metric, :root[data-theme="dark"] .panel, :root[data-theme="dark"] .side-card { background: rgba(21, 27, 36, 0.86); border-color: var(--line); }
+    .metric { min-height: 92px; padding: 16px; border-radius: 14px; display: grid; align-content: space-between; }
+    .metric span { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+    .metric strong { font-size: clamp(22px, 3vw, 34px); line-height: 1.05; }
+    .metric small { color: var(--muted); font-size: 12px; }
+    .content { display: grid; grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr); gap: 16px; padding: 18px 20px; align-items: start; }
+    .panel, .side-card { border-radius: 16px; overflow: hidden; }
+    .panel + .panel, .side-card + .side-card { margin-top: 16px; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); background: rgba(237, 243, 251, 0.7); }
+    :root[data-theme="dark"] .panel-head { background: rgba(29, 37, 49, 0.78); }
+    .panel-head h2 { margin: 0; font-size: 17px; }
+    .count { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 9px; border-radius: 999px; color: var(--muted); background: var(--soft); font-size: 12px; font-weight: 800; }
+    .panel-body { padding: 16px; }
+    .note { border: 1px solid rgba(201, 130, 18, 0.35); background: rgba(255, 247, 237, 0.78); border-radius: 12px; padding: 12px 14px; color: #7a4a00; line-height: 1.55; }
+    :root[data-theme="dark"] .note { background: rgba(201, 130, 18, 0.1); color: #ffd58a; }
+    .status-good { color: var(--green); }
+    .status-warn { color: var(--amber); }
+    .status-bad { color: var(--red); }
+    .search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 12px; }
+    input[type="search"] { width: 100%; min-height: 38px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; background: var(--panel); color: var(--ink); }
+    .stock-list { display: grid; gap: 10px; max-height: calc(100vh - 300px); overflow: auto; padding-right: 4px; }
+    .stock-group { border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,0.62); overflow: hidden; }
+    :root[data-theme="dark"] .stock-group { background: rgba(29,37,49,0.44); }
+    .stock-head { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+    .stock-head:hover { background: rgba(37, 99, 235, 0.06); }
+    .stock-group.selected .stock-head { background: rgba(37, 99, 235, 0.11); }
+    .symbol { display: grid; gap: 3px; }
+    .symbol strong { font-size: 15px; }
+    .subtle, small { color: var(--muted); }
+    .group-stats { display: flex; flex-wrap: wrap; gap: 7px; justify-content: flex-end; }
+    .pill { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); font-size: 12px; font-weight: 800; }
+    .trade-details { display: none; border-top: 1px solid var(--line); padding: 8px 10px 12px; }
+    .stock-group.selected .trade-details { display: grid; gap: 8px; }
+    .trade-row { display: grid; grid-template-columns: auto minmax(0,1fr) auto; gap: 10px; align-items: center; width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 9px 10px; color: var(--ink); background: rgba(255,255,255,0.66); cursor: pointer; text-align: left; }
+    :root[data-theme="dark"] .trade-row { background: rgba(15,20,27,0.34); }
+    .trade-row.realized { background: linear-gradient(90deg, rgba(16, 185, 129, 0.16), rgba(255,255,255,0.72)); border-color: rgba(16, 185, 129, 0.34); }
+    .trade-row.unrealized { background: linear-gradient(90deg, rgba(245, 158, 11, 0.18), rgba(255,255,255,0.74)); border-color: rgba(245, 158, 11, 0.38); }
+    :root[data-theme="dark"] .trade-row.realized { background: linear-gradient(90deg, rgba(45, 212, 163, 0.14), rgba(15,20,27,0.34)); border-color: rgba(45, 212, 163, 0.34); }
+    :root[data-theme="dark"] .trade-row.unrealized { background: linear-gradient(90deg, rgba(242, 184, 75, 0.16), rgba(15,20,27,0.34)); border-color: rgba(242, 184, 75, 0.36); }
+    .trade-row:hover, .trade-row.active { border-color: rgba(37,99,235,0.55); box-shadow: 0 0 0 2px rgba(37,99,235,0.12) inset; }
+    .trade-index { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; background: var(--soft); font-weight: 900; color: var(--blue); }
+    .trade-title-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
+    .status-chip { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 9px; border-radius: 8px; font-size: 12px; font-weight: 900; letter-spacing: .02em; }
+    .status-chip.realized { color: #065f46; background: rgba(16, 185, 129, 0.22); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .status-chip.unrealized { color: #8a5200; background: rgba(245, 158, 11, 0.24); border: 1px solid rgba(245, 158, 11, 0.38); }
+    :root[data-theme="dark"] .status-chip.realized { color: #a7f3d0; background: rgba(45, 212, 163, 0.16); }
+    :root[data-theme="dark"] .status-chip.unrealized { color: #ffe2a3; background: rgba(242, 184, 75, 0.18); }
+    .trade-separator { color: var(--muted); font-weight: 900; }
+    .trade-meta { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .chart-panel { position: sticky; top: 92px; }
+    .chart-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+    .chart-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chart-wrap { position: relative; width: 100%; height: min(58vh, 560px); min-height: 380px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); margin-top: 12px; }
+    .kline-canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+    .kline-canvas.is-panning { cursor: grabbing; }
+    .kline-tooltip { position: absolute; left: 10px; top: 10px; display: none; min-width: 220px; max-width: min(360px, calc(100% - 20px)); padding: 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.94); box-shadow: 0 10px 24px rgba(21, 32, 51, 0.12); color: var(--ink); pointer-events: none; font-size: 12px; line-height: 1.55; }
+    :root[data-theme="dark"] .kline-tooltip { background: rgba(21, 27, 36, 0.95); }
+    .tooltip-line { display: block; color: var(--muted); }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+    .legend-dot { width: 9px; height: 9px; display: inline-block; border-radius: 999px; margin-right: 4px; vertical-align: middle; }
+    .empty { padding: 18px; color: var(--muted); text-align: center; }
+    .site-footer { margin: 8px 20px 0; padding: 12px 14px; border: 1px solid rgba(21, 32, 51, 0.18); background: rgba(255, 255, 255, 0.48); color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 1080px) { .topbar, .content { grid-template-columns: 1fr; } .actions { justify-content: flex-start; } .chart-panel { position: static; } .stock-list { max-height: none; } }
+    @media (max-width: 760px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .topbar, .content { padding-left: 12px; padding-right: 12px; } .chart-wrap { height: 430px; min-height: 360px; } }
+    @media (max-width: 560px) { .summary { grid-template-columns: 1fr; } .metric strong { font-size: 24px; } .group-stats { justify-content: flex-start; } .stock-head, .trade-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>MWP-A 已/未實現損益</h1>
+        <div class="meta" id="dataMeta">讀取中</div>
+      </div>
+      <div class="actions" aria-label="工具列">
+        <a class="primary-button" href="mwp_a_strategy.html">MWP-A追蹤</a>
+        <a class="mode-button" href="index.html">每日策略訊號</a>
+        <a class="mode-button" href="reports/pullback_v9_fixed_addon_random_splits.html" target="_blank" rel="noopener">回測報告</a>
+        <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
+        <button class="icon-button" id="reloadButton" type="button">↻</button>
+      </div>
+    </header>
+
+    <section class="summary" aria-label="已/未實現損益摘要">
+      <div class="metric"><span>部位總數</span><strong id="metricTrades">-</strong><small id="metricTradeMeta">-</small></div>
+      <div class="metric"><span>已實現損益</span><strong id="metricPnl">-</strong><small>每單 TWD 100,000 模擬單位</small></div>
+      <div class="metric"><span>未實現估值</span><strong id="metricWinRate">-</strong><small id="metricWinLoss">-</small></div>
+      <div class="metric"><span>已實現平均</span><strong id="metricAvgReturn">-</strong><small id="metricMedianReturn">-</small></div>
+    </section>
+
+    <main class="content">
+      <section class="panel">
+        <div class="panel-head"><h2>個股部位總覽</h2><span class="count" id="groupCount">0 檔</span></div>
+        <div class="panel-body">
+          <div class="note">點擊一檔個股會展開該股所有已實現與未實現部位；已損益與未損益會用不同底色色塊標示，右側只會顯示一張互動 K 線圖並標出所有進出場 / 估值點。</div>
+          <div class="search-row" style="margin-top:12px">
+            <input id="searchInput" type="search" placeholder="搜尋股票代號、名稱、已損益、未損益或出場原因">
+            <button class="mode-button" id="clearSearch" type="button">清除</button>
+          </div>
+          <div class="stock-list" id="stockList"></div>
+        </div>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="panel-head chart-toolbar">
+          <div>
+            <h2 id="chartTitle">互動 K 線圖</h2>
+            <small id="chartSubtitle">請先選擇左側個股</small>
+          </div>
+          <div class="chart-buttons">
+            <button class="mode-button" data-chart-action="zoom-in" type="button">放大</button>
+            <button class="mode-button" data-chart-action="zoom-out" type="button">縮小</button>
+            <button class="mode-button" data-chart-action="reset" type="button">重設</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="chart-wrap">
+            <canvas id="klineCanvas" class="kline-canvas"></canvas>
+            <div id="klineTooltip" class="kline-tooltip"></div>
+          </div>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:#2563eb"></span>MA5</span>
+            <span><span class="legend-dot" style="background:#f59e0b"></span>MA10</span>
+            <span><span class="legend-dot" style="background:#0f766e"></span>MA20</span>
+            <span><span class="legend-dot" style="background:#7c3aed"></span>MA60</span>
+            <span><span class="legend-dot" style="background:#16a34a"></span>進場</span>
+            <span><span class="legend-dot" style="background:#dc2626"></span>出場</span>
+            <span><span class="legend-dot" style="background:#f59e0b"></span>選取交易</span>
+          </div>
+          <p class="subtle">互動方式：滑鼠移動查看十字線與 OHLC；拖曳可平移；滾輪或按鈕可縮放；點擊進出場 marker 會反向選取交易明細。</p>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><strong>Created by Codex</strong> · Only for educational use. This dashboard is not financial advice.</footer>
+  </div>
+
+  <script>
+    const DATA_URL = "reports/mwp_a_strategy_tracking.json";
+    const MANIFEST_URL = "reports/stock_data_manifest.json";
+    const state = {
+      payload: null,
+      groups: [],
+      filteredGroups: [],
+      selectedKey: null,
+      selectedTradeId: null,
+      manifest: new Map(),
+      csvCache: new Map(),
+      chart: { sourceRows: [], viewStart: 0, viewEnd: 0, markerBoxes: [], markers: [] },
+    };
+
+    const el = {
+      dataMeta: document.getElementById("dataMeta"),
+      metricTrades: document.getElementById("metricTrades"),
+      metricTradeMeta: document.getElementById("metricTradeMeta"),
+      metricPnl: document.getElementById("metricPnl"),
+      metricWinRate: document.getElementById("metricWinRate"),
+      metricWinLoss: document.getElementById("metricWinLoss"),
+      metricAvgReturn: document.getElementById("metricAvgReturn"),
+      metricMedianReturn: document.getElementById("metricMedianReturn"),
+      groupCount: document.getElementById("groupCount"),
+      stockList: document.getElementById("stockList"),
+      searchInput: document.getElementById("searchInput"),
+      clearSearch: document.getElementById("clearSearch"),
+      chartTitle: document.getElementById("chartTitle"),
+      chartSubtitle: document.getElementById("chartSubtitle"),
+      canvas: document.getElementById("klineCanvas"),
+      tooltip: document.getElementById("klineTooltip"),
+    };
+
+    const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    const num = value => Number.isFinite(Number(value)) ? Number(value) : null;
+    const fmtNum = value => Number.isFinite(Number(value)) ? Number(value).toLocaleString("zh-TW") : "-";
+    const fmtMoney = value => {
+      const n = num(value);
+      if (n === null) return "-";
+      const sign = n > 0 ? "+" : "";
+      return `${sign}${n.toLocaleString("zh-TW", { maximumFractionDigits: 0 })}`;
+    };
+    const fmtPct = value => {
+      const n = num(value);
+      if (n === null) return "-";
+      const sign = n > 0 ? "+" : "";
+      return `${sign}${n.toFixed(2)}%`;
+    };
+    const fmtPrice = value => {
+      const n = num(value);
+      return n === null ? "-" : n.toLocaleString("zh-TW", { minimumFractionDigits: n >= 100 ? 1 : 2, maximumFractionDigits: 2 });
+    };
+    const fmtVolumeLots = value => {
+      const n = num(value);
+      if (n === null) return "-";
+      return `${Math.round(n / 1000).toLocaleString("zh-TW")} 張`;
+    };
+    const pnlClass = value => Number(value) >= 0 ? "status-good" : "status-bad";
+
+    function applyTheme(theme) {
+      const nextTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem("dailySignalTheme", nextTheme);
+      const btn = document.getElementById("themeToggle");
+      if (btn) btn.textContent = nextTheme === "dark" ? "日間" : "夜間";
+      if (state.chart.sourceRows.length) drawChart();
+    }
+
+    function parseCsvLine(line) {
+      const output = [];
+      let current = "";
+      let quoted = false;
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+        const next = line[index + 1];
+        if (char === '"' && quoted && next === '"') { current += '"'; index += 1; }
+        else if (char === '"') quoted = !quoted;
+        else if (char === "," && !quoted) { output.push(current); current = ""; }
+        else current += char;
+      }
+      output.push(current);
+      return output;
+    }
+
+    function parseCsv(text) {
+      const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/).filter(Boolean);
+      const headers = parseCsvLine(lines.shift() || "").map(item => item.trim());
+      return lines.map(line => {
+        const values = parseCsvLine(line);
+        const raw = {};
+        headers.forEach((header, index) => { raw[header] = values[index]; });
+        return {
+          date: raw.date,
+          open: num(String(raw.open || "").replace(/,/g, "")),
+          high: num(String(raw.high || "").replace(/,/g, "")),
+          low: num(String(raw.low || "").replace(/,/g, "")),
+          close: num(String(raw.close || "").replace(/,/g, "")),
+          volume: num(String(raw.volume_shares || raw.volume || "0").replace(/,/g, "")) || 0,
+        };
+      }).filter(row => row.date && [row.open, row.high, row.low, row.close].every(Number.isFinite));
+    }
+
+    function addMovingAverages(rows) {
+      return rows.map((row, index) => {
+        const withMa = { ...row };
+        [5, 10, 20, 60].forEach(windowSize => {
+          if (index < windowSize - 1) withMa[`ma${windowSize}`] = null;
+          else {
+            let total = 0;
+            for (let cursor = index - windowSize + 1; cursor <= index; cursor += 1) total += rows[cursor].close;
+            withMa[`ma${windowSize}`] = total / windowSize;
+          }
+        });
+        return withMa;
+      });
+    }
+
+    function groupRealizedTrades(rows) {
+      const map = new Map();
+      rows.forEach((row, index) => {
+        const market = String(row.market || "").toUpperCase();
+        const stockNo = String(row.stock_no || "");
+        if (!market || !stockNo) return;
+        const key = `${market}:${stockNo}`;
+        const unresolved = Boolean(row.unresolved) || row.positionStatus === "unrealized";
+        const trade = {
+          ...row,
+          id: `${key}:${unresolved ? "unrealized" : "realized"}:${row.unit_type || "unit"}:${row.addon_number || 0}:${row.signal_date || ""}:${row.entry_date || ""}:${row.exit_date || ""}:${index}`,
+          market,
+          stockNo,
+          stockName: row.stock_name || "",
+          label: row.label || `${stockNo} ${row.stock_name || ""}`.trim(),
+          entryDate: row.entry_date,
+          entryPrice: num(row.entry_price),
+          exitDate: row.exit_date,
+          exitPrice: num(row.exit_price),
+          signalDate: row.signal_date,
+          returnPct: num(row.return_pct) || 0,
+          pnl: num(row.pnl) || 0,
+          unitType: row.unit_type || "base",
+          addonNumber: row.addon_number || 0,
+          exitReason: row.exit_reason || "",
+          holdingDays: row.holding_days,
+          unresolved,
+          status: unresolved ? "unrealized" : "realized",
+          statusLabel: unresolved ? "未損益" : "已損益",
+        };
+        if (!map.has(key)) map.set(key, { key, market, stockNo, stockName: trade.stockName, label: trade.label, trades: [] });
+        map.get(key).trades.push(trade);
+      });
+      return [...map.values()].map(group => {
+        group.trades.sort((a, b) => String(a.entryDate).localeCompare(String(b.entryDate)) || String(a.exitDate).localeCompare(String(b.exitDate)));
+        const realizedTrades = group.trades.filter(trade => !trade.unresolved);
+        const unrealizedTrades = group.trades.filter(trade => trade.unresolved);
+        const realizedPnl = realizedTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+        const unrealizedPnl = unrealizedTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+        const totalPnl = realizedPnl + unrealizedPnl;
+        const wins = realizedTrades.filter(trade => trade.pnl >= 0).length;
+        const losses = realizedTrades.length - wins;
+        const realizedReturns = realizedTrades.map(trade => trade.returnPct).sort((a, b) => a - b);
+        const avgRealizedReturn = realizedReturns.reduce((sum, value) => sum + value, 0) / Math.max(1, realizedReturns.length);
+        const mid = Math.floor(realizedReturns.length / 2);
+        const medianReturn = realizedReturns.length ? (realizedReturns.length % 2 ? realizedReturns[mid] : (realizedReturns[mid - 1] + realizedReturns[mid]) / 2) : null;
+        const eventDates = group.trades.flatMap(trade => [trade.exitDate, trade.entryDate]).filter(Boolean).sort();
+        return {
+          ...group,
+          realizedPnl,
+          unrealizedPnl,
+          totalPnl,
+          realizedCount: realizedTrades.length,
+          unrealizedCount: unrealizedTrades.length,
+          wins,
+          losses,
+          winRate: wins / Math.max(1, realizedTrades.length) * 100,
+          avgReturn: avgRealizedReturn,
+          medianReturn,
+          latestExit: eventDates.length ? eventDates[eventDates.length - 1] : "",
+        };
+      }).sort((a, b) => b.unrealizedCount - a.unrealizedCount || String(b.latestExit).localeCompare(String(a.latestExit)) || b.totalPnl - a.totalPnl);
+    }
+
+    function renderMetrics(rows, groups) {
+      const realizedRows = rows.filter(row => !row.unresolved);
+      const unrealizedRows = rows.filter(row => row.unresolved);
+      const realizedPnl = realizedRows.reduce((sum, row) => sum + (num(row.pnl) || 0), 0);
+      const unrealizedPnl = unrealizedRows.reduce((sum, row) => sum + (num(row.pnl) || 0), 0);
+      const realizedReturns = realizedRows.map(row => num(row.return_pct) || 0).sort((a, b) => a - b);
+      const wins = realizedRows.filter(row => Number(row.pnl) >= 0).length;
+      const losses = realizedRows.length - wins;
+      const avgReturn = realizedReturns.reduce((sum, value) => sum + value, 0) / Math.max(1, realizedReturns.length);
+      const mid = Math.floor(realizedReturns.length / 2);
+      const median = realizedReturns.length ? (realizedReturns.length % 2 ? realizedReturns[mid] : (realizedReturns[mid - 1] + realizedReturns[mid]) / 2) : null;
+      el.metricTrades.textContent = fmtNum(rows.length);
+      el.metricTradeMeta.textContent = `${fmtNum(groups.length)} 檔｜已 ${fmtNum(realizedRows.length)} / 未 ${fmtNum(unrealizedRows.length)}`;
+      el.metricPnl.textContent = fmtMoney(realizedPnl);
+      el.metricPnl.className = pnlClass(realizedPnl);
+      el.metricWinRate.textContent = fmtMoney(unrealizedPnl);
+      el.metricWinRate.className = pnlClass(unrealizedPnl);
+      el.metricWinLoss.textContent = `在場 ${fmtNum(unrealizedRows.length)} 筆｜估值含 latest_close`;
+      el.metricAvgReturn.textContent = fmtPct(realizedRows.length ? avgReturn : null);
+      el.metricMedianReturn.textContent = `中位 ${fmtPct(median)}｜勝 ${fmtNum(wins)} / 負 ${fmtNum(losses)}`;
+      el.groupCount.textContent = `${groups.length} 檔`;
+    }
+
+    function tradeUnitLabel(trade) {
+      return trade.unitType === "addon" ? `加碼單 #${esc(trade.addonNumber)}` : "母單";
+    }
+
+    function tradeRowHtml(trade, index) {
+      const active = trade.id === state.selectedTradeId;
+      const statusClass = trade.unresolved ? "unrealized" : "realized";
+      const exitVerb = trade.unresolved ? "估值" : "出場";
+      return `<button class="trade-row ${statusClass} ${active ? "active" : ""}" type="button" data-trade-id="${esc(trade.id)}">
+        <span class="trade-index">#${index + 1}</span>
+        <span>
+          <strong class="trade-title-line"><span class="status-chip ${statusClass}">${trade.statusLabel}</span><span class="trade-separator">—</span><span>${tradeUnitLabel(trade)}</span></strong>
+          <span class="trade-meta">進場 ${esc(trade.entryDate)} @ ${fmtPrice(trade.entryPrice)}｜${exitVerb} ${esc(trade.exitDate)} @ ${fmtPrice(trade.exitPrice)}｜持有 ${fmtNum(trade.holdingDays)} 日｜${esc(trade.exitReason)}</span>
+        </span>
+        <strong class="${pnlClass(trade.pnl)}">${fmtMoney(trade.pnl)}<br><small>${fmtPct(trade.returnPct)}</small></strong>
+      </button>`;
+    }
+
+    function groupHtml(group) {
+      const selected = group.key === state.selectedKey;
+      return `<article class="stock-group ${selected ? "selected" : ""}" data-group-key="${esc(group.key)}">
+        <button class="stock-head" type="button" data-select-group="${esc(group.key)}">
+          <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(group.market)}｜最新事件 ${esc(group.latestExit)}</small></span>
+          <span class="group-stats">
+            <span class="pill ${pnlClass(group.realizedPnl)}">已 ${fmtMoney(group.realizedPnl)}</span>
+            <span class="pill ${pnlClass(group.unrealizedPnl)}">未 ${fmtMoney(group.unrealizedPnl)}</span>
+            <span class="pill">已 ${fmtNum(group.realizedCount)} / 未 ${fmtNum(group.unrealizedCount)}</span>
+          </span>
+        </button>
+        <div class="trade-details">${group.trades.map(tradeRowHtml).join("")}</div>
+      </article>`;
+    }
+
+    function renderGroups() {
+      const query = el.searchInput.value.trim().toLowerCase();
+      state.filteredGroups = state.groups.filter(group => {
+        const text = `${group.market} ${group.stockNo} ${group.stockName} ${group.label} ${group.trades.map(trade => `${trade.statusLabel} ${trade.entryDate} ${trade.exitDate} ${trade.exitReason} ${trade.unitType}`).join(" ")}`.toLowerCase();
+        return !query || text.includes(query);
+      });
+      if (state.selectedKey && !state.filteredGroups.some(group => group.key === state.selectedKey)) {
+        state.selectedKey = null;
+        state.selectedTradeId = null;
+        drawEmptyChart("請先選擇左側個股");
+      }
+      el.stockList.innerHTML = state.filteredGroups.length
+        ? state.filteredGroups.map(groupHtml).join("")
+        : `<div class="empty">沒有符合搜尋條件的部位。</div>`;
+    }
+
+    function parseDate(value) {
+      const text = String(value || "").trim();
+      const match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (!match) return null;
+      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    }
+
+    function markerIndex(rows, date) {
+      if (!date) return -1;
+      const exact = rows.findIndex(row => row.date === date);
+      if (exact >= 0) return exact;
+      return rows.findIndex(row => row.date > date);
+    }
+
+    function selectedGroup() {
+      return state.groups.find(group => group.key === state.selectedKey) || null;
+    }
+
+    function selectedTrade() {
+      const group = selectedGroup();
+      return group?.trades.find(trade => trade.id === state.selectedTradeId) || null;
+    }
+
+    function chartWindowForTrades(rows, trades) {
+      const anchors = [];
+      trades.forEach(trade => {
+        [trade.signalDate, trade.entryDate, trade.exitDate].forEach(date => {
+          const index = markerIndex(rows, date);
+          if (index >= 0) anchors.push(index);
+        });
+      });
+      if (!anchors.length) return { start: Math.max(0, rows.length - 90), end: rows.length - 1 };
+      return { start: Math.max(0, Math.min(...anchors) - 35), end: Math.min(rows.length - 1, Math.max(...anchors) + 35) };
+    }
+
+    function buildTradeMarkers(trades) {
+      return trades.flatMap((trade, index) => ([
+        { id: `${trade.id}:entry`, tradeId: trade.id, date: trade.entryDate, price: trade.entryPrice, type: "entry", label: `#${index + 1} 買`, pnl: trade.pnl },
+        { id: `${trade.id}:exit`, tradeId: trade.id, date: trade.exitDate, price: trade.exitPrice, type: "exit", label: `#${index + 1} ${trade.unresolved ? "估" : "賣"}`, pnl: trade.pnl },
+      ]));
+    }
+
+    function resolveManifestPath(item) {
+      let file = String(item?.file || "").replaceAll("\\", "/");
+      if (file.startsWith("../data/")) return file.replace(/^\.\.\/data\//, "data/");
+      return file;
+    }
+
+    function fetchErrorMessage(error, pagePath) {
+      if (location.protocol === "file:") {
+        return `讀取失敗：瀏覽器禁止 file:// 頁面讀取本地 JSON。請在 daily_stock_signal_git 目錄執行 python -m http.server 8000，然後開 http://localhost:8000/site/${pagePath}`;
+      }
+      return `讀取失敗：${error.message}`;
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    async function loadManifest() {
+      try {
+        const manifest = await fetchJson(MANIFEST_URL);
+        state.manifest = new Map((manifest || []).map(item => [item.key, { ...item, file: resolveManifestPath(item) }]));
+      } catch (error) {
+        state.manifest = new Map();
+      }
+    }
+
+    async function loadCandles(group) {
+      const manifest = state.manifest.get(group.key);
+      if (!manifest) throw new Error("找不到這檔股票的 K 線 manifest。請先執行 build_site.ps1 產生 stock_data_manifest.json。");
+      if (state.csvCache.has(manifest.file)) return state.csvCache.get(manifest.file);
+      const response = await fetch(encodeURI(manifest.file), { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const rows = addMovingAverages(parseCsv(await response.text()).sort((a, b) => String(a.date).localeCompare(String(b.date))));
+      state.csvCache.set(manifest.file, rows);
+      return rows;
+    }
+
+    function chartPalette() {
+      const dark = document.documentElement.dataset.theme === "dark";
+      return dark
+        ? { bg: "#111720", grid: "#2d3747", text: "#9aa7b8", cross: "rgba(203, 213, 225, .42)", panel: "rgba(21,27,36,.94)" }
+        : { bg: "#fbfcfe", grid: "#e5ebf4", text: "#66758c", cross: "rgba(15, 23, 42, .38)", panel: "rgba(255,255,255,.94)" };
+    }
+
+    function clampRange(start, end) {
+      const total = state.chart.sourceRows.length;
+      if (!total) return { start: 0, end: 0 };
+      const minBars = Math.min(24, total);
+      const size = Math.max(minBars, Math.min(total, end - start + 1));
+      const safeStart = Math.max(0, Math.min(start, total - size));
+      return { start: safeStart, end: safeStart + size - 1 };
+    }
+
+    function setChartRange(start, end) {
+      const range = clampRange(start, end);
+      state.chart.viewStart = range.start;
+      state.chart.viewEnd = range.end;
+    }
+
+    function drawEmptyChart(message) {
+      const ctx = el.canvas.getContext("2d");
+      const rect = el.canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      el.canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      el.canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const palette = chartPalette();
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      ctx.fillStyle = palette.text;
+      ctx.font = "14px Microsoft JhengHei, Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(message, rect.width / 2, rect.height / 2);
+      el.tooltip.style.display = "none";
+      state.chart.markerBoxes = [];
+    }
+
+    function drawChart(hoverIndex = null) {
+      const rows = state.chart.sourceRows || [];
+      if (!rows.length) return drawEmptyChart("沒有 K 線資料");
+      const ctx = el.canvas.getContext("2d");
+      const rect = el.canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      el.canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      el.canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const width = rect.width;
+      const height = rect.height;
+      const pad = { top: 18, right: 50, bottom: 32, left: 50 };
+      const volumeHeight = Math.max(52, Math.min(72, height * 0.22));
+      const gap = 14;
+      const volumeBottom = height - pad.bottom;
+      const volumeTop = volumeBottom - volumeHeight;
+      const priceBottom = volumeTop - gap;
+      const range = clampRange(state.chart.viewStart, state.chart.viewEnd);
+      state.chart.viewStart = range.start;
+      state.chart.viewEnd = range.end;
+      const candleRows = rows.slice(range.start, range.end + 1);
+      const highs = candleRows.map(row => row.high);
+      const lows = candleRows.map(row => row.low);
+      state.chart.markers.forEach(marker => {
+        const idx = markerIndex(rows, marker.date);
+        if (idx >= range.start && idx <= range.end && Number.isFinite(Number(marker.price))) {
+          highs.push(Number(marker.price));
+          lows.push(Number(marker.price));
+        }
+      });
+      const maxPrice = Math.max(...highs) * 1.025;
+      const minPrice = Math.min(...lows) * 0.975;
+      const priceRange = Math.max(1, maxPrice - minPrice);
+      const maxVolume = Math.max(1, ...candleRows.map(row => row.volume));
+      const plotWidth = width - pad.left - pad.right;
+      const xStep = plotWidth / Math.max(1, candleRows.length);
+      const candleWidth = Math.max(2, Math.min(8, xStep * 0.58));
+      const xAt = index => pad.left + index * xStep + xStep / 2;
+      const yPrice = value => pad.top + ((maxPrice - value) / priceRange) * (priceBottom - pad.top);
+      const yVolume = value => volumeBottom - (value / maxVolume) * volumeHeight;
+      const palette = chartPalette();
+      state.chart.pad = pad;
+      state.chart.xStep = xStep;
+      state.chart.candleRows = candleRows;
+      state.chart.markerBoxes = [];
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = palette.bg;
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = palette.grid;
+      ctx.lineWidth = 1;
+      ctx.fillStyle = palette.text;
+      ctx.font = "11px Microsoft JhengHei, Arial";
+      ctx.textAlign = "right";
+      for (let i = 0; i <= 4; i += 1) {
+        const y = pad.top + (i / 4) * (priceBottom - pad.top);
+        const price = maxPrice - (i / 4) * priceRange;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(width - pad.right, y); ctx.stroke();
+        ctx.fillText(fmtPrice(price), width - 8, y + 4);
+      }
+      candleRows.forEach((row, index) => {
+        const x = xAt(index);
+        const up = row.close >= row.open;
+        const color = up ? "#d92d43" : "#0f8a62";
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.moveTo(x, yPrice(row.high)); ctx.lineTo(x, yPrice(row.low)); ctx.stroke();
+        const openY = yPrice(row.open);
+        const closeY = yPrice(row.close);
+        ctx.fillRect(x - candleWidth / 2, Math.min(openY, closeY), candleWidth, Math.max(2, Math.abs(closeY - openY)));
+        ctx.globalAlpha = 0.22;
+        const vy = yVolume(row.volume);
+        ctx.fillRect(x - candleWidth / 2, vy, candleWidth, Math.max(1, volumeBottom - vy));
+        ctx.globalAlpha = 1;
+      });
+      [["ma5", "#2563eb"], ["ma10", "#f59e0b"], ["ma20", "#0f766e"], ["ma60", "#7c3aed"]].forEach(([key, color]) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        let started = false;
+        candleRows.forEach((row, index) => {
+          const value = row[key];
+          if (!Number.isFinite(Number(value))) return;
+          const x = xAt(index);
+          const y = yPrice(value);
+          if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+      });
+      ctx.strokeStyle = palette.grid;
+      ctx.beginPath(); ctx.moveTo(pad.left, volumeTop); ctx.lineTo(width - pad.right, volumeTop); ctx.moveTo(pad.left, volumeBottom); ctx.lineTo(width - pad.right, volumeBottom); ctx.stroke();
+      ctx.fillStyle = palette.text;
+      ctx.textAlign = "left";
+      ctx.fillText(candleRows[0]?.date || "", pad.left, height - 12);
+      ctx.textAlign = "right";
+      ctx.fillText(candleRows[candleRows.length - 1]?.date || "", width - pad.right, height - 12);
+      ctx.fillText(`量 ${fmtVolumeLots(maxVolume)}`, width - 8, volumeTop + 4);
+
+      state.chart.markers.forEach(marker => {
+        const sourceIndex = markerIndex(rows, marker.date);
+        const visibleIndex = sourceIndex - range.start;
+        if (visibleIndex < 0 || visibleIndex >= candleRows.length) return;
+        const x = xAt(visibleIndex);
+        const y = yPrice(marker.price);
+        const selected = marker.tradeId === state.selectedTradeId;
+        const color = selected ? "#f59e0b" : (marker.type === "entry" ? "#16a34a" : "#dc2626");
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = selected ? 2.6 : 1.4;
+        ctx.globalAlpha = selected ? 0.95 : 0.64;
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, volumeBottom); ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = color;
+        if (marker.type === "entry") {
+          ctx.beginPath(); ctx.moveTo(x, y - 8); ctx.lineTo(x - 7, y + 6); ctx.lineTo(x + 7, y + 6); ctx.closePath(); ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.moveTo(x, y + 8); ctx.lineTo(x - 7, y - 6); ctx.lineTo(x + 7, y - 6); ctx.closePath(); ctx.fill();
+        }
+        ctx.font = `${selected ? "bold" : "600"} 11px Microsoft JhengHei, Arial`;
+        ctx.textAlign = "center";
+        const labelY = marker.type === "entry" ? Math.max(14, y - 12) : Math.min(priceBottom - 4, y + 18);
+        ctx.fillText(marker.label, x, labelY);
+        state.chart.markerBoxes.push({ marker, x, y, radius: selected ? 14 : 11 });
+        ctx.restore();
+      });
+
+      const safeHover = hoverIndex === null ? null : Math.max(0, Math.min(candleRows.length - 1, hoverIndex));
+      if (safeHover !== null && candleRows[safeHover]) {
+        const row = candleRows[safeHover];
+        const x = xAt(safeHover);
+        const y = yPrice(row.close);
+        ctx.save();
+        ctx.strokeStyle = palette.cross;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, volumeBottom); ctx.moveTo(pad.left, y); ctx.lineTo(width - pad.right, y); ctx.stroke();
+        ctx.restore();
+        const prev = candleRows[safeHover - 1];
+        const chg = prev ? (row.close / prev.close - 1) * 100 : null;
+        const group = selectedGroup();
+        el.tooltip.innerHTML = `<strong>${esc(group?.label || "")} ${esc(row.date)}</strong>
+          <span class="tooltip-line">開 ${fmtPrice(row.open)}｜高 ${fmtPrice(row.high)}｜低 ${fmtPrice(row.low)}｜收 ${fmtPrice(row.close)}</span>
+          <span class="tooltip-line">日漲跌 ${fmtPct(chg)}｜成交 ${fmtVolumeLots(row.volume)}</span>
+          <span class="tooltip-line">MA5 ${fmtPrice(row.ma5)} / MA10 ${fmtPrice(row.ma10)} / MA20 ${fmtPrice(row.ma20)} / MA60 ${fmtPrice(row.ma60)}</span>`;
+        el.tooltip.style.display = "block";
+      } else {
+        el.tooltip.style.display = "none";
+      }
+    }
+
+    function hoverAt(clientX) {
+      if (!state.chart.sourceRows.length) return;
+      const rect = el.canvas.getBoundingClientRect();
+      const localX = clientX - rect.left;
+      const rawIndex = Math.round((localX - state.chart.pad.left - state.chart.xStep / 2) / Math.max(1, state.chart.xStep));
+      drawChart(rawIndex);
+    }
+
+    function zoomChart(factor, centerVisibleIndex = null, alignEnd = false) {
+      if (!state.chart.sourceRows.length) return;
+      const total = state.chart.sourceRows.length;
+      const currentSize = state.chart.viewEnd - state.chart.viewStart + 1;
+      const minBars = Math.min(24, total);
+      const nextSize = Math.max(minBars, Math.min(total, Math.round(currentSize * factor)));
+      const center = alignEnd ? total - 1 : state.chart.viewStart + (centerVisibleIndex ?? Math.round((currentSize - 1) / 2));
+      let start = alignEnd ? total - nextSize : Math.round(center - nextSize / 2);
+      setChartRange(start, start + nextSize - 1);
+      drawChart();
+    }
+
+    function resetChartView() {
+      const group = selectedGroup();
+      if (!group || !state.chart.sourceRows.length) return;
+      const range = chartWindowForTrades(state.chart.sourceRows, group.trades);
+      setChartRange(range.start, range.end);
+      drawChart();
+    }
+
+    let dragState = null;
+    el.canvas.addEventListener("mousemove", event => { if (!dragState) hoverAt(event.clientX); });
+    el.canvas.addEventListener("pointerdown", event => {
+      el.canvas.setPointerCapture?.(event.pointerId);
+      const currentSize = state.chart.viewEnd - state.chart.viewStart + 1;
+      dragState = { x: event.clientX, start: state.chart.viewStart, size: currentSize, moved: false };
+      el.canvas.classList.add("is-panning");
+      hoverAt(event.clientX);
+    });
+    el.canvas.addEventListener("pointermove", event => {
+      if (!dragState || event.buttons !== 1) return;
+      const deltaBars = Math.round((dragState.x - event.clientX) / Math.max(1, state.chart.xStep || 1));
+      const nextStart = dragState.start + deltaBars;
+      if (nextStart !== state.chart.viewStart) {
+        dragState.moved = true;
+        setChartRange(nextStart, nextStart + dragState.size - 1);
+        drawChart();
+      }
+    });
+    el.canvas.addEventListener("pointerup", event => {
+      el.canvas.releasePointerCapture?.(event.pointerId);
+      if (dragState && !dragState.moved) {
+        const rect = el.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const hit = state.chart.markerBoxes.find(box => Math.hypot(box.x - x, box.y - y) <= box.radius);
+        if (hit) selectTrade(hit.marker.tradeId);
+        else hoverAt(event.clientX);
+      }
+      dragState = null;
+      el.canvas.classList.remove("is-panning");
+    });
+    el.canvas.addEventListener("pointercancel", event => {
+      el.canvas.releasePointerCapture?.(event.pointerId);
+      dragState = null;
+      el.canvas.classList.remove("is-panning");
+    });
+    el.canvas.addEventListener("mouseleave", () => { if (!dragState) drawChart(); });
+    el.canvas.addEventListener("wheel", event => {
+      if (!state.chart.sourceRows.length) return;
+      event.preventDefault();
+      const rect = el.canvas.getBoundingClientRect();
+      const localX = event.clientX - rect.left;
+      const rawIndex = Math.round((localX - state.chart.pad.left - state.chart.xStep / 2) / Math.max(1, state.chart.xStep));
+      zoomChart(event.deltaY > 0 ? 1.18 : 0.84, rawIndex);
+    }, { passive: false });
+
+    async function selectGroup(key) {
+      const group = state.groups.find(item => item.key === key);
+      if (!group) return;
+      state.selectedKey = key;
+      state.selectedTradeId = state.selectedTradeId && group.trades.some(trade => trade.id === state.selectedTradeId)
+        ? state.selectedTradeId
+        : group.trades[0]?.id || null;
+      renderGroups();
+      el.chartTitle.textContent = `${group.label} 已實現交易 K 線`;
+      el.chartSubtitle.textContent = `${group.trades.length} 筆｜已 ${group.realizedCount} / 未 ${group.unrealizedCount}｜進出場 / 估值點共 ${group.trades.length * 2} 個 marker`;
+      drawEmptyChart("讀取 K 線中");
+      try {
+        const rows = await loadCandles(group);
+        state.chart.sourceRows = rows;
+        state.chart.markers = buildTradeMarkers(group.trades);
+        const range = chartWindowForTrades(rows, group.trades);
+        setChartRange(range.start, range.end);
+        drawChart();
+      } catch (error) {
+        state.chart.sourceRows = [];
+        state.chart.markers = [];
+        drawEmptyChart(`K 線資料讀取失敗：${error.message}`);
+      }
+    }
+
+    function selectTrade(tradeId) {
+      const group = selectedGroup();
+      if (!group || !group.trades.some(trade => trade.id === tradeId)) return;
+      state.selectedTradeId = tradeId;
+      renderGroups();
+      drawChart();
+      document.querySelector(`[data-trade-id="${CSS.escape(tradeId)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+
+    document.addEventListener("click", event => {
+      const groupButton = event.target.closest?.("[data-select-group]");
+      if (groupButton) {
+        const key = groupButton.dataset.selectGroup;
+        if (state.selectedKey === key) {
+          state.selectedKey = null;
+          state.selectedTradeId = null;
+          renderGroups();
+          el.chartTitle.textContent = "互動 K 線圖";
+          el.chartSubtitle.textContent = "請先選擇左側個股";
+          state.chart.sourceRows = [];
+          state.chart.markers = [];
+          drawEmptyChart("請先選擇左側個股");
+        } else selectGroup(key);
+        return;
+      }
+      const tradeButton = event.target.closest?.("[data-trade-id]");
+      if (tradeButton) selectTrade(tradeButton.dataset.tradeId);
+      const chartButton = event.target.closest?.("[data-chart-action]");
+      if (chartButton) {
+        const action = chartButton.dataset.chartAction;
+        if (action === "zoom-in") zoomChart(0.72, null, true);
+        if (action === "zoom-out") zoomChart(1.35, null, true);
+        if (action === "reset") resetChartView();
+      }
+    });
+
+    el.searchInput.addEventListener("input", renderGroups);
+    el.clearSearch.addEventListener("click", () => { el.searchInput.value = ""; renderGroups(); });
+    document.getElementById("themeToggle").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+    document.getElementById("reloadButton").addEventListener("click", loadData);
+    window.addEventListener("resize", () => drawChart());
+
+    async function loadData() {
+      try {
+        el.dataMeta.textContent = "讀取中";
+        await loadManifest();
+        const payload = await fetchJson(DATA_URL);
+        state.payload = payload;
+        const realizedRows = (payload.tracking?.historical_realized_units || []).map(row => ({ ...row, unresolved: false, positionStatus: "realized" }));
+        const unrealizedRows = (payload.tracking?.historical_unresolved_units || []).map(row => ({ ...row, unresolved: true, positionStatus: "unrealized" }));
+        const rows = [...realizedRows, ...unrealizedRows];
+        state.groups = groupRealizedTrades(rows);
+        state.selectedKey = state.groups[0]?.key || null;
+        state.selectedTradeId = state.groups[0]?.trades[0]?.id || null;
+        renderMetrics(rows, state.groups);
+        renderGroups();
+        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-A"} · 已 ${fmtNum(realizedRows.length)} 筆 / 未 ${fmtNum(unrealizedRows.length)} 筆 · K線 manifest ${fmtNum(state.manifest.size)} 檔`;
+        if (state.selectedKey) await selectGroup(state.selectedKey);
+        else drawEmptyChart("目前沒有部位資料");
+      } catch (error) {
+        const message = fetchErrorMessage(error, "mwp_a_realized_pnl.html");
+        el.dataMeta.textContent = message;
+        el.stockList.innerHTML = `<div class="empty">${esc(message)}</div>`;
+        drawEmptyChart(message);
+      }
+    }
+
+    applyTheme(localStorage.getItem("dailySignalTheme") || "light");
+    drawEmptyChart("請先選擇左側個股");
+    loadData();
+  </script>
+</body>
+</html>

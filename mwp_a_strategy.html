@@ -151,6 +151,7 @@
       </div>
       <div class="actions" aria-label="工具列">
         <a class="primary-button" href="index.html">每日策略訊號</a>
+        <a class="mode-button active" href="mwp_a_realized_pnl.html">已實現損益</a>
         <a class="mode-button" href="reports/pullback_v9_fixed_addon_random_splits.html" target="_blank" rel="noopener">回測報告</a>
         <a class="mode-button" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
@@ -256,6 +257,12 @@
     const fmtPct = value => Number.isFinite(Number(value)) ? `${Number(value).toFixed(2)}%` : "-";
     const fmtNum = value => Number.isFinite(Number(value)) ? Number(value).toLocaleString("zh-TW") : "-";
     const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    function fetchErrorMessage(error) {
+      if (location.protocol === "file:") {
+        return "讀取失敗：瀏覽器禁止 file:// 頁面讀取本地 JSON。請在 daily_stock_signal_git 目錄執行 python -m http.server 8000，然後開 http://localhost:8000/site/mwp_a_strategy.html";
+      }
+      return `讀取失敗：${error.message}`;
+    }
 
     function applyTheme(theme) {
       document.documentElement.dataset.theme = theme;
@@ -346,7 +353,10 @@
         renderUnresolved(tracking.historical_unresolved_units || []);
         renderRadar(tracking.daily_pullback_radar_candidates || [], tracking.as_of_daily_signal_date);
       } catch (error) {
-        document.getElementById("dataMeta").textContent = `讀取失敗：${error.message}`;
+        const message = fetchErrorMessage(error);
+        document.getElementById("dataMeta").textContent = message;
+        const note = document.getElementById("strategyNote");
+        if (note) note.textContent = message;
       }
     }
     loadData();

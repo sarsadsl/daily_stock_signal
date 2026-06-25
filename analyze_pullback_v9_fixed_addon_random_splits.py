@@ -103,7 +103,7 @@ def run() -> dict[str, Any]:
             "purpose": "Keep the fixed V9+ random-stock-split test unchanged, then add PB-V23 add-on conditions only.",
             "fixed_entry": "V9+ entry is fixed: abc_fast / market all / weekly all / monthly trend / signal controlled / top_n 0.",
             "fixed_mother_exit": "weekly_core mother exit is fixed.",
-            "addon_logic": "PB-V23 focus add-on logic: MA20 retest, max5/spacing5, scan to available data end, loose-confluence structural close stop with next-open execution, and 15% close-based catastrophic line.",
+            "addon_logic": "Corrected PB-V23 focus add-on logic: MA20 retest, max5/spacing5, add-ons only while the mother/base unit is still open, loose-confluence structural close stop with next-open execution, and 15% close-based catastrophic line for add-ons only. If the mother has exited, later entries must be new mother setups with the base 7% hard stop, not add-ons. Add-on entries are blocked when any same-stock buy or buy-signal candidate occurred in the prior 10 trading days. Any still-open add-on is force-closed when the mother/base unit exits.",
             "split": "Same 10 seeds and same stock-code 60/20/20 split method as pullback_v9_fixed_random_splits. No rule or exit re-selection per seed.",
             "costs": "V9+ gross framework retained; no additional V18 stress cost is applied to V9 add-ons.",
         },

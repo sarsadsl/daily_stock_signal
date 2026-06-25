@@ -18,6 +18,7 @@ from analyze_pullback_plus_independent_versions import target_summary
 from analyze_pullback_plus_random_splits import SEEDS, random_stock_groups, strategy_stats
 from analyze_pullback_technical_phenotypes import find_series, make_series_map
 from analyze_pullback_v18_all_scores_no_limit import build_all_score_exits
+from pullback_lifecycle_filters import filter_same_stock_mother_entries
 from run_market_backtest import read_rows, csv_files
 from analyze_pullback_multitimeframe_search import BENCHMARK_CSV
 
@@ -75,6 +76,7 @@ def simulate_all_score_addons(
             base_unit["pnl"] = round(float(base_unit["return_pct"]) / 100 * POSITION_SIZE)
         units.append(base_unit)
 
+        base_exit_index = dates.get(str(base_unit.get("exit_date")), len(rows) - 1)
         addon_units = scan_addons(
             source,
             rows,
@@ -85,6 +87,8 @@ def simulate_all_score_addons(
             benchmark_rows,
             benchmark_dates,
             FOCUS_VARIANT,
+            base_exit_index,
+            base_unit,
         )
         addon_units = apply_stress_to_addons(addon_units)
         for addon in addon_units:
@@ -180,7 +184,14 @@ def compact_packages(summary: dict[str, Any]) -> str:
 
 def run() -> dict[str, Any]:
     base_rows, metadata = build_all_score_exits()
+    raw_base_count = len(base_rows)
     series = make_series_map(csv_files())
+    raw_buy_dates_by_stock: dict[tuple[str, str], list[str]] = {}
+    for row in base_rows:
+        raw_buy_dates_by_stock.setdefault((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), []).append(str(row.get("entry_date")))
+    base_rows, lifecycle_diagnostics = filter_same_stock_mother_entries(base_rows, series, find_series, cooldown_trading_days=10)
+    for row in base_rows:
+        row["same_stock_buy_signal_entry_dates"] = sorted(set(raw_buy_dates_by_stock.get((str(row.get("market") or "").upper(), str(row.get("stock_no") or "")), [])))
     benchmark_rows = read_rows(BENCHMARK_CSV)
     benchmark_dates = {row.date: index for index, row in enumerate(benchmark_rows)}
     v8_path = REPORT_DIR / "pullback_pb_v8_multitimeframe_search.json"
@@ -200,11 +211,11 @@ def run() -> dict[str, Any]:
         "version": VERSION,
         "methodology": {
             "base": "All-score V18+ no-limit mother pool: one-year enriched pullback pool with avoid_score4 removed, V17 runner mother exit, V18 fee/tax/slippage stress, no finite capital/max position/day-entry/duplicate-stock capacity limits.",
-            "addon_logic": "PB-V23 focus add-on: PB-V20 MA20-retest timing, max5/spacing5, scan to available data end, PB-V22 loose confluence structural stop with next-open execution, and 15% close-based catastrophic line.",
+            "addon_logic": "Corrected PB-V23 focus add-on: add-ons only while the mother/base unit is still open; add-on entries are blocked by same-stock 10-trading-day buy/buy-signal cooldown; any still-open add-on is force-closed when the mother/base unit exits; PB-V20 MA20-retest timing, max5/spacing5, PB-V22 loose confluence structural stop with next-open execution, and 15% close-based catastrophic line for add-ons only.",
             "changed_from_previous_all_score": "Adds V23 add-on units. Mother units are unchanged from pullback_v18_all_scores_no_limit.",
             "split": {"validation_start": validation_start, "test_start": test_start},
         },
-        "universe": metadata,
+        "universe": {**metadata, "raw_base_rows_before_lifecycle_filter": raw_base_count, "lifecycle_filter": lifecycle_diagnostics},
         "result": result,
         "random_stock_unit_runs": random_runs,
         "random_stock_unit_statistics": strategy_stats(random_runs),
