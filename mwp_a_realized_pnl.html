@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MWP-A 已/未實現損益</title>
+  <title>MWP-C 已/未實現損益</title>
   <style>
     :root {
       color-scheme: light;
@@ -176,13 +176,13 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>MWP-A 已/未實現損益</h1>
+        <h1>MWP-C 已/未實現損益</h1>
         <div class="meta" id="dataMeta">讀取中</div>
       </div>
       <div class="actions" aria-label="工具列">
-        <a class="primary-button" href="mwp_a_strategy.html">MWP-A追蹤</a>
+        <a class="primary-button" href="mwp_a_strategy.html">MWP-C追蹤</a>
         <a class="mode-button" href="index.html">每日策略訊號</a>
-        <a class="mode-button" href="reports/pullback_v9_fixed_addon_random_splits.html" target="_blank" rel="noopener">回測報告</a>
+        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
         <button class="icon-button" id="reloadButton" type="button">↻</button>
       </div>
@@ -846,7 +846,7 @@
         ? state.selectedTradeId
         : group.trades[0]?.id || null;
       renderGroups();
-      el.chartTitle.textContent = `${group.label} 已實現交易 K 線`;
+      el.chartTitle.textContent = `${group.label} MWP-C 部位 K 線`;
       el.chartSubtitle.textContent = `${group.trades.length} 筆｜已 ${group.realizedCount} / 未 ${group.unrealizedCount}｜進出場 / 估值點共 ${group.trades.length * 2} 個 marker`;
       drawEmptyChart("讀取 K 線中");
       try {
@@ -919,7 +919,7 @@
         state.selectedTradeId = state.groups[0]?.trades[0]?.id || null;
         renderMetrics(rows, state.groups);
         renderGroups();
-        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-A"} · 已 ${fmtNum(realizedRows.length)} 筆 / 未 ${fmtNum(unrealizedRows.length)} 筆 · K線 manifest ${fmtNum(state.manifest.size)} 檔`;
+        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-C"} · 已 ${fmtNum(realizedRows.length)} 筆 / 未 ${fmtNum(unrealizedRows.length)} 筆 · K線 manifest ${fmtNum(state.manifest.size)} 檔`;
         if (state.selectedKey) await selectGroup(state.selectedKey);
         else drawEmptyChart("目前沒有部位資料");
       } catch (error) {

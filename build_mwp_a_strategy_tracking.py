@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Build tracking payload for MWP-A strategy page."""
+"""Build tracking payload for the MWP strategy page.
+
+The historical page URL is still `mwp_a_strategy.html`, but the active content has
+been promoted to MWP-C: the return-first capped PB-V23 variant with MA20 slope filter.
+"""
 
 from __future__ import annotations
 
@@ -8,15 +12,14 @@ from pathlib import Path
 from typing import Any
 
 REPORT_DIR = Path("reports")
-BACKTEST_JSON = REPORT_DIR / "pullback_v9_fixed_addon_random_splits.json"
-NO_ADDON_JSON = REPORT_DIR / "pullback_v9_fixed_random_splits.json"
+BACKTEST_JSON = REPORT_DIR / "mwp_c_return_first_capped.json"
 TOP_LISTS_JSON = REPORT_DIR / "daily_signal_top_lists.json"
 DAILY_SIGNAL_JSON = REPORT_DIR / "daily_signal_alert.json"
 OUT_JSON = REPORT_DIR / "mwp_a_strategy_tracking.json"
 
-STRATEGY_NAME = "主升回檔加碼策略"
-STRATEGY_CODE = "MWP-A"
-STRATEGY_CODE_MEANING = "Main Wave Pullback Add-on"
+STRATEGY_NAME = "報酬率優先低頻加碼策略"
+STRATEGY_CODE = "MWP-C"
+STRATEGY_CODE_MEANING = "Return-first capped Main Wave Pullback"
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -71,7 +74,7 @@ def compact_unit(row: dict[str, Any]) -> dict[str, Any]:
         "addon_number": row.get("addon_number"),
         "unresolved": bool(row.get("unresolved")),
         "holding_days": row.get("holding_days"),
-        "source": "historical_backtest",
+        "source": "historical_backtest_mwp_c",
     }
 
 
@@ -91,7 +94,7 @@ def compact_package(row: dict[str, Any]) -> dict[str, Any]:
         "package_return_pct": row.get("package_return_pct"),
         "total_pnl": row.get("total_pnl"),
         "unresolved": bool(row.get("unresolved")),
-        "source": "historical_backtest",
+        "source": "historical_backtest_mwp_c",
     }
 
 
@@ -118,19 +121,20 @@ def compact_daily_signal(row: dict[str, Any]) -> dict[str, Any]:
         "volume_ratio": row.get("volume_ratio"),
         "weighted_score": row.get("weighted_score"),
         "chart_path": row.get("chart_path"),
-        "tracking_note": "Daily radar pullback candidate. Not yet an exact MWP-A trigger until the V9+ exact scanner is wired into daily sync.",
+        "tracking_note": "Daily radar pullback candidate. Not yet an exact MWP-C trigger until the MWP-C exact scanner is wired into daily sync.",
     }
 
 
 def run() -> dict[str, Any]:
     backtest = load_json(BACKTEST_JSON, {})
-    no_addon = load_json(NO_ADDON_JSON, {})
     top_lists = load_json(TOP_LISTS_JSON, {})
     daily_rows = load_json(DAILY_SIGNAL_JSON, [])
 
     framework_summary = backtest.get("framework_summary", {})
     units = backtest.get("units", [])
     packages = backtest.get("packages", [])
+    baseline = backtest.get("baseline_without_filter", {})
+
     unresolved_units = [compact_unit(row) for row in units if row.get("unresolved")]
     realized_units = [compact_unit(row) for row in units if not row.get("unresolved")]
     unresolved_packages = [compact_package(row) for row in packages if row.get("unresolved")]
@@ -141,20 +145,42 @@ def run() -> dict[str, Any]:
     pullback_radar = [compact_daily_signal(row) for row in (top_lists.get("pullback") or [])]
     daily_date = current_daily_date(daily_rows if isinstance(daily_rows, list) else [])
 
+    strategy_source = backtest.get("strategy", {})
+    strategy = {
+        "name": STRATEGY_NAME,
+        "code": STRATEGY_CODE,
+        "code_meaning": STRATEGY_CODE_MEANING,
+        "title": f"{STRATEGY_CODE} {STRATEGY_NAME}",
+        "status": "Backtest candidate; ready for forward paper-tracking.",
+        "description": "MWP-C 是報酬率優先、低頻、總進場單位壓在 300 以內的主升段回檔加碼策略。它以 PB-V23 原始母單池為基礎，最多加碼 1 次，MA20 retest band 1.9%，並新增 MA20 近 5 日斜率 > 0 的生命週期濾網。",
+        "entry_rule": "PB-V23 原始母單池；整個母單生命週期必須通過 MA20 近 5 日斜率 > 0 濾網；若未通過，母單與其所有加碼單都排除。",
+        "addon_rule": "每個母單生命週期最多加碼 1 次；加碼條件為 MA20 retest band 1.9%；加碼只允許在母單仍持有時發生；加碼日前 10 個交易日內不得已有同股買進或買進候選訊號；母單出場時仍在場的加碼單同步出場。",
+        "risk_rule": "母單 hard stop 7%；加碼單使用 15% close-based catastrophic stop；母單出場會同步結束該生命週期所有仍在場加碼單。",
+        "technical_filter": "MA20 近 5 日斜率 > 0",
+        "source_title": strategy_source.get("title"),
+    }
+
     return {
-        "strategy": {
-            "name": STRATEGY_NAME,
-            "code": STRATEGY_CODE,
-            "code_meaning": STRATEGY_CODE_MEANING,
-            "title": f"{STRATEGY_NAME} {STRATEGY_CODE}",
-            "status": "Forward paper-trading candidate; not production-ready.",
-            "description": "固定 V9+ 股池與 weekly_core 母單出場，使用 PB-V23 MA20 retest 加碼邏輯，目標是追蹤主升段回檔後的大波段機會。",
-            "entry_rule": "ABC 快速回檔｜不限大盤｜不限週線｜月線趨勢多頭｜貼近 MA20｜每日全部收；同股母單未出場不得重複開母單，且前 10 個交易日內已有同股買進則跳過。",
-            "addon_rule": "母單仍持有時才允許 MA20 retest 加碼；加碼日前 10 個交易日內不得已有同股買進或買進候選訊號；最多 5 次；加碼單用結構共振停損與 15% close-based catastrophic stop；母單停損維持 7%；母單出場時仍在場的加碼單同步出場。",
-        },
+        "strategy": strategy,
         "backtest": {
-            "no_addon_full": compact_summary(no_addon.get("full_summary")),
-            "no_addon_random_stock_test": (no_addon.get("statistics") or {}).get("stock_test"),
+            "baseline_full_units": compact_summary(baseline.get("full_units")),
+            "baseline_random_unit_stock_test": baseline.get("random_unit_stock_test"),
+            "baseline_random_package_stock_test": baseline.get("random_package_stock_test"),
+            "mwp_c_full_units": compact_summary((framework_summary.get("chronological_unit") or {}).get("full")),
+            "mwp_c_full_packages": compact_summary((framework_summary.get("chronological_package") or {}).get("full")),
+            "mwp_c_base_units": compact_summary(framework_summary.get("base_units")),
+            "mwp_c_addon_units": compact_summary(framework_summary.get("addon_units")),
+            "mwp_c_random_unit_stock_test": (backtest.get("unit_random_statistics") or {}).get("stock_test"),
+            "mwp_c_random_package_stock_test": (backtest.get("package_random_statistics") or {}).get("stock_test"),
+            "selected_lifecycles": framework_summary.get("selected_lifecycles"),
+            "selected_units": framework_summary.get("selected_units"),
+            "excluded_lifecycles": framework_summary.get("excluded_lifecycles"),
+            "excluded_units": framework_summary.get("excluded_units"),
+            "stop_loss_lifecycle_rate_pct": framework_summary.get("stop_loss_lifecycle_rate_pct"),
+            "lifecycle_violations": framework_summary.get("lifecycle_violations"),
+            # Backward-compatible aliases used by older dashboard code.
+            "no_addon_full": compact_summary(baseline.get("full_units")),
+            "no_addon_random_stock_test": baseline.get("random_unit_stock_test"),
             "addon_full_units": compact_summary((framework_summary.get("chronological_unit") or {}).get("full")),
             "addon_base_units": compact_summary(framework_summary.get("base_units")),
             "addon_addon_units": compact_summary(framework_summary.get("addon_units")),
@@ -164,15 +190,16 @@ def run() -> dict[str, Any]:
         "tracking": {
             "as_of_daily_signal_date": daily_date,
             "formal_forward_records": [],
-            "formal_forward_note": "The page is ready for forward tracking. Exact MWP-A daily triggers will be appended here after the V9+ exact scanner is wired into daily sync.",
+            "formal_forward_note": "The page is ready for MWP-C forward paper-tracking. Exact MWP-C daily triggers will be appended here after the exact scanner is wired into daily sync.",
             "daily_pullback_radar_candidates": pullback_radar,
             "historical_unresolved_units": unresolved_units,
             "historical_realized_units": realized_units,
             "historical_unresolved_packages": unresolved_packages,
         },
         "source_reports": {
-            "backtest": "pullback_v9_fixed_addon_random_splits.json",
-            "no_addon_reference": "pullback_v9_fixed_random_splits.json",
+            "backtest": "mwp_c_return_first_capped.json",
+            "baseline_reference": "mwp_c_return_first_capped.json#baseline_without_filter",
+            "technical_filter_experiment": "mwp_technical_filter_experiment.json",
             "daily_radar": "daily_signal_top_lists.json",
         },
     }

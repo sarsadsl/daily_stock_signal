@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>主升回檔加碼策略 MWP-A</title>
+  <title>MWP-C 報酬率優先低頻加碼策略</title>
   <style>
     :root {
       color-scheme: light;
@@ -146,13 +146,13 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>主升回檔加碼策略 MWP-A</h1>
+        <h1>MWP-C 報酬率優先低頻加碼策略</h1>
         <div class="meta" id="dataMeta">讀取中</div>
       </div>
       <div class="actions" aria-label="工具列">
         <a class="primary-button" href="index.html">每日策略訊號</a>
-        <a class="mode-button active" href="mwp_a_realized_pnl.html">已實現損益</a>
-        <a class="mode-button" href="reports/pullback_v9_fixed_addon_random_splits.html" target="_blank" rel="noopener">回測報告</a>
+        <a class="mode-button active" href="mwp_a_realized_pnl.html">MWP-C 已/未損益</a>
+        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
         <a class="mode-button" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
         <button class="icon-button" id="reloadButton" type="button">↻</button>
@@ -160,7 +160,7 @@
     </header>
 
     <section class="summary" aria-label="策略摘要">
-      <div class="metric"><span>策略狀態</span><strong id="metricStatus">-</strong><small>尚未 production-ready</small></div>
+      <div class="metric"><span>策略狀態</span><strong id="metricStatus">-</strong><small>MWP-C backtest candidate</small></div>
       <div class="metric"><span>Random unit test</span><strong id="metricRandomUnit">-</strong><small id="metricRandomUnitMeta">-</small></div>
       <div class="metric"><span>Random package test</span><strong id="metricRandomPackage">-</strong><small id="metricRandomPackageMeta">-</small></div>
       <div class="metric"><span>未實現追蹤</span><strong id="metricUnresolved">-</strong><small id="metricUnresolvedMeta">-</small></div>
@@ -169,9 +169,9 @@
     <main class="content">
       <section>
         <div class="panel">
-          <div class="panel-head"><h2>策略說明</h2><span class="count">MWP = Main Wave Pullback</span></div>
+          <div class="panel-head"><h2>策略說明</h2><span class="count">MWP-C = Return-first capped</span></div>
           <div class="panel-body">
-            <div class="note" id="strategyNote">MWP-A 代表 Main Wave Pullback Add-on，也就是主升段回檔後，用加碼單追蹤大波段的候選策略。</div>
+            <div class="note" id="strategyNote">MWP-C 代表 Return-first capped Main Wave Pullback，也就是報酬率優先、總進場單位控制在 300 以內，並加入 MA20 斜率濾網的主升段回檔加碼策略。</div>
             <div class="grid-2" style="margin-top:12px">
               <div class="mini-card"><h3>母單條件</h3><p id="entryRule">-</p></div>
               <div class="mini-card"><h3>加碼條件</h3><p id="addonRule">-</p></div>
@@ -216,7 +216,7 @@
         <div class="side-card">
           <div class="panel-head"><h2>今日雷達候選</h2><span class="count" id="radarDate">-</span></div>
           <div class="panel-body">
-            <div class="note">目前先接每日訊號的「回檔雷達候選」。這不是正式 MWP-A 觸發；下一步會把 V9+ exact scanner 接入每日同步。</div>
+            <div class="note">目前先接每日訊號的「回檔雷達候選」。這不是正式 MWP-C 觸發；下一步會把 MWP-C exact scanner 接入每日同步。</div>
             <div class="table-wrap" style="margin-top:12px">
               <table>
                 <thead><tr><th>股票</th><th>分數</th><th>收盤</th><th>量比</th></tr></thead>
@@ -233,8 +233,8 @@
               <span class="chip">新訊號</span>
               <span class="chip">等待隔日開盤</span>
               <span class="chip">母單持有</span>
-              <span class="chip">MA20 retest 加碼</span>
-              <span class="chip">結構停損線</span>
+              <span class="chip">MA20 retest band 1.9%</span>
+              <span class="chip">MA20 5日斜率濾網</span>
               <span class="chip">未實現損益</span>
               <span class="chip">已實現出場</span>
             </div>
@@ -244,7 +244,7 @@
         <div class="side-card">
           <div class="panel-head"><h2>風險提醒</h2><span class="count status-warn">未部署</span></div>
           <div class="panel-body">
-            <div class="note">這個頁面是 forward paper-trading tracker，不是實盤部署頁。回測漂亮的部分仍有大量未實現估值，必須等未來 cohort 實際出場後再判斷。</div>
+            <div class="note">這個頁面是 MWP-C forward paper-trading tracker，不是實盤部署頁。MWP-C 雖已加入 MA20 斜率濾網並壓低進場單位，仍必須等未來 cohort 實際出場後再判斷。</div>
           </div>
         </div>
       </aside>
@@ -279,19 +279,22 @@
       return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(summary?.win_rate_pct)} / ${fmtPct(summary?.avg_return_pct)}</div><p>${fmtNum(count)} 筆/份｜中位 ${fmtPct(summary?.median_return_pct)}｜未實現 ${fmtNum(summary?.unresolved || 0)}</p></div>`;
     }
 
-    function randomCard(title, stat) {
+    function randomCard(title, stat, countKey = "units") {
       const test = stat || {};
-      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(test.win_rate_pct?.mean)} / ${fmtPct(test.avg_return_pct?.mean)}</div><p>平均 ${fmtNum(test.trades?.mean)} 筆｜達標 ${fmtNum(test.pass_60win_10avg_count)} / 10</p></div>`;
+      const countMean = test[countKey]?.mean ?? test.trades?.mean ?? test.signals?.mean ?? "-";
+      const passCount = test.avg_ge_10_count ?? test.pass_60win_10avg_count ?? "-";
+      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(test.win_rate_pct?.mean)} / ${fmtPct(test.avg_return_pct?.mean)}</div><p>平均 ${fmtNum(countMean)} 筆/份｜平均報酬≥10% ${fmtNum(passCount)} / 10</p></div>`;
     }
 
     function renderBacktest(backtest) {
       document.getElementById("backtestCards").innerHTML = [
-        statCard("不加碼 full", backtest.no_addon_full, "trades"),
-        randomCard("不加碼 random stock-test", backtest.no_addon_random_stock_test),
-        statCard("加碼後 full units", backtest.addon_full_units),
-        statCard("加碼單 units", backtest.addon_addon_units),
-        randomCard("加碼後 random unit stock-test", backtest.addon_random_unit_stock_test),
-        randomCard("加碼後 random package stock-test", backtest.addon_random_package_stock_test),
+        statCard("未加 MA20 斜率濾網 baseline", backtest.baseline_full_units || backtest.no_addon_full),
+        randomCard("Baseline random unit stock-test", backtest.baseline_random_unit_stock_test || backtest.no_addon_random_stock_test),
+        statCard("MWP-C full units", backtest.mwp_c_full_units || backtest.addon_full_units),
+        statCard("MWP-C 母單 units", backtest.mwp_c_base_units || backtest.addon_base_units),
+        statCard("MWP-C 加碼單 units", backtest.mwp_c_addon_units || backtest.addon_addon_units),
+        randomCard("MWP-C random unit stock-test", backtest.mwp_c_random_unit_stock_test || backtest.addon_random_unit_stock_test),
+        randomCard("MWP-C random package stock-test", backtest.mwp_c_random_package_stock_test || backtest.addon_random_package_stock_test, "signals"),
       ].join("");
     }
 
@@ -325,7 +328,7 @@
       document.getElementById("forwardNote").textContent = note || "尚未有正式 forward record。";
       document.getElementById("forwardRows").innerHTML = records.map(row => `
         <tr><td>${escapeHtml(row.label)}</td><td>${escapeHtml(row.signal_date)}</td><td>${escapeHtml(row.status)}</td><td>${escapeHtml(row.base_status)}</td><td>${escapeHtml(row.addon_status)}</td><td>${fmtPct(row.unrealized_return_pct)}</td></tr>
-      `).join("") || `<tr><td colspan="6" class="empty">正式 MWP-A forward cohort 尚未開始記錄。</td></tr>`;
+      `).join("") || `<tr><td colspan="6" class="empty">正式 MWP-C forward cohort 尚未開始記錄。</td></tr>`;
     }
 
     async function loadData() {
@@ -336,16 +339,18 @@
         const strategy = payload.strategy || {};
         const backtest = payload.backtest || {};
         const tracking = payload.tracking || {};
-        document.title = strategy.title || "主升回檔加碼策略 MWP-A";
+        document.title = strategy.title || "MWP-C 報酬率優先低頻加碼策略";
         document.getElementById("dataMeta").textContent = `${strategy.code_meaning || "Main Wave Pullback Add-on"} · ${strategy.status || "Forward tracking"}`;
-        document.getElementById("metricStatus").textContent = "觀察候選";
-        document.getElementById("metricRandomUnit").textContent = `${fmtPct(backtest.addon_random_unit_stock_test?.win_rate_pct?.mean)} / ${fmtPct(backtest.addon_random_unit_stock_test?.avg_return_pct?.mean)}`;
-        document.getElementById("metricRandomUnitMeta").textContent = `達標 ${fmtNum(backtest.addon_random_unit_stock_test?.pass_60win_10avg_count)} / 10`;
-        document.getElementById("metricRandomPackage").textContent = `${fmtPct(backtest.addon_random_package_stock_test?.win_rate_pct?.mean)} / ${fmtPct(backtest.addon_random_package_stock_test?.avg_return_pct?.mean)}`;
-        document.getElementById("metricRandomPackageMeta").textContent = `達標 ${fmtNum(backtest.addon_random_package_stock_test?.pass_60win_10avg_count)} / 10`;
+        document.getElementById("metricStatus").textContent = strategy.code || "MWP-C";
+        const randomUnit = backtest.mwp_c_random_unit_stock_test || backtest.addon_random_unit_stock_test || {};
+        const randomPackage = backtest.mwp_c_random_package_stock_test || backtest.addon_random_package_stock_test || {};
+        document.getElementById("metricRandomUnit").textContent = `${fmtPct(randomUnit.win_rate_pct?.mean)} / ${fmtPct(randomUnit.avg_return_pct?.mean)}`;
+        document.getElementById("metricRandomUnitMeta").textContent = `平均報酬≥10% ${fmtNum(randomUnit.avg_ge_10_count ?? randomUnit.pass_60win_10avg_count)} / 10｜p25 ${fmtPct(randomUnit.avg_return_pct?.p25)}`;
+        document.getElementById("metricRandomPackage").textContent = `${fmtPct(randomPackage.win_rate_pct?.mean)} / ${fmtPct(randomPackage.avg_return_pct?.mean)}`;
+        document.getElementById("metricRandomPackageMeta").textContent = `平均報酬≥10% ${fmtNum(randomPackage.avg_ge_10_count ?? randomPackage.pass_60win_10avg_count)} / 10`;
         document.getElementById("metricUnresolved").textContent = fmtNum(tracking.historical_unresolved_units?.length || 0);
         document.getElementById("metricUnresolvedMeta").textContent = "歷史未實現單位";
-        document.getElementById("strategyNote").textContent = `${strategy.code} = ${strategy.code_meaning}。${strategy.description}`;
+        document.getElementById("strategyNote").textContent = `${strategy.code || "MWP-C"} = ${strategy.code_meaning || "Return-first capped Main Wave Pullback"}。${strategy.description || ""}`;
         document.getElementById("entryRule").textContent = strategy.entry_rule || "-";
         document.getElementById("addonRule").textContent = strategy.addon_rule || "-";
         renderBacktest(backtest);
