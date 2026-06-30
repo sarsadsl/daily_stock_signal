@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""Build the deployable MWP-C return-first capped strategy report.
-
-MWP-C is the return-first capped variant selected after the unit-cap and technical-filter
-experiments:
-- PB-V23 original mother pool
-- max 1 add-on per mother lifecycle
-- MA20 retest band 1.9%
-- whole-lifecycle filter: signal-date MA20 5-trading-day slope > 0
-"""
+"""Build the deployable MWP-C formal strategy report."""
 
 from __future__ import annotations
 
@@ -16,23 +8,27 @@ import json
 from pathlib import Path
 from typing import Any
 
+import analyze_pullback_pb_v23_independent_lifecycle as pbv23
 from analyze_mwp_addon_strategy_comparison import strategy_record
+from analyze_mwp_c_consolidation_parameter_sweep import make_base_exit
+from analyze_mwp_c_dynamic_structure_compare import addon_exit_fixed, simulate_variant_with_exit_policy
 from analyze_mwp_technical_filter_experiment import (
     BASE_VARIANT,
     build_features,
     filter_record,
     ge,
-    simulate_baseline,
 )
 
 REPORT_DIR = Path("reports")
 OUT_JSON = REPORT_DIR / "mwp_c_return_first_capped.json"
 OUT_HTML = REPORT_DIR / "mwp_c_return_first_capped.html"
 OUT_MD = REPORT_DIR / "mwp_c_return_first_capped.md"
-VERSION = "MWP-C-return-first-capped-ma20-slope"
+VERSION = "MWP-C-return-first-capped-ma20-slope-consolidation30"
 STRATEGY_CODE = "MWP-C"
 
 FILTER_LABEL = "MA20 近 5 日斜率 > 0"
+CONSOLIDATION_WINDOW = 30
+BREAKOUT_MODE = "high"
 
 
 def compact_random(stats: dict[str, Any]) -> dict[str, Any]:
@@ -52,19 +48,36 @@ def fmt(value: Any) -> str:
     return str(value)
 
 
-def lifecycle_key(row: dict[str, Any]) -> tuple[str, str, str]:
-    return (str(row.get("market") or "").upper(), str(row.get("stock_no") or ""), str(row.get("signal_date") or ""))
-
-
 def filtered_units_and_packages() -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
-    units, packages, series = simulate_baseline()
+    source_trades = json.loads(pbv23.PBV4_JSON.read_text(encoding="utf-8"))["trades"]
+    series = pbv23.make_series_map(pbv23.csv_files())
+    benchmark_rows = pbv23.read_rows(pbv23.BENCHMARK_CSV)
+    benchmark_dates = {row.date: index for index, row in enumerate(benchmark_rows)}
+    v8 = json.loads((REPORT_DIR / "pullback_pb_v8_multitimeframe_search.json").read_text(encoding="utf-8"))
+    result = simulate_variant_with_exit_policy(
+        source_trades,
+        series,
+        benchmark_rows,
+        benchmark_dates,
+        v8["split"]["validation_start"],
+        v8["split"]["test_start"],
+        BASE_VARIANT,
+        make_base_exit(CONSOLIDATION_WINDOW, BREAKOUT_MODE),
+        addon_exit_fixed,
+    )
+    units = result["units"]
+    packages = result["packages"]
     features = build_features(packages, series)
-    record = filter_record(FILTER_LABEL, packages, units, features, ge("ma20_slope5_pct", 0))
-    selected_keys = {lifecycle_key(package) for package in record["packages"]}
-    selected_units = [unit for unit in units if lifecycle_key(unit) in selected_keys]
-    selected_packages = [package for package in packages if lifecycle_key(package) in selected_keys]
-    baseline_record = strategy_record("baseline：不加 MA20 斜率濾網", units, packages, "simulated baseline")
-    return selected_units, selected_packages, record, baseline_record
+    slope_gate = ge("ma20_slope5_pct", 0)
+    record = filter_record(
+        f"{FILTER_LABEL} + 30日整理低點母單保護",
+        packages,
+        units,
+        features,
+        lambda package, current_features, current_units: slope_gate(package, current_features, current_units),
+    )
+    baseline_record = strategy_record("baseline：30日整理低點母單保護，不加 MA20 斜率濾網", units, packages, "simulated baseline")
+    return record["units"], record["packages"], record, baseline_record
 
 
 def build_payload() -> dict[str, Any]:
@@ -75,18 +88,18 @@ def build_payload() -> dict[str, Any]:
         "version": VERSION,
         "strategy": {
             "code": STRATEGY_CODE,
-            "name": "Return-first capped MWP with MA20 slope filter",
+            "name": "Return-first capped MWP with MA20 slope filter and 30-day consolidation floor",
             "title": "MWP-C 報酬率優先低頻加碼策略",
             "status": "Backtest candidate; ready for remote/code review.",
-            "base_pool": "PB-V23 original mother pool",
-            "addon_rule": "Max 1 add-on per mother lifecycle; MA20 retest band 1.9%; add-ons only while mother is open; 10-trading-day same-stock buy/buy-signal cooldown; add-ons sync-exit when mother exits.",
-            "technical_filter": FILTER_LABEL,
-            "risk_rule": "Mother hard stop 7%; add-on close-based catastrophic stop 15%; mother exit synchronizes remaining add-ons.",
+            "base_pool": "母單來源先從主升段回檔訊號中，保留次日開盤低於訊號日收盤 2% 的候選，再交給 MWP-C 正式篩選。",
+            "addon_rule": "每個母單生命週期最多 1 筆加碼；加碼需回測 MA20 1.9% 範圍內；母單仍持有中才可加碼；同股 10 個交易日內若已有買進或買進候選則不加碼；母單出場時加碼單同步出場。",
+            "technical_filter": f"{FILTER_LABEL}，且母單採 30 日整理低點保護，突破條件用盤中高點，不套用到加碼單",
+            "risk_rule": "Mother hard stop 7%; mother structure floor ratchets upward only after breaking the prior 30-day range high; add-on close-based catastrophic stop 15%; mother exit synchronizes remaining add-ons.",
         },
         "methodology": {
             "unit_cap_goal": "Keep total entries under 300 units, including mother/base and add-on units.",
             "selected_variant": BASE_VARIANT,
-            "filter_level": "Whole mother lifecycle/package. If the mother lifecycle fails the filter, its base and all add-ons are excluded.",
+            "filter_level": "Whole mother lifecycle/package. If the mother lifecycle fails the technical filter, its base and all add-ons are excluded.",
             "random_stock_splits": "10 stock-code random 60/20/20 splits via the same helper used by MWP comparison reports.",
         },
         "baseline_without_filter": {
@@ -116,6 +129,7 @@ def build_payload() -> dict[str, Any]:
         "source_reports": {
             "unit_cap_experiment": "mwp_addon_unit_cap_experiment.json",
             "technical_filter_experiment": "mwp_technical_filter_experiment.json",
+            "consolidation_parameter_sweep": "mwp_c_consolidation_parameter_sweep.json",
         },
     }
     return payload
@@ -135,7 +149,7 @@ def render_html(payload: dict[str, Any]) -> str:
     baseline = payload["baseline_without_filter"]
     return f"""<!doctype html><html lang='zh-Hant'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>{VERSION}</title><style>
 :root{{--bg:#f6f7fb;--paper:#fff;--ink:#172033;--muted:#667085;--line:#e4e7ec;--blue:#2563eb}}*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 system-ui,'Microsoft JhengHei',sans-serif}}header,main{{max-width:1300px;margin:auto;padding:28px 20px}}header{{border-bottom:1px solid var(--line)}}h1{{margin:0 0 8px;font-size:30px}}p{{color:var(--muted)}}.note{{border-left:4px solid var(--blue);background:#eff6ff;padding:12px 14px;margin:18px 0;border-radius:12px}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}}.card{{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}}table{{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}}th,td{{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}}thead th{{background:#f8fafc;color:var(--muted);font-size:12px}}code{{background:#eef2ff;padding:2px 6px;border-radius:6px}}
-</style></head><body><header><h1>{html.escape(strategy['title'])}</h1><p>{html.escape(strategy['name'])}</p><div class='note'><strong>正式加入濾網：</strong>{html.escape(strategy['technical_filter'])}。總 units {summary['selected_units']}，生命週期 {summary['selected_lifecycles']}，生命週期違規 {summary['lifecycle_violations']}。</div></header><main><section class='grid'><div class='card'><h2>Full units</h2><p>{html.escape(unit_cell(summary['chronological_unit']['full']))}</p></div><div class='card'><h2>Base units</h2><p>{html.escape(unit_cell(summary['base_units']))}</p></div><div class='card'><h2>Add-on units</h2><p>{html.escape(unit_cell(summary['addon_units']))}</p></div><div class='card'><h2>Random stock-test</h2><p>{html.escape(random_cell(payload['unit_random_statistics']['stock_test']))}</p></div></section><h2>與未加濾網 baseline 比較</h2><table><thead><tr><th>版本</th><th>Full units</th><th>Random unit stock-test</th><th>Package stock-test</th></tr></thead><tbody><tr><td>Baseline 無 MA20 斜率濾網</td><td>{html.escape(unit_cell(baseline['full_units']))}</td><td>{html.escape(random_cell(baseline['random_unit_stock_test']))}</td><td>{html.escape(random_cell(baseline['random_package_stock_test'], 'signals'))}</td></tr><tr><td>MWP-C 加 MA20 斜率濾網</td><td>{html.escape(unit_cell(summary['chronological_unit']['full']))}</td><td>{html.escape(random_cell(payload['unit_random_statistics']['stock_test']))}</td><td>{html.escape(random_cell(payload['package_random_statistics']['stock_test'], 'signals'))}</td></tr></tbody></table><h2>策略規則</h2><ul><li>{html.escape(strategy['base_pool'])}</li><li>{html.escape(strategy['addon_rule'])}</li><li>{html.escape(strategy['risk_rule'])}</li></ul><p>JSON: <code>{OUT_JSON}</code>｜MD: <code>{OUT_MD}</code></p></main></body></html>"""
+</style></head><body><header><h1>{html.escape(strategy['title'])}</h1><p>{html.escape(strategy['name'])}</p><div class='note'><strong>正式加入濾網：</strong>{html.escape(strategy['technical_filter'])}。總 units {summary['selected_units']}，生命週期 {summary['selected_lifecycles']}，生命週期違規 {summary['lifecycle_violations']}。</div></header><main><section class='grid'><div class='card'><h2>Full units</h2><p>{html.escape(unit_cell(summary['chronological_unit']['full']))}</p></div><div class='card'><h2>Base units</h2><p>{html.escape(unit_cell(summary['base_units']))}</p></div><div class='card'><h2>Add-on units</h2><p>{html.escape(unit_cell(summary['addon_units']))}</p></div><div class='card'><h2>Random stock-test</h2><p>{html.escape(random_cell(payload['unit_random_statistics']['stock_test']))}</p></div></section><h2>與同一套 30 日整理低點框架但不加 MA20 斜率濾網的 baseline 比較</h2><table><thead><tr><th>版本</th><th>Full units</th><th>Random unit stock-test</th><th>Package stock-test</th></tr></thead><tbody><tr><td>Baseline：30 日整理低點母單保護，不加 MA20 斜率濾網</td><td>{html.escape(unit_cell(baseline['full_units']))}</td><td>{html.escape(random_cell(baseline['random_unit_stock_test']))}</td><td>{html.escape(random_cell(baseline['random_package_stock_test'], 'signals'))}</td></tr><tr><td>MWP-C：30 日整理低點母單保護 + MA20 斜率濾網</td><td>{html.escape(unit_cell(summary['chronological_unit']['full']))}</td><td>{html.escape(random_cell(payload['unit_random_statistics']['stock_test']))}</td><td>{html.escape(random_cell(payload['package_random_statistics']['stock_test'], 'signals'))}</td></tr></tbody></table><h2>策略規則</h2><ul><li>{html.escape(strategy['base_pool'])}</li><li>{html.escape(strategy['addon_rule'])}</li><li>{html.escape(strategy['risk_rule'])}</li></ul><p>JSON: <code>{OUT_JSON}</code>｜MD: <code>{OUT_MD}</code></p></main></body></html>"""
 
 
 def render_md(payload: dict[str, Any]) -> str:

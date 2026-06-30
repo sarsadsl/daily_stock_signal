@@ -180,9 +180,10 @@
         <div class="meta" id="dataMeta">讀取中</div>
       </div>
       <div class="actions" aria-label="工具列">
-        <a class="primary-button" href="mwp_a_strategy.html">MWP-C追蹤</a>
+        <a class="primary-button" href="mwp_c_strategy.html">MWP-C追蹤</a>
         <a class="mode-button" href="index.html">每日策略訊號</a>
         <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
+        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">參數比較</a>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
         <button class="icon-button" id="reloadButton" type="button">↻</button>
       </div>
@@ -299,6 +300,7 @@
       return `${Math.round(n / 1000).toLocaleString("zh-TW")} 張`;
     };
     const pnlClass = value => Number(value) >= 0 ? "status-good" : "status-bad";
+    const marketLabel = value => ({ TWSE: "上市", TPEX: "上櫃" })[String(value || "").toUpperCase()] || String(value || "-");
 
     function applyTheme(theme) {
       const nextTheme = theme === "dark" ? "dark" : "light";
@@ -467,7 +469,7 @@
       const selected = group.key === state.selectedKey;
       return `<article class="stock-group ${selected ? "selected" : ""}" data-group-key="${esc(group.key)}">
         <button class="stock-head" type="button" data-select-group="${esc(group.key)}">
-          <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(group.market)}｜最新事件 ${esc(group.latestExit)}</small></span>
+          <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(marketLabel(group.market))}｜最新事件 ${esc(group.latestExit)}</small></span>
           <span class="group-stats">
             <span class="pill ${pnlClass(group.realizedPnl)}">已 ${fmtMoney(group.realizedPnl)}</span>
             <span class="pill ${pnlClass(group.unrealizedPnl)}">未 ${fmtMoney(group.unrealizedPnl)}</span>
@@ -923,7 +925,7 @@
         if (state.selectedKey) await selectGroup(state.selectedKey);
         else drawEmptyChart("目前沒有部位資料");
       } catch (error) {
-        const message = fetchErrorMessage(error, "mwp_a_realized_pnl.html");
+        const message = fetchErrorMessage(error, "mwp_c_realized_pnl.html");
         el.dataMeta.textContent = message;
         el.stockList.innerHTML = `<div class="empty">${esc(message)}</div>`;
         drawEmptyChart(message);

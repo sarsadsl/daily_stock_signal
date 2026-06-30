@@ -88,12 +88,12 @@ $rankingsSource = Join-Path $rootPath "top_signal_rankings.html"
 $rankingsTarget = Join-Path $sitePath "rankings.html"
 Copy-FileIfExists -Source $rankingsSource -Destination $rankingsTarget
 
-$mwpSource = Join-Path $rootPath "mwp_a_strategy.html"
-$mwpTarget = Join-Path $sitePath "mwp_a_strategy.html"
+$mwpSource = Join-Path $rootPath "mwp_c_strategy.html"
+$mwpTarget = Join-Path $sitePath "mwp_c_strategy.html"
 Copy-FileIfExists -Source $mwpSource -Destination $mwpTarget
 
-$mwpRealizedSource = Join-Path $rootPath "mwp_a_realized_pnl.html"
-$mwpRealizedTarget = Join-Path $sitePath "mwp_a_realized_pnl.html"
+$mwpRealizedSource = Join-Path $rootPath "mwp_c_realized_pnl.html"
+$mwpRealizedTarget = Join-Path $sitePath "mwp_c_realized_pnl.html"
 Copy-FileIfExists -Source $mwpRealizedSource -Destination $mwpRealizedTarget
 
 $reportsSource = Join-Path $rootPath "reports"
@@ -129,7 +129,14 @@ if (Test-Path -LiteralPath $reportsSource) {
         "mwp_addon_strategy_comparison.json",
         "mwp_addon_unit_cap_experiment.json",
         "mwp_technical_filter_experiment.json",
+        "mwp_c_parameter_compare.json",
+        "mwp_c_base_stop_delay_compare.json",
+        "mwp_c_entry_gate_compare.json",
+        "mwp_c_dynamic_structure_compare.json",
+        "mwp_c_consolidation_structure_compare.json",
+        "mwp_c_consolidation_parameter_sweep.json",
         "mwp_c_return_first_capped.json",
+        "mwp_c_forward_records.json",
         "mwp_a_strategy_tracking.json"
     )) {
         Copy-FileIfExists -Source (Join-Path $reportsSource $name) -Destination (Join-Path $reportsTarget $name)
@@ -173,6 +180,18 @@ if (Test-Path -LiteralPath $reportsSource) {
         "mwp_addon_unit_cap_experiment.md",
         "mwp_technical_filter_experiment.html",
         "mwp_technical_filter_experiment.md",
+        "mwp_c_parameter_compare.html",
+        "mwp_c_parameter_compare.md",
+        "mwp_c_base_stop_delay_compare.html",
+        "mwp_c_base_stop_delay_compare.md",
+        "mwp_c_entry_gate_compare.html",
+        "mwp_c_entry_gate_compare.md",
+        "mwp_c_dynamic_structure_compare.html",
+        "mwp_c_dynamic_structure_compare.md",
+        "mwp_c_consolidation_structure_compare.html",
+        "mwp_c_consolidation_structure_compare.md",
+        "mwp_c_consolidation_parameter_sweep.html",
+        "mwp_c_consolidation_parameter_sweep.md",
         "mwp_c_return_first_capped.html",
         "mwp_c_return_first_capped.md"
     )) {
@@ -192,10 +211,13 @@ Copy-LatestStockCsvs -Market "tpex"
 
 $reportsOutput = Join-Path $sitePath "reports"
 New-Item -ItemType Directory -Path $reportsOutput -Force | Out-Null
-$script:stockManifest |
+$rootReportsOutput = Join-Path $rootPath "reports"
+New-Item -ItemType Directory -Path $rootReportsOutput -Force | Out-Null
+$stockManifestJson = $script:stockManifest |
     Sort-Object market, stock_no |
-    ConvertTo-Json -Depth 4 |
-    Set-Content -LiteralPath (Join-Path $reportsOutput "stock_data_manifest.json") -Encoding UTF8
+    ConvertTo-Json -Depth 4
+$stockManifestJson | Set-Content -LiteralPath (Join-Path $reportsOutput "stock_data_manifest.json") -Encoding UTF8
+$stockManifestJson | Set-Content -LiteralPath (Join-Path $rootReportsOutput "stock_data_manifest.json") -Encoding UTF8
 
 $metadata = [ordered]@{
     built_at = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")

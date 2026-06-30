@@ -1,21 +1,21 @@
-# MWP-C-return-first-capped-ma20-slope
+# MWP-C-return-first-capped-ma20-slope-consolidation30
 
 策略：MWP-C 報酬率優先低頻加碼策略
-正式濾網：MA20 近 5 日斜率 > 0
+正式濾網：MA20 近 5 日斜率 > 0，且母單採 30 日整理低點保護，突破條件用盤中高點，不套用到加碼單
 
 ## 結果
-- Full units: 243｜勝 43.21%｜均 40.02%｜中 -5.80%｜未 107
-- Base units: 179｜勝 36.31%｜均 39.60%｜中 -7.00%｜未 62
-- Add-on units: 64｜勝 62.50%｜均 41.19%｜中 11.74%｜未 45
-- Random unit stock-test: test均 48.5｜報酬均 46.80%｜p25 39.76%｜勝均 45.92%
-- Random package stock-test: test均 35.8｜報酬均 39.33%｜p25 29.02%｜勝均 38.95%
+- Full units: 245｜勝 40.41%｜均 34.49%｜中 -4.93%｜未 103
+- Base units: 179｜勝 36.87%｜均 34.83%｜中 -7.00%｜未 59
+- Add-on units: 66｜勝 50.00%｜均 33.56%｜中 0.12%｜未 44
+- Random unit stock-test: test均 48.9｜報酬均 41.07%｜p25 34.19%｜勝均 43.00%
+- Random package stock-test: test均 35.8｜報酬均 34.02%｜p25 24.49%｜勝均 38.07%
 - Lifecycle violations: 0
 
 ## Baseline comparison
-- Baseline full units: 257｜勝 42.80%｜均 39.24%｜中 -6.18%｜未 112
-- Baseline random unit stock-test: test均 50.9｜報酬均 33.02%｜p25 29.12%｜勝均 40.69%
+- Baseline full units: 259｜勝 40.15%｜均 33.75%｜中 -5.82%｜未 108
+- Baseline random unit stock-test: test均 51.6｜報酬均 29.02%｜p25 25.80%｜勝均 39.97%
 
 ## Rules
-- PB-V23 original mother pool
-- Max 1 add-on per mother lifecycle; MA20 retest band 1.9%; add-ons only while mother is open; 10-trading-day same-stock buy/buy-signal cooldown; add-ons sync-exit when mother exits.
-- Mother hard stop 7%; add-on close-based catastrophic stop 15%; mother exit synchronizes remaining add-ons.
+- 母單來源先從主升段回檔訊號中，保留次日開盤低於訊號日收盤 2% 的候選，再交給 MWP-C 正式篩選。
+- 每個母單生命週期最多 1 筆加碼；加碼需回測 MA20 1.9% 範圍內；母單仍持有中才可加碼；同股 10 個交易日內若已有買進或買進候選則不加碼；母單出場時加碼單同步出場。
+- Mother hard stop 7%; mother structure floor ratchets upward only after breaking the prior 30-day range high; add-on close-based catastrophic stop 15%; mother exit synchronizes remaining add-ons.

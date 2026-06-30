@@ -109,7 +109,7 @@
     .metric span { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
     .metric strong { font-size: clamp(22px, 3vw, 34px); line-height: 1.05; }
     .metric small { color: var(--muted); font-size: 12px; }
-    .content { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr); gap: 16px; padding: 18px 20px; }
+    .content { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(420px, 0.98fr); gap: 16px; padding: 18px 20px; }
     .panel, .side-card { border-radius: 16px; overflow: hidden; }
     .panel + .panel, .side-card + .side-card { margin-top: 16px; }
     .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); background: rgba(237, 243, 251, 0.7); }
@@ -128,11 +128,83 @@
     .mini-card h3 { margin: 0 0 6px; font-size: 14px; }
     .mini-card .big { font-size: 24px; font-weight: 900; }
     .mini-card p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .dist { margin-top: 10px; }
+    .dist-track {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(217, 45, 67, 0.18), rgba(201, 130, 18, 0.18), rgba(15, 138, 98, 0.2));
+      overflow: hidden;
+    }
+    .dist-band {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.2), rgba(15, 118, 110, 0.28));
+    }
+    .dist-marker {
+      position: absolute;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(21, 32, 51, 0.25);
+      transform: translate(-50%, -50%);
+    }
+    .dist-marker.p25 { background: var(--amber); }
+    .dist-marker.mean { background: var(--blue); }
+    .dist-marker.p75 { background: var(--green); }
+    .dist-labels {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .dist-labels strong {
+      display: block;
+      color: var(--ink);
+      font-size: 12px;
+    }
+    .rule-list { margin: 6px 0 0; padding-left: 18px; color: var(--ink); }
+    .rule-list li { margin: 0 0 7px; line-height: 1.55; }
+    .rule-list li:last-child { margin-bottom: 0; }
     .table-wrap { overflow: auto; }
+    .table-wrap.stock-list-scroll {
+      max-height: 560px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
     table { width: 100%; border-collapse: collapse; min-width: 780px; }
-    th, td { padding: 10px 11px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; font-size: 13px; }
+    th, td { padding: 10px 11px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; font-size: 13px; line-height: 1.45; white-space: normal; word-break: break-word; overflow-wrap: anywhere; }
     th:first-child, td:first-child { text-align: left; }
     thead th { position: sticky; top: 0; background: var(--soft); color: var(--muted); font-size: 12px; z-index: 1; }
+    td strong { display: block; }
+    td small, th small { display: block; margin-top: 4px; color: var(--muted); line-height: 1.4; }
+    .forward-table { min-width: 100%; table-layout: fixed; }
+    .forward-table th:nth-child(1), .forward-table td:nth-child(1) { width: 24%; }
+    .forward-table th:nth-child(2), .forward-table td:nth-child(2) { width: 12%; }
+    .forward-table th:nth-child(3), .forward-table td:nth-child(3) { width: 20%; }
+    .forward-table th:nth-child(4), .forward-table td:nth-child(4),
+    .forward-table th:nth-child(5), .forward-table td:nth-child(5) { width: 15%; }
+    .forward-table th:nth-child(6), .forward-table td:nth-child(6) { width: 14%; }
+    .unresolved-table { min-width: 100%; table-layout: fixed; }
+    .unresolved-table th:nth-child(1), .unresolved-table td:nth-child(1) { width: 20%; }
+    .unresolved-table th:nth-child(2), .unresolved-table td:nth-child(2) { width: 12%; }
+    .unresolved-table th:nth-child(3), .unresolved-table td:nth-child(3) { width: 12%; }
+    .unresolved-table th:nth-child(4), .unresolved-table td:nth-child(4) { width: 14%; }
+    .unresolved-table th:nth-child(5), .unresolved-table td:nth-child(5) { width: 14%; }
+    .unresolved-table th:nth-child(6), .unresolved-table td:nth-child(6) { width: 10%; }
+    .unresolved-table th:nth-child(7), .unresolved-table td:nth-child(7) { width: 18%; }
+    .radar-wrap { overflow-x: auto; }
+    .radar-table { min-width: 740px; table-layout: fixed; }
+    .radar-table th:nth-child(1), .radar-table td:nth-child(1) { width: 27%; }
+    .radar-table th:nth-child(2), .radar-table td:nth-child(2) { width: 21%; }
+    .radar-table th:nth-child(3), .radar-table td:nth-child(3) { width: 18%; }
+    .radar-table th:nth-child(4), .radar-table td:nth-child(4) { width: 34%; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-size: 12px; font-weight: 800; }
     :root[data-theme="dark"] .chip { background: #1d2531; }
@@ -151,8 +223,9 @@
       </div>
       <div class="actions" aria-label="工具列">
         <a class="primary-button" href="index.html">每日策略訊號</a>
-        <a class="mode-button active" href="mwp_a_realized_pnl.html">MWP-C 已/未損益</a>
+        <a class="mode-button active" href="mwp_c_realized_pnl.html">MWP-C 已/未損益</a>
         <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
+        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">參數比較</a>
         <a class="mode-button" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
         <button class="icon-button" id="reloadButton" type="button">↻</button>
@@ -160,21 +233,27 @@
     </header>
 
     <section class="summary" aria-label="策略摘要">
-      <div class="metric"><span>策略狀態</span><strong id="metricStatus">-</strong><small>MWP-C backtest candidate</small></div>
-      <div class="metric"><span>Random unit test</span><strong id="metricRandomUnit">-</strong><small id="metricRandomUnitMeta">-</small></div>
-      <div class="metric"><span>Random package test</span><strong id="metricRandomPackage">-</strong><small id="metricRandomPackageMeta">-</small></div>
+      <div class="metric"><span>策略狀態</span><strong id="metricStatus">-</strong><small>MWP-C 回測版本，追蹤中</small></div>
+      <div class="metric"><span>隨機單筆測試</span><strong id="metricRandomUnit">-</strong><small id="metricRandomUnitMeta">-</small></div>
+      <div class="metric"><span>隨機組合測試</span><strong id="metricRandomPackage">-</strong><small id="metricRandomPackageMeta">-</small></div>
       <div class="metric"><span>未實現追蹤</span><strong id="metricUnresolved">-</strong><small id="metricUnresolvedMeta">-</small></div>
     </section>
 
     <main class="content">
       <section>
         <div class="panel">
-          <div class="panel-head"><h2>策略說明</h2><span class="count">MWP-C = Return-first capped</span></div>
+          <div class="panel-head"><h2>策略說明</h2><span class="count">報酬優先上限型主升段回檔策略</span></div>
           <div class="panel-body">
-            <div class="note" id="strategyNote">MWP-C 代表 Return-first capped Main Wave Pullback，也就是報酬率優先、總進場單位控制在 300 以內，並加入 MA20 斜率濾網的主升段回檔加碼策略。</div>
+            <div class="note" id="strategyNote">MWP-C 是報酬優先、總進場單位控制在 300 以內，並加入 MA20 斜率濾網的主升段回檔策略。</div>
+            <div class="mini-card" style="margin-top:12px">
+              <h3>如何成為主升段中的回檔型態</h3>
+              <ul class="rule-list" id="mainUptrendRule"><li>-</li></ul>
+            </div>
             <div class="grid-2" style="margin-top:12px">
-              <div class="mini-card"><h3>母單條件</h3><p id="entryRule">-</p></div>
+              <div class="mini-card"><h3>母單條件</h3><ul class="rule-list" id="entryRuleList"><li>-</li></ul></div>
               <div class="mini-card"><h3>加碼條件</h3><p id="addonRule">-</p></div>
+              <div class="mini-card"><h3>出場條件</h3><ul class="rule-list" id="riskRuleList"><li>-</li></ul></div>
+              <div class="mini-card"><h3>停利 / 持有邏輯</h3><p id="takeProfitRule">-</p></div>
             </div>
           </div>
         </div>
@@ -183,15 +262,21 @@
           <div class="panel-head"><h2>回測狀況</h2><span class="count">含未實現估值</span></div>
           <div class="panel-body">
             <div class="grid-2" id="backtestCards"></div>
+            <div class="note" style="margin-top:12px">
+              <strong>欄位說明：</strong>每張回測卡的大字格式都是「勝率 / 平均報酬」。
+              已出場與全部進場單位卡片下方的「X 筆/份｜中位 Y%｜未實現 Z」代表樣本數、中位數報酬、以及目前仍未出場的單位數。
+              隨機測試卡片下方的「平均 X 筆/份｜平均報酬≥10% N/10」代表 10 次隨機 stock split 測試中的平均樣本數，與平均報酬至少 10% 的達成次數。
+              分布圖中的「保守分位 / 平均報酬 / 偏樂觀分位」分別對應 p25、mean、p75。
+            </div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><h2>Forward cohort 正式追蹤</h2><span class="count" id="forwardCount">0 筆</span></div>
+          <div class="panel-head"><h2>正式追蹤中</h2><span class="count" id="forwardCount">0 筆</span></div>
           <div class="panel-body">
             <div class="note" id="forwardNote">尚未有正式 forward record。</div>
-            <div class="table-wrap" style="margin-top:12px">
-              <table>
+            <div class="table-wrap stock-list-scroll" style="margin-top:12px">
+              <table class="forward-table">
                 <thead><tr><th>股票</th><th>訊號日</th><th>狀態</th><th>母單</th><th>加碼</th><th>未實現</th></tr></thead>
                 <tbody id="forwardRows"></tbody>
               </table>
@@ -202,8 +287,8 @@
         <div class="panel">
           <div class="panel-head"><h2>歷史未實現單位</h2><span class="count" id="unresolvedCount">0 份</span></div>
           <div class="panel-body">
-            <div class="table-wrap">
-              <table>
+            <div class="table-wrap stock-list-scroll">
+              <table class="unresolved-table">
                 <thead><tr><th>股票</th><th>類型</th><th>訊號日</th><th>進場日</th><th>目前估值日</th><th>報酬</th><th>原因</th></tr></thead>
                 <tbody id="unresolvedRows"></tbody>
               </table>
@@ -216,10 +301,10 @@
         <div class="side-card">
           <div class="panel-head"><h2>今日雷達候選</h2><span class="count" id="radarDate">-</span></div>
           <div class="panel-body">
-            <div class="note">目前先接每日訊號的「回檔雷達候選」。這不是正式 MWP-C 觸發；下一步會把 MWP-C exact scanner 接入每日同步。</div>
-            <div class="table-wrap" style="margin-top:12px">
-              <table>
-                <thead><tr><th>股票</th><th>分數</th><th>收盤</th><th>量比</th></tr></thead>
+            <div class="note">這裡顯示的是 MWP-C 每日精準掃描結果，只反映今天收盤後的機會與狀態，不直接當成正式績效。</div>
+            <div class="table-wrap radar-wrap" style="margin-top:12px">
+              <table class="radar-table">
+                <thead><tr><th>股票</th><th>狀態 / 原因</th><th>收盤 / 上限</th><th>斜率 / 說明</th></tr></thead>
                 <tbody id="radarRows"></tbody>
               </table>
             </div>
@@ -227,14 +312,13 @@
         </div>
 
         <div class="side-card">
-          <div class="panel-head"><h2>追蹤重點</h2><span class="count">checklist</span></div>
+          <div class="panel-head"><h2>追蹤重點</h2><span class="count">重點清單</span></div>
           <div class="panel-body">
             <div class="chips">
-              <span class="chip">新訊號</span>
-              <span class="chip">等待隔日開盤</span>
+              <span class="chip">新訊號（隔日開盤進場）</span>
               <span class="chip">母單持有</span>
-              <span class="chip">MA20 retest band 1.9%</span>
-              <span class="chip">MA20 5日斜率濾網</span>
+              <span class="chip">MA20 回測帶 1.9%</span>
+              <span class="chip">MA20 5 日斜率濾網</span>
               <span class="chip">未實現損益</span>
               <span class="chip">已實現出場</span>
             </div>
@@ -244,7 +328,7 @@
         <div class="side-card">
           <div class="panel-head"><h2>風險提醒</h2><span class="count status-warn">未部署</span></div>
           <div class="panel-body">
-            <div class="note">這個頁面是 MWP-C forward paper-trading tracker，不是實盤部署頁。MWP-C 雖已加入 MA20 斜率濾網並壓低進場單位，仍必須等未來 cohort 實際出場後再判斷。</div>
+            <div class="note">這個頁面是 MWP-C 的正式追蹤頁，不是實盤部署頁。MWP-C 雖已加入 MA20 斜率濾網並壓低進場單位，仍必須等未來 cohort 實際出場後再判斷。</div>
           </div>
         </div>
       </aside>
@@ -257,9 +341,11 @@
     const fmtPct = value => Number.isFinite(Number(value)) ? `${Number(value).toFixed(2)}%` : "-";
     const fmtNum = value => Number.isFinite(Number(value)) ? Number(value).toLocaleString("zh-TW") : "-";
     const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+    const marketLabel = value => ({ TWSE: "上市", TPEX: "上櫃" })[String(value || "").toUpperCase()] || String(value || "-");
     function fetchErrorMessage(error) {
       if (location.protocol === "file:") {
-        return "讀取失敗：瀏覽器禁止 file:// 頁面讀取本地 JSON。請在 daily_stock_signal_git 目錄執行 python -m http.server 8000，然後開 http://localhost:8000/site/mwp_a_strategy.html";
+        return "讀取失敗：瀏覽器禁止 file:// 頁面讀取本地 JSON。請在 daily_stock_signal_git 目錄執行 python -m http.server 8000，然後開 http://localhost:8000/site/mwp_c_strategy.html";
       }
       return `讀取失敗：${error.message}`;
     }
@@ -279,56 +365,133 @@
       return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(summary?.win_rate_pct)} / ${fmtPct(summary?.avg_return_pct)}</div><p>${fmtNum(count)} 筆/份｜中位 ${fmtPct(summary?.median_return_pct)}｜未實現 ${fmtNum(summary?.unresolved || 0)}</p></div>`;
     }
 
+    function distributionHtml(stat) {
+      const dist = stat?.avg_return_pct || {};
+      const min = Number(dist.min);
+      const p25 = Number(dist.p25);
+      const mean = Number(dist.mean);
+      const p75 = Number(dist.p75);
+      const max = Number(dist.max);
+      if (![min, p25, mean, p75, max].every(Number.isFinite) || max <= min) return "";
+      const pos = value => clamp(((value - min) / (max - min)) * 100, 0, 100);
+      const bandLeft = Math.min(pos(p25), pos(p75));
+      const bandWidth = Math.max(2, Math.abs(pos(p75) - pos(p25)));
+      return `
+        <div class="dist" aria-label="報酬分布示意圖">
+          <div class="dist-track">
+            <div class="dist-band" style="left:${bandLeft}%;width:${bandWidth}%"></div>
+            <span class="dist-marker p25" style="left:${pos(p25)}%" title="保守分位報酬"></span>
+            <span class="dist-marker mean" style="left:${pos(mean)}%" title="平均報酬"></span>
+            <span class="dist-marker p75" style="left:${pos(p75)}%" title="偏樂觀分位報酬"></span>
+          </div>
+          <div class="dist-labels">
+            <div><strong>${fmtPct(p25)}</strong>保守分位</div>
+            <div><strong>${fmtPct(mean)}</strong>平均報酬</div>
+            <div><strong>${fmtPct(p75)}</strong>偏樂觀分位</div>
+          </div>
+        </div>`;
+    }
+
     function randomCard(title, stat, countKey = "units") {
       const test = stat || {};
       const countMean = test[countKey]?.mean ?? test.trades?.mean ?? test.signals?.mean ?? "-";
       const passCount = test.avg_ge_10_count ?? test.pass_60win_10avg_count ?? "-";
-      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(test.win_rate_pct?.mean)} / ${fmtPct(test.avg_return_pct?.mean)}</div><p>平均 ${fmtNum(countMean)} 筆/份｜平均報酬≥10% ${fmtNum(passCount)} / 10</p></div>`;
+      return `<div class="mini-card"><h3>${escapeHtml(title)}</h3><div class="big">${fmtPct(test.win_rate_pct?.mean)} / ${fmtPct(test.avg_return_pct?.mean)}</div><p>平均 ${fmtNum(countMean)} 筆/份｜平均報酬≥10% ${fmtNum(passCount)} / 10</p>${distributionHtml(test)}</div>`;
     }
 
     function renderBacktest(backtest) {
       document.getElementById("backtestCards").innerHTML = [
-        statCard("未加 MA20 斜率濾網 baseline", backtest.baseline_full_units || backtest.no_addon_full),
-        randomCard("Baseline random unit stock-test", backtest.baseline_random_unit_stock_test || backtest.no_addon_random_stock_test),
-        statCard("MWP-C full units", backtest.mwp_c_full_units || backtest.addon_full_units),
-        statCard("MWP-C 母單 units", backtest.mwp_c_base_units || backtest.addon_base_units),
-        statCard("MWP-C 加碼單 units", backtest.mwp_c_addon_units || backtest.addon_addon_units),
-        randomCard("MWP-C random unit stock-test", backtest.mwp_c_random_unit_stock_test || backtest.addon_random_unit_stock_test),
-        randomCard("MWP-C random package stock-test", backtest.mwp_c_random_package_stock_test || backtest.addon_random_package_stock_test, "signals"),
+        statCard("未加 MA20 斜率濾網基準版", backtest.baseline_full_units || backtest.no_addon_full),
+        randomCard("基準版隨機單筆測試", backtest.baseline_random_unit_stock_test || backtest.no_addon_random_stock_test),
+        statCard("MWP-C 全部進場單位", backtest.mwp_c_full_units || backtest.addon_full_units),
+        statCard("MWP-C 母單進場單位", backtest.mwp_c_base_units || backtest.addon_base_units),
+        statCard("MWP-C 加碼單進場單位", backtest.mwp_c_addon_units || backtest.addon_addon_units),
+        randomCard("MWP-C 隨機單筆測試", backtest.mwp_c_random_unit_stock_test || backtest.addon_random_unit_stock_test),
+        randomCard("MWP-C 隨機組合測試", backtest.mwp_c_random_package_stock_test || backtest.addon_random_package_stock_test, "signals"),
       ].join("");
+    }
+
+    function renderRuleList(elementId, items) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const rows = Array.isArray(items) ? items.filter(Boolean) : [];
+      el.innerHTML = rows.length
+        ? rows.map(item => `<li>${escapeHtml(item)}</li>`).join("")
+        : "<li>-</li>";
     }
 
     function renderUnresolved(rows) {
       document.getElementById("unresolvedCount").textContent = `${rows.length} 份`;
       document.getElementById("unresolvedRows").innerHTML = rows.slice(0, 80).map(row => `
         <tr>
-          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(row.market)}</small></td>
-          <td>${row.unit_type === "addon" ? `加碼 #${escapeHtml(row.addon_number)}` : "母單"}</td>
-          <td>${escapeHtml(row.signal_date)}</td>
+          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(marketLabel(row.market))}</small></td>
+          <td>${escapeHtml(unitTypeLabel(row.unit_type, row.addon_number))}<small>${escapeHtml(row.unresolved ? "追蹤中" : "已結束")}</small></td>
+          <td>${escapeHtml(row.signal_date)}<small>訊號日</small></td>
           <td>${escapeHtml(row.entry_date)}<br><small>${fmtNum(row.entry_price)}</small></td>
-          <td>${escapeHtml(row.exit_date)}</td>
-          <td class="${Number(row.return_pct) >= 0 ? "status-good" : "status-bad"}">${fmtPct(row.return_pct)}</td>
-          <td>${escapeHtml(row.exit_reason)}</td>
+          <td>${escapeHtml(row.exit_date)}<small>最新估值日</small></td>
+          <td class="${Number(row.return_pct) >= 0 ? "status-good" : "status-bad"}">${fmtPct(row.return_pct)}<small>${fmtNum(row.pnl)}</small></td>
+          <td>${escapeHtml(row.exit_reason)}<small>${escapeHtml(row.holding_days ? `持有 ${row.holding_days} 天` : "")}</small></td>
         </tr>`).join("") || `<tr><td colspan="7" class="empty">目前沒有未實現單位。</td></tr>`;
     }
 
-    function renderRadar(rows, date) {
+    function radarKindLabel(kind) {
+      return ({
+        new_mother_candidate: "新母單",
+        addon_candidate: "加碼訊號",
+        watchlist_near_miss: "觀察名單",
+        exit_candidate: "出場觀察",
+        cooldown_blocked: "同股已有母單，禁止重複建單",
+      })[kind] || kind || "-";
+    }
+
+    function statusLabel(status) {
+      return ({
+        pending_next_open: "待次日開盤",
+        open: "持有中",
+        exited: "已出場",
+        entry_filter_failed: "次日開盤未達進場條件",
+      })[status] || status || "-";
+    }
+
+    function unitTypeLabel(unitType, addonNumber) {
+      if (unitType === "addon") return `加碼單 #${addonNumber ?? "-"}`;
+      if (unitType === "base") return "母單";
+      return unitType || "-";
+    }
+
+    function renderRadar(rows, date, grouped = null) {
       document.getElementById("radarDate").textContent = date || "-";
+      const groups = grouped || {};
+      const counts = [
+        ["新母單", groups.new_mother_candidates?.length],
+        ["加碼訊號", groups.addon_candidates?.length],
+        ["觀察", groups.watchlist_near_misses?.length],
+        ["出場", groups.exit_candidates?.length],
+        ["禁止重複建單", groups.cooldown_blocked?.length],
+      ].filter(item => Number.isFinite(Number(item[1]))).map(item => `${item[0]} ${item[1]}`).join(" / ");
       document.getElementById("radarRows").innerHTML = rows.map(row => `
         <tr>
-          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(row.market)}</small></td>
-          <td>${escapeHtml(row.score_label || row.score)}</td>
-          <td>${fmtNum(row.close)}</td>
-          <td>${fmtNum(row.volume_ratio)}</td>
+          <td><strong>${escapeHtml(row.label)}</strong><br><small>${escapeHtml(radarKindLabel(row.radar_kind))} · ${escapeHtml(marketLabel(row.market))}</small></td>
+          <td>${escapeHtml(row.entry_status || row.exit_signal || row.block_reason || row.score_label || row.score || "-")}<small>${escapeHtml(row.reason || "")}</small></td>
+          <td>${fmtNum(row.close)}<br><small>進場上限 ${fmtNum(row.entry_limit_price)}</small></td>
+          <td>${fmtNum(row.ma20_slope5_pct ?? row.volume_ratio)}<br><small>${escapeHtml(row.tracking_note || "")}</small></td>
         </tr>`).join("") || `<tr><td colspan="4" class="empty">今日沒有雷達候選。</td></tr>`;
+      if (counts) document.getElementById("radarDate").textContent = `${date || "-"} · ${counts}`;
     }
 
     function renderForward(records, note) {
       document.getElementById("forwardCount").textContent = `${records.length} 筆`;
       document.getElementById("forwardNote").textContent = note || "尚未有正式 forward record。";
       document.getElementById("forwardRows").innerHTML = records.map(row => `
-        <tr><td>${escapeHtml(row.label)}</td><td>${escapeHtml(row.signal_date)}</td><td>${escapeHtml(row.status)}</td><td>${escapeHtml(row.base_status)}</td><td>${escapeHtml(row.addon_status)}</td><td>${fmtPct(row.unrealized_return_pct)}</td></tr>
-      `).join("") || `<tr><td colspan="6" class="empty">正式 MWP-C forward cohort 尚未開始記錄。</td></tr>`;
+        <tr>
+          <td><strong>${escapeHtml(row.label)}</strong><small>${escapeHtml(marketLabel(row.market))}</small></td>
+          <td>${escapeHtml(row.signal_date)}<small>${escapeHtml(row.entry_date ? `進場日 ${row.entry_date}` : "待次日開盤")}</small></td>
+          <td>${escapeHtml(statusLabel(row.status))}<small>${escapeHtml(row.exit_reason || "")}</small></td>
+          <td>${escapeHtml(statusLabel(row.base_status))}<small>${fmtNum(row.entry_price)}</small></td>
+          <td>${escapeHtml(statusLabel(row.addon_status))}<small>${escapeHtml(row.addon_number ? `第 ${row.addon_number} 筆` : "")}</small></td>
+          <td class="${Number(row.unrealized_return_pct) >= 0 ? "status-good" : "status-bad"}">${fmtPct(row.unrealized_return_pct)}<small>${fmtNum(row.unrealized_pnl)}</small></td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="empty">正式 MWP-C 追蹤尚未開始記錄。</td></tr>`;
     }
 
     async function loadData() {
@@ -340,7 +503,7 @@
         const backtest = payload.backtest || {};
         const tracking = payload.tracking || {};
         document.title = strategy.title || "MWP-C 報酬率優先低頻加碼策略";
-        document.getElementById("dataMeta").textContent = `${strategy.code_meaning || "Main Wave Pullback Add-on"} · ${strategy.status || "Forward tracking"}`;
+        document.getElementById("dataMeta").textContent = `${strategy.code_meaning || "主升段回檔策略"} · ${strategy.status || "追蹤中"}`;
         document.getElementById("metricStatus").textContent = strategy.code || "MWP-C";
         const randomUnit = backtest.mwp_c_random_unit_stock_test || backtest.addon_random_unit_stock_test || {};
         const randomPackage = backtest.mwp_c_random_package_stock_test || backtest.addon_random_package_stock_test || {};
@@ -350,13 +513,16 @@
         document.getElementById("metricRandomPackageMeta").textContent = `平均報酬≥10% ${fmtNum(randomPackage.avg_ge_10_count ?? randomPackage.pass_60win_10avg_count)} / 10`;
         document.getElementById("metricUnresolved").textContent = fmtNum(tracking.historical_unresolved_units?.length || 0);
         document.getElementById("metricUnresolvedMeta").textContent = "歷史未實現單位";
-        document.getElementById("strategyNote").textContent = `${strategy.code || "MWP-C"} = ${strategy.code_meaning || "Return-first capped Main Wave Pullback"}。${strategy.description || ""}`;
-        document.getElementById("entryRule").textContent = strategy.entry_rule || "-";
+        document.getElementById("strategyNote").textContent = `${strategy.code || "MWP-C"}：${strategy.code_meaning || "報酬優先上限型主升段回檔策略"}。${strategy.description || ""}`;
+        renderRuleList("mainUptrendRule", strategy.main_uptrend_pullback_items);
+        renderRuleList("entryRuleList", strategy.entry_rule_items);
         document.getElementById("addonRule").textContent = strategy.addon_rule || "-";
+        renderRuleList("riskRuleList", strategy.risk_rule_items || [strategy.risk_rule || "-"]);
+        document.getElementById("takeProfitRule").textContent = strategy.take_profit_rule || "目前沒有獨立固定百分比停利，主要是續抱到結構轉弱才出場。";
         renderBacktest(backtest);
         renderForward(tracking.formal_forward_records || [], tracking.formal_forward_note);
         renderUnresolved(tracking.historical_unresolved_units || []);
-        renderRadar(tracking.daily_pullback_radar_candidates || [], tracking.as_of_daily_signal_date);
+        renderRadar(tracking.daily_pullback_radar_candidates || [], tracking.as_of_daily_signal_date, tracking.daily_mwp_c_radar || null);
       } catch (error) {
         const message = fetchErrorMessage(error);
         document.getElementById("dataMeta").textContent = message;

@@ -98,6 +98,11 @@ jobs:
               )
           PY
 
+      - name: Update and verify MWP-C forward cohort
+        run: |
+          python build_mwp_a_strategy_tracking.py
+          python verify_mwp_c_forward_records.py --expected-date "${{ inputs.as_of }}"
+
       - name: Build static site
         shell: pwsh
         run: ./build_site.ps1
@@ -115,6 +120,8 @@ jobs:
             reports/daily_signal_alert.csv
             reports/daily_signal_alert.txt
             reports/daily_signal_top_lists.json
+            reports/mwp_a_strategy_tracking.json
+            reports/mwp_c_forward_records.json
             charts/daily_alert/*.png
           )
           if [ "${#files[@]}" -gt 0 ]; then
