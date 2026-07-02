@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MWP-C 已/未實現損益</title>
+  <title>MWP-C 撌??芸祕?暹???/title>
   <style>
     :root {
       color-scheme: light;
@@ -104,12 +104,16 @@
     :root[data-theme="dark"] .mode-button.active { background: rgba(122, 162, 255, 0.14); border-color: rgba(122, 162, 255, 0.5); }
     .theme-button { min-width: 84px; color: #0f4c81; background: #eef7ff; border-color: #cfe0ff; font-weight: 800; }
     .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding: 18px 20px 0; }
+    .summary-forward { padding-top: 10px; }
     .metric, .panel, .side-card { border: 1px solid rgba(219, 227, 239, 0.92); background: rgba(255, 255, 255, 0.88); box-shadow: var(--shadow); }
     :root[data-theme="dark"] .metric, :root[data-theme="dark"] .panel, :root[data-theme="dark"] .side-card { background: rgba(21, 27, 36, 0.86); border-color: var(--line); }
     .metric { min-height: 92px; padding: 16px; border-radius: 14px; display: grid; align-content: space-between; }
+    .metric-forward { border-color: rgba(37, 99, 235, 0.28); background: linear-gradient(180deg, rgba(237, 244, 255, 0.92), rgba(255, 255, 255, 0.9)); }
+    :root[data-theme="dark"] .metric-forward { background: linear-gradient(180deg, rgba(18, 30, 48, 0.9), rgba(21, 27, 36, 0.9)); border-color: rgba(122, 162, 255, 0.34); }
     .metric span { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
     .metric strong { font-size: clamp(22px, 3vw, 34px); line-height: 1.05; }
     .metric small { color: var(--muted); font-size: 12px; }
+    .summary-caption { padding: 18px 20px 0; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
     .content { display: grid; grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr); gap: 16px; padding: 18px 20px; align-items: start; }
     .panel, .side-card { border-radius: 16px; overflow: hidden; }
     .panel + .panel, .side-card + .side-card { margin-top: 16px; }
@@ -176,34 +180,42 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>MWP-C 已/未實現損益</h1>
-        <div class="meta" id="dataMeta">讀取中</div>
+        <h1>MWP-C 撌??芸祕?暹???/h1>
+        <div class="meta" id="dataMeta">霈?葉</div>
       </div>
-      <div class="actions" aria-label="工具列">
-        <a class="primary-button" href="mwp_c_strategy.html">MWP-C追蹤</a>
-        <a class="mode-button" href="index.html">每日策略訊號</a>
-        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
-        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">參數比較</a>
-        <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
-        <button class="icon-button" id="reloadButton" type="button">↻</button>
+      <div class="actions" aria-label="撌亙??>
+        <a class="primary-button" href="mwp_c_strategy.html">MWP-C餈質馱</a>
+        <a class="mode-button" href="index.html">瘥蝑閮?</a>
+        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C?勗?</a>
+        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">?瘥?</a>
+        <button class="mode-button theme-button" id="themeToggle" type="button">憭?</button>
+        <button class="icon-button" id="reloadButton" type="button">??/button>
       </div>
     </header>
 
-    <section class="summary" aria-label="已/未實現損益摘要">
-      <div class="metric"><span>部位總數</span><strong id="metricTrades">-</strong><small id="metricTradeMeta">-</small></div>
-      <div class="metric"><span>已實現損益</span><strong id="metricPnl">-</strong><small>每單 TWD 100,000 模擬單位</small></div>
-      <div class="metric"><span>未實現估值</span><strong id="metricWinRate">-</strong><small id="metricWinLoss">-</small></div>
-      <div class="metric"><span>已實現平均</span><strong id="metricAvgReturn">-</strong><small id="metricMedianReturn">-</small></div>
+    <section class="summary" aria-label="撌??芸祕?暹???閬?>
+      <div class="metric"><span>?其?蝮賣</span><strong id="metricTrades">-</strong><small id="metricTradeMeta">-</small></div>
+      <div class="metric"><span>撌脣祕?暹???/span><strong id="metricPnl">-</strong><small>瘥 TWD 100,000 璅⊥?桐?</small></div>
+      <div class="metric"><span>?芸祕?曆摯??/span><strong id="metricWinRate">-</strong><small id="metricWinLoss">-</small></div>
+      <div class="metric"><span>撌脣祕?曉像??/span><strong id="metricAvgReturn">-</strong><small id="metricMedianReturn">-</small></div>
+    </section>
+
+    <div class="summary-caption">Formal Forward Summary 繚 TWD 100,000 per unit</div>
+    <section class="summary summary-forward" aria-label="甇??餈質馱撠惇??">
+      <div class="metric metric-forward"><span>甇??餈質馱蝮賜???/span><strong id="forwardTotalCount">-</strong><small id="forwardCountMeta">-</small></div>
+      <div class="metric metric-forward"><span>甇??餈質馱撌脣?渡蜇??</span><strong id="forwardRealizedPnl">-</strong><small id="forwardRealizedMeta">-</small></div>
+      <div class="metric metric-forward"><span>甇??餈質馱撌脣?游像???/span><strong id="forwardAverageReturn">-</strong><small id="forwardAverageMeta">-</small></div>
+      <div class="metric metric-forward"><span>甇??餈質馱??銝剜撖衣</span><strong id="forwardUnrealizedPnl">-</strong><small id="forwardUnrealizedMeta">-</small></div>
     </section>
 
     <main class="content">
       <section class="panel">
-        <div class="panel-head"><h2>個股部位總覽</h2><span class="count" id="groupCount">0 檔</span></div>
+        <div class="panel-head"><h2>??其?蝮質汗</h2><span class="count" id="groupCount">0 瑼?/span></div>
         <div class="panel-body">
-          <div class="note">點擊一檔個股會展開該股所有已實現與未實現部位；已損益與未損益會用不同底色色塊標示，右側只會顯示一張互動 K 線圖並標出所有進出場 / 估值點。</div>
+          <div class="note">暺?銝瑼???府?⊥??歇撖衣?撖衣?其?嚗歇??????銝?摨?脣?璅內嚗?游?＊蝷箔?撘萎???K 蝺?銝行??箸??脣??/ 隡啣潮???/div>
           <div class="search-row" style="margin-top:12px">
-            <input id="searchInput" type="search" placeholder="搜尋股票代號、名稱、已損益、未損益或出場原因">
-            <button class="mode-button" id="clearSearch" type="button">清除</button>
+            <input id="searchInput" type="search" placeholder="???∠巨隞????蝔晞歇???????游???>
+            <button class="mode-button" id="clearSearch" type="button">皜</button>
           </div>
           <div class="stock-list" id="stockList"></div>
         </div>
@@ -212,13 +224,13 @@
       <section class="panel chart-panel">
         <div class="panel-head chart-toolbar">
           <div>
-            <h2 id="chartTitle">互動 K 線圖</h2>
-            <small id="chartSubtitle">請先選擇左側個股</small>
+            <h2 id="chartTitle">鈭? K 蝺?</h2>
+            <small id="chartSubtitle">隢??豢?撌血?</small>
           </div>
           <div class="chart-buttons">
-            <button class="mode-button" data-chart-action="zoom-in" type="button">放大</button>
-            <button class="mode-button" data-chart-action="zoom-out" type="button">縮小</button>
-            <button class="mode-button" data-chart-action="reset" type="button">重設</button>
+            <button class="mode-button" data-chart-action="zoom-in" type="button">?曉之</button>
+            <button class="mode-button" data-chart-action="zoom-out" type="button">蝮桀?</button>
+            <button class="mode-button" data-chart-action="reset" type="button">?身</button>
           </div>
         </div>
         <div class="panel-body">
@@ -231,17 +243,18 @@
             <span><span class="legend-dot" style="background:#f59e0b"></span>MA10</span>
             <span><span class="legend-dot" style="background:#0f766e"></span>MA20</span>
             <span><span class="legend-dot" style="background:#7c3aed"></span>MA60</span>
-            <span><span class="legend-dot" style="background:#16a34a"></span>進場</span>
-            <span><span class="legend-dot" style="background:#dc2626"></span>出場</span>
-            <span><span class="legend-dot" style="background:#f59e0b"></span>選取交易</span>
+            <span><span class="legend-dot" style="background:#16a34a"></span>?脣</span>
+            <span><span class="legend-dot" style="background:#dc2626"></span>?箏</span>
+            <span><span class="legend-dot" style="background:#f59e0b"></span>?詨?鈭斗?</span>
           </div>
-          <p class="subtle">互動方式：滑鼠移動查看十字線與 OHLC；拖曳可平移；滾輪或按鈕可縮放；點擊進出場 marker 會反向選取交易明細。</p>
+          <p class="subtle">鈭??孵?嚗?曌宏???摮???OHLC嚗??喳撟喟宏嚗遝頛芣????舐葬?橘?暺??脣??marker ????漱??蝝啜?/p>
         </div>
       </section>
     </main>
-    <footer class="site-footer"><strong>Created by Codex</strong> · Only for educational use. This dashboard is not financial advice.</footer>
+    <footer class="site-footer"><strong>Created by Codex</strong> 繚 Only for educational use. This dashboard is not financial advice.</footer>
   </div>
 
+  <script src="mwp_c_strategy_helpers.js"></script>
   <script>
     const DATA_URL = "reports/mwp_a_strategy_tracking.json";
     const MANIFEST_URL = "reports/stock_data_manifest.json";
@@ -265,6 +278,14 @@
       metricWinLoss: document.getElementById("metricWinLoss"),
       metricAvgReturn: document.getElementById("metricAvgReturn"),
       metricMedianReturn: document.getElementById("metricMedianReturn"),
+      forwardTotalCount: document.getElementById("forwardTotalCount"),
+      forwardCountMeta: document.getElementById("forwardCountMeta"),
+      forwardRealizedPnl: document.getElementById("forwardRealizedPnl"),
+      forwardRealizedMeta: document.getElementById("forwardRealizedMeta"),
+      forwardAverageReturn: document.getElementById("forwardAverageReturn"),
+      forwardAverageMeta: document.getElementById("forwardAverageMeta"),
+      forwardUnrealizedPnl: document.getElementById("forwardUnrealizedPnl"),
+      forwardUnrealizedMeta: document.getElementById("forwardUnrealizedMeta"),
       groupCount: document.getElementById("groupCount"),
       stockList: document.getElementById("stockList"),
       searchInput: document.getElementById("searchInput"),
@@ -297,17 +318,17 @@
     const fmtVolumeLots = value => {
       const n = num(value);
       if (n === null) return "-";
-      return `${Math.round(n / 1000).toLocaleString("zh-TW")} 張`;
+      return `${Math.round(n / 1000).toLocaleString("zh-TW")} lots`;
     };
     const pnlClass = value => Number(value) >= 0 ? "status-good" : "status-bad";
-    const marketLabel = value => ({ TWSE: "上市", TPEX: "上櫃" })[String(value || "").toUpperCase()] || String(value || "-");
+    const marketLabel = value => ({ TWSE: "銝?", TPEX: "銝?" })[String(value || "").toUpperCase()] || String(value || "-");
 
     function applyTheme(theme) {
       const nextTheme = theme === "dark" ? "dark" : "light";
       document.documentElement.dataset.theme = nextTheme;
       localStorage.setItem("dailySignalTheme", nextTheme);
       const btn = document.getElementById("themeToggle");
-      if (btn) btn.textContent = nextTheme === "dark" ? "日間" : "夜間";
+      if (btn) btn.textContent = nextTheme === "dark" ? "?仿?" : "憭?";
       if (state.chart.sourceRows.length) drawChart();
     }
 
@@ -388,7 +409,7 @@
           holdingDays: row.holding_days,
           unresolved,
           status: unresolved ? "unrealized" : "realized",
-          statusLabel: unresolved ? "未損益" : "已損益",
+          statusLabel: unresolved ? "\u672a\u5be6\u73fe" : "\u5df2\u5be6\u73fe",
         };
         if (!map.has(key)) map.set(key, { key, market, stockNo, stockName: trade.stockName, label: trade.label, trades: [] });
         map.get(key).trades.push(trade);
@@ -436,30 +457,52 @@
       const mid = Math.floor(realizedReturns.length / 2);
       const median = realizedReturns.length ? (realizedReturns.length % 2 ? realizedReturns[mid] : (realizedReturns[mid - 1] + realizedReturns[mid]) / 2) : null;
       el.metricTrades.textContent = fmtNum(rows.length);
-      el.metricTradeMeta.textContent = `${fmtNum(groups.length)} 檔｜已 ${fmtNum(realizedRows.length)} / 未 ${fmtNum(unrealizedRows.length)}`;
+      el.metricTradeMeta.textContent = `${fmtNum(groups.length)} 瑼?撌?${fmtNum(realizedRows.length)} / ??${fmtNum(unrealizedRows.length)}`;
       el.metricPnl.textContent = fmtMoney(realizedPnl);
       el.metricPnl.className = pnlClass(realizedPnl);
       el.metricWinRate.textContent = fmtMoney(unrealizedPnl);
       el.metricWinRate.className = pnlClass(unrealizedPnl);
-      el.metricWinLoss.textContent = `在場 ${fmtNum(unrealizedRows.length)} 筆｜估值含 latest_close`;
+      el.metricWinLoss.textContent = `?典 ${fmtNum(unrealizedRows.length)} 蝑?隡啣澆 latest_close`;
       el.metricAvgReturn.textContent = fmtPct(realizedRows.length ? avgReturn : null);
-      el.metricMedianReturn.textContent = `中位 ${fmtPct(median)}｜勝 ${fmtNum(wins)} / 負 ${fmtNum(losses)}`;
-      el.groupCount.textContent = `${groups.length} 檔`;
+      el.metricMedianReturn.textContent = `銝凋? ${fmtPct(median)}嚚? ${fmtNum(wins)} / 鞎?${fmtNum(losses)}`;
+      el.groupCount.textContent = `${groups.length} groups`;
+    }
+
+    function renderForwardSummary(summary) {
+      const totalCount = summary?.totalCount ?? null;
+      const realizedCount = summary?.realizedCount ?? null;
+      const unrealizedCount = summary?.unrealizedCount ?? null;
+      const realizedTotalPnl = summary?.realizedTotalPnl ?? null;
+      const realizedWinRate = summary?.realizedWinRate ?? null;
+      const realizedAverageReturnPct = summary?.realizedAverageReturnPct ?? null;
+      const unrealizedAverageReturnPct = summary?.unrealizedAverageReturnPct ?? null;
+      const unrealizedTotalPnl = summary?.unrealizedTotalPnl ?? null;
+
+      el.forwardTotalCount.textContent = fmtNum(totalCount);
+      el.forwardCountMeta.textContent = `已出場 ${fmtNum(realizedCount)} / 持有中 ${fmtNum(unrealizedCount)}`;
+      el.forwardRealizedPnl.textContent = fmtMoney(realizedTotalPnl);
+      el.forwardRealizedPnl.className = pnlClass(realizedTotalPnl);
+      el.forwardRealizedMeta.textContent = `勝率 ${fmtPct(realizedWinRate)}`;
+      el.forwardAverageReturn.textContent = fmtPct(realizedAverageReturnPct);
+      el.forwardAverageMeta.textContent = `已出場筆數 ${fmtNum(realizedCount)}`;
+      el.forwardUnrealizedPnl.textContent = fmtMoney(unrealizedTotalPnl);
+      el.forwardUnrealizedPnl.className = pnlClass(unrealizedTotalPnl);
+      el.forwardUnrealizedMeta.textContent = `平均未實現報酬 ${fmtPct(unrealizedAverageReturnPct)}｜持有中 ${fmtNum(unrealizedCount)}`;
     }
 
     function tradeUnitLabel(trade) {
-      return trade.unitType === "addon" ? `加碼單 #${esc(trade.addonNumber)}` : "母單";
+      return trade.unitType === "addon" ? `?Ⅳ??#${esc(trade.addonNumber)}` : "瘥";
     }
 
     function tradeRowHtml(trade, index) {
       const active = trade.id === state.selectedTradeId;
       const statusClass = trade.unresolved ? "unrealized" : "realized";
-      const exitVerb = trade.unresolved ? "估值" : "出場";
+      const exitVerb = trade.unresolved ? "Latest close" : "Exit";
       return `<button class="trade-row ${statusClass} ${active ? "active" : ""}" type="button" data-trade-id="${esc(trade.id)}">
         <span class="trade-index">#${index + 1}</span>
         <span>
-          <strong class="trade-title-line"><span class="status-chip ${statusClass}">${trade.statusLabel}</span><span class="trade-separator">—</span><span>${tradeUnitLabel(trade)}</span></strong>
-          <span class="trade-meta">進場 ${esc(trade.entryDate)} @ ${fmtPrice(trade.entryPrice)}｜${exitVerb} ${esc(trade.exitDate)} @ ${fmtPrice(trade.exitPrice)}｜持有 ${fmtNum(trade.holdingDays)} 日｜${esc(trade.exitReason)}</span>
+          <strong class="trade-title-line"><span class="status-chip ${statusClass}">${trade.statusLabel}</span><span class="trade-separator">·</span><span>${tradeUnitLabel(trade)}</span></strong>
+          <span class="trade-meta">Entry ${esc(trade.entryDate)} @ ${fmtPrice(trade.entryPrice)} | ${exitVerb} ${esc(trade.exitDate)} @ ${fmtPrice(trade.exitPrice)} | Hold ${fmtNum(trade.holdingDays)} days | ${esc(trade.exitReason)}</span>
         </span>
         <strong class="${pnlClass(trade.pnl)}">${fmtMoney(trade.pnl)}<br><small>${fmtPct(trade.returnPct)}</small></strong>
       </button>`;
@@ -469,11 +512,11 @@
       const selected = group.key === state.selectedKey;
       return `<article class="stock-group ${selected ? "selected" : ""}" data-group-key="${esc(group.key)}">
         <button class="stock-head" type="button" data-select-group="${esc(group.key)}">
-          <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(marketLabel(group.market))}｜最新事件 ${esc(group.latestExit)}</small></span>
+          <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(marketLabel(group.market))}嚚??唬?隞?${esc(group.latestExit)}</small></span>
           <span class="group-stats">
-            <span class="pill ${pnlClass(group.realizedPnl)}">已 ${fmtMoney(group.realizedPnl)}</span>
-            <span class="pill ${pnlClass(group.unrealizedPnl)}">未 ${fmtMoney(group.unrealizedPnl)}</span>
-            <span class="pill">已 ${fmtNum(group.realizedCount)} / 未 ${fmtNum(group.unrealizedCount)}</span>
+            <span class="pill ${pnlClass(group.realizedPnl)}">撌?${fmtMoney(group.realizedPnl)}</span>
+            <span class="pill ${pnlClass(group.unrealizedPnl)}">??${fmtMoney(group.unrealizedPnl)}</span>
+            <span class="pill">撌?${fmtNum(group.realizedCount)} / ??${fmtNum(group.unrealizedCount)}</span>
           </span>
         </button>
         <div class="trade-details">${group.trades.map(tradeRowHtml).join("")}</div>
@@ -489,11 +532,11 @@
       if (state.selectedKey && !state.filteredGroups.some(group => group.key === state.selectedKey)) {
         state.selectedKey = null;
         state.selectedTradeId = null;
-        drawEmptyChart("請先選擇左側個股");
+        drawEmptyChart("隢??豢?撌血?");
       }
       el.stockList.innerHTML = state.filteredGroups.length
         ? state.filteredGroups.map(groupHtml).join("")
-        : `<div class="empty">沒有符合搜尋條件的部位。</div>`;
+        : `<div class="empty">瘝?蝚血???璇辣?雿?/div>`;
     }
 
     function parseDate(value) {
@@ -533,8 +576,8 @@
 
     function buildTradeMarkers(trades) {
       return trades.flatMap((trade, index) => ([
-        { id: `${trade.id}:entry`, tradeId: trade.id, date: trade.entryDate, price: trade.entryPrice, type: "entry", label: `#${index + 1} 買`, pnl: trade.pnl },
-        { id: `${trade.id}:exit`, tradeId: trade.id, date: trade.exitDate, price: trade.exitPrice, type: "exit", label: `#${index + 1} ${trade.unresolved ? "估" : "賣"}`, pnl: trade.pnl },
+        { id: `${trade.id}:entry`, tradeId: trade.id, date: trade.entryDate, price: trade.entryPrice, type: "entry", label: `#${index + 1} Entry`, pnl: trade.pnl },
+        { id: `${trade.id}:exit`, tradeId: trade.id, date: trade.exitDate, price: trade.exitPrice, type: "exit", label: `#${index + 1} ${trade.unresolved ? "Latest" : "Exit"}`, pnl: trade.pnl },
       ]));
     }
 
@@ -546,9 +589,9 @@
 
     function fetchErrorMessage(error, pagePath) {
       if (location.protocol === "file:") {
-        return `讀取失敗：瀏覽器禁止 file:// 頁面讀取本地 JSON。請在 daily_stock_signal_git 目錄執行 python -m http.server 8000，然後開 http://localhost:8000/site/${pagePath}`;
+        return `霈?仃???汗?函?甇?file:// ?霈???JSON????daily_stock_signal_git ?桅??瑁? python -m http.server 8000嚗敺? http://localhost:8000/site/${pagePath}`;
       }
-      return `讀取失敗：${error.message}`;
+      return `霈?仃??${error.message}`;
     }
 
     async function fetchJson(url) {
@@ -568,7 +611,7 @@
 
     async function loadCandles(group) {
       const manifest = state.manifest.get(group.key);
-      if (!manifest) throw new Error("找不到這檔股票的 K 線 manifest。請先執行 build_site.ps1 產生 stock_data_manifest.json。");
+      if (!manifest) throw new Error("Missing stock data manifest entry for the selected group.");
       if (state.csvCache.has(manifest.file)) return state.csvCache.get(manifest.file);
       const response = await fetch(encodeURI(manifest.file), { cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -619,7 +662,7 @@
 
     function drawChart(hoverIndex = null) {
       const rows = state.chart.sourceRows || [];
-      if (!rows.length) return drawEmptyChart("沒有 K 線資料");
+      if (!rows.length) return drawEmptyChart("No K-line data available.");
       const ctx = el.canvas.getContext("2d");
       const rect = el.canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -712,7 +755,7 @@
       ctx.fillText(candleRows[0]?.date || "", pad.left, height - 12);
       ctx.textAlign = "right";
       ctx.fillText(candleRows[candleRows.length - 1]?.date || "", width - pad.right, height - 12);
-      ctx.fillText(`量 ${fmtVolumeLots(maxVolume)}`, width - 8, volumeTop + 4);
+      ctx.fillText(`??${fmtVolumeLots(maxVolume)}`, width - 8, volumeTop + 4);
 
       state.chart.markers.forEach(marker => {
         const sourceIndex = markerIndex(rows, marker.date);
@@ -756,8 +799,8 @@
         const chg = prev ? (row.close / prev.close - 1) * 100 : null;
         const group = selectedGroup();
         el.tooltip.innerHTML = `<strong>${esc(group?.label || "")} ${esc(row.date)}</strong>
-          <span class="tooltip-line">開 ${fmtPrice(row.open)}｜高 ${fmtPrice(row.high)}｜低 ${fmtPrice(row.low)}｜收 ${fmtPrice(row.close)}</span>
-          <span class="tooltip-line">日漲跌 ${fmtPct(chg)}｜成交 ${fmtVolumeLots(row.volume)}</span>
+          <span class="tooltip-line">??${fmtPrice(row.open)}嚚? ${fmtPrice(row.high)}嚚? ${fmtPrice(row.low)}嚚 ${fmtPrice(row.close)}</span>
+          <span class="tooltip-line">?交撞頝?${fmtPct(chg)}嚚?鈭?${fmtVolumeLots(row.volume)}</span>
           <span class="tooltip-line">MA5 ${fmtPrice(row.ma5)} / MA10 ${fmtPrice(row.ma10)} / MA20 ${fmtPrice(row.ma20)} / MA60 ${fmtPrice(row.ma60)}</span>`;
         el.tooltip.style.display = "block";
       } else {
@@ -848,9 +891,9 @@
         ? state.selectedTradeId
         : group.trades[0]?.id || null;
       renderGroups();
-      el.chartTitle.textContent = `${group.label} MWP-C 部位 K 線`;
-      el.chartSubtitle.textContent = `${group.trades.length} 筆｜已 ${group.realizedCount} / 未 ${group.unrealizedCount}｜進出場 / 估值點共 ${group.trades.length * 2} 個 marker`;
-      drawEmptyChart("讀取 K 線中");
+      el.chartTitle.textContent = `${group.label} MWP-C K-line`;
+      el.chartSubtitle.textContent = `${group.trades.length} trades | realized ${group.realizedCount} / unrealized ${group.unrealizedCount} | markers ${group.trades.length * 2}`;
+      drawEmptyChart("Loading K-line data...");
       try {
         const rows = await loadCandles(group);
         state.chart.sourceRows = rows;
@@ -861,7 +904,7 @@
       } catch (error) {
         state.chart.sourceRows = [];
         state.chart.markers = [];
-        drawEmptyChart(`K 線資料讀取失敗：${error.message}`);
+        drawEmptyChart(`K 蝺????仃??${error.message}`);
       }
     }
 
@@ -882,11 +925,11 @@
           state.selectedKey = null;
           state.selectedTradeId = null;
           renderGroups();
-          el.chartTitle.textContent = "互動 K 線圖";
-          el.chartSubtitle.textContent = "請先選擇左側個股";
+          el.chartTitle.textContent = "鈭? K 蝺?";
+          el.chartSubtitle.textContent = "隢??豢?撌血?";
           state.chart.sourceRows = [];
           state.chart.markers = [];
-          drawEmptyChart("請先選擇左側個股");
+          drawEmptyChart("隢??豢?撌血?");
         } else selectGroup(key);
         return;
       }
@@ -909,10 +952,15 @@
 
     async function loadData() {
       try {
-        el.dataMeta.textContent = "讀取中";
+        el.dataMeta.textContent = "霈?葉";
         await loadManifest();
         const payload = await fetchJson(DATA_URL);
         state.payload = payload;
+        const forwardSummary = window.mwpCStrategyHelpers?.buildFormalForwardSummary
+          ? window.mwpCStrategyHelpers.buildFormalForwardSummary(
+              payload.tracking?.formal_forward_records || []
+            )
+          : null;
         const realizedRows = (payload.tracking?.historical_realized_units || []).map(row => ({ ...row, unresolved: false, positionStatus: "realized" }));
         const unrealizedRows = (payload.tracking?.historical_unresolved_units || []).map(row => ({ ...row, unresolved: true, positionStatus: "unrealized" }));
         const rows = [...realizedRows, ...unrealizedRows];
@@ -920,20 +968,23 @@
         state.selectedKey = state.groups[0]?.key || null;
         state.selectedTradeId = state.groups[0]?.trades[0]?.id || null;
         renderMetrics(rows, state.groups);
+        renderForwardSummary(forwardSummary);
         renderGroups();
-        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-C"} · 已 ${fmtNum(realizedRows.length)} 筆 / 未 ${fmtNum(unrealizedRows.length)} 筆 · K線 manifest ${fmtNum(state.manifest.size)} 檔`;
+        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-C"} | realized ${fmtNum(realizedRows.length)} | unrealized ${fmtNum(unrealizedRows.length)} | manifest ${fmtNum(state.manifest.size)}`;
         if (state.selectedKey) await selectGroup(state.selectedKey);
-        else drawEmptyChart("目前沒有部位資料");
+        else drawEmptyChart("No trade group selected.");
       } catch (error) {
         const message = fetchErrorMessage(error, "mwp_c_realized_pnl.html");
         el.dataMeta.textContent = message;
         el.stockList.innerHTML = `<div class="empty">${esc(message)}</div>`;
+        renderForwardSummary(null);
         drawEmptyChart(message);
       }
     }
 
     applyTheme(localStorage.getItem("dailySignalTheme") || "light");
-    drawEmptyChart("請先選擇左側個股");
+    renderForwardSummary(null);
+    drawEmptyChart("隢??豢?撌血?");
     loadData();
   </script>
 </body>
