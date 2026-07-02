@@ -64,11 +64,16 @@ class ForwardRecordVerificationTests(unittest.TestCase):
         )
 
         freshness_index = workflow.index("- name: Verify report freshness")
+        freshness_command_index = workflow.index(
+            'python verify_daily_signal_freshness.py --expected-date "${{ inputs.as_of }}"'
+        )
         tracker_index = workflow.index("python build_mwp_a_strategy_tracking.py")
         verifier_index = workflow.index("python verify_mwp_c_forward_records.py")
         site_index = workflow.index("- name: Build static site")
 
         self.assertLess(freshness_index, tracker_index)
+        self.assertLess(freshness_index, freshness_command_index)
+        self.assertLess(freshness_command_index, tracker_index)
         self.assertLess(tracker_index, verifier_index)
         self.assertLess(verifier_index, site_index)
         self.assertIn("reports/mwp_a_strategy_tracking.json", workflow)
