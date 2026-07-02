@@ -6,7 +6,7 @@
   root.mwpCStrategyHelpers = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function factory() {
   const NOTIONAL_CAPITAL_PER_UNIT = 100000;
-  const HOLDING_FORWARD_STATUSES = new Set(["\u6301\u6709\u4e2d", "open"]);
+  const HOLDING_FORWARD_STATUSES = new Set(["\u6301\u6709\u4e2d", "\u5df2\u9032\u5834", "open"]);
   const EXITED_FORWARD_STATUSES = new Set(["\u5df2\u51fa\u5834", "exited"]);
   const FAILED_ENTRY_STATUSES = new Set([
     "\u6b21\u65e5\u958b\u76e4\u672a\u9054\u9032\u5834\u689d\u4ef6",

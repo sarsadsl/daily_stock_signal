@@ -11,6 +11,10 @@ test("active statuses are treated as primary rows", () => {
   assert.equal(isActiveForwardStatus("open"), true);
   assert.equal(isActiveForwardStatus("exited"), true);
   assert.equal(isActiveForwardStatus("pending"), false);
+  assert.equal(isActiveForwardStatus("持有中"), true);
+  assert.equal(isActiveForwardStatus("已出場"), true);
+  assert.equal(isActiveForwardStatus("已進場"), true);
+  assert.equal(isActiveForwardStatus("待次日開盤"), false);
 });
 
 test("buildVisibleForwardRecords keeps active rows first and only today's failed entries", () => {
