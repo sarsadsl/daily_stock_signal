@@ -336,6 +336,7 @@
     <footer class="site-footer"><strong>Created by Codex</strong> · Only for educational use. This dashboard is not financial advice.</footer>
   </div>
 
+  <script src="mwp_c_strategy_helpers.js"></script>
   <script>
     const DATA_URL = "reports/mwp_a_strategy_tracking.json";
     const fmtPct = value => Number.isFinite(Number(value)) ? `${Number(value).toFixed(2)}%` : "-";
@@ -479,10 +480,13 @@
       if (counts) document.getElementById("radarDate").textContent = `${date || "-"} · ${counts}`;
     }
 
-    function renderForward(records, note) {
-      document.getElementById("forwardCount").textContent = `${records.length} 筆`;
+    function renderForward(records, note, asOfDate) {
+      const visible = window.mwpCStrategyHelpers
+        ? window.mwpCStrategyHelpers.buildVisibleForwardRecords(records, asOfDate)
+        : (records || []);
+      document.getElementById("forwardCount").textContent = `${visible.length} 筆`;
       document.getElementById("forwardNote").textContent = note || "尚未有正式 forward record。";
-      document.getElementById("forwardRows").innerHTML = records.map(row => `
+      document.getElementById("forwardRows").innerHTML = visible.map(row => `
         <tr>
           <td><strong>${escapeHtml(row.label)}</strong><small>${escapeHtml(marketLabel(row.market))}</small></td>
           <td>${escapeHtml(row.signal_date)}<small>${escapeHtml(row.entry_date ? `進場日 ${row.entry_date}` : "待次日開盤")}</small></td>
@@ -520,7 +524,11 @@
         renderRuleList("riskRuleList", strategy.risk_rule_items || [strategy.risk_rule || "-"]);
         document.getElementById("takeProfitRule").textContent = strategy.take_profit_rule || "目前沒有獨立固定百分比停利，主要是續抱到結構轉弱才出場。";
         renderBacktest(backtest);
-        renderForward(tracking.formal_forward_records || [], tracking.formal_forward_note);
+        renderForward(
+          tracking.formal_forward_records || [],
+          tracking.formal_forward_note,
+          tracking.as_of_daily_signal_date
+        );
         renderUnresolved(tracking.historical_unresolved_units || []);
         renderRadar(tracking.daily_pullback_radar_candidates || [], tracking.as_of_daily_signal_date, tracking.daily_mwp_c_radar || null);
       } catch (error) {

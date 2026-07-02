@@ -92,6 +92,10 @@ $mwpSource = Join-Path $rootPath "mwp_c_strategy.html"
 $mwpTarget = Join-Path $sitePath "mwp_c_strategy.html"
 Copy-FileIfExists -Source $mwpSource -Destination $mwpTarget
 
+$mwpHelperSource = Join-Path $rootPath "mwp_c_strategy_helpers.js"
+$mwpHelperTarget = Join-Path $sitePath "mwp_c_strategy_helpers.js"
+Copy-FileIfExists -Source $mwpHelperSource -Destination $mwpHelperTarget
+
 $mwpRealizedSource = Join-Path $rootPath "mwp_c_realized_pnl.html"
 $mwpRealizedTarget = Join-Path $sitePath "mwp_c_realized_pnl.html"
 Copy-FileIfExists -Source $mwpRealizedSource -Destination $mwpRealizedTarget
