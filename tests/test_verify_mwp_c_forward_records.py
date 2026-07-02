@@ -79,6 +79,25 @@ class ForwardRecordVerificationTests(unittest.TestCase):
         self.assertIn("reports/mwp_a_strategy_tracking.json", workflow)
         self.assertIn("reports/mwp_c_forward_records.json", workflow)
 
+    def test_deploy_site_workflow_also_deploys_cloudflare_pages(self) -> None:
+        workflow = Path(".github/workflows/deploy-site.yml").read_text(
+            encoding="utf-8"
+        )
+
+        site_index = workflow.index("- name: Build static site")
+        github_pages_index = workflow.index("- name: Deploy to GitHub Pages")
+
+        self.assertIn("- name: Deploy to Cloudflare Pages", workflow)
+        self.assertIn("uses: cloudflare/wrangler-action@v3", workflow)
+        self.assertIn(
+            "pages deploy site --project-name=daily-stock-signal --branch=main",
+            workflow,
+        )
+        self.assertLess(site_index, github_pages_index)
+        self.assertLess(
+            github_pages_index, workflow.index("- name: Deploy to Cloudflare Pages")
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
