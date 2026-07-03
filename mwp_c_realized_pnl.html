@@ -127,6 +127,8 @@
     .status-good { color: var(--green); }
     .status-warn { color: var(--amber); }
     .status-bad { color: var(--red); }
+    .view-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .view-switch .mode-button { min-width: 96px; }
     .search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 12px; }
     input[type="search"] { width: 100%; min-height: 38px; border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; background: var(--panel); color: var(--ink); }
     .stock-list { display: grid; gap: 10px; max-height: calc(100vh - 300px); overflow: auto; padding-right: 4px; }
@@ -213,6 +215,10 @@
         <div class="panel-head"><h2>股票交易清單</h2><span class="count" id="groupCount">0 檔</span></div>
         <div class="panel-body">
           <div class="note">點選左側股票可展開每筆交易，右側 K 線圖會同步顯示進場、出場與目前選取的交易標記，方便對照已實現與未實現損益。</div>
+          <div class="view-switch" role="tablist" aria-label="股票交易清單視圖">
+            <button class="mode-button active" id="historyViewButton" type="button" data-view="historical" aria-pressed="true">歷史交易</button>
+            <button class="mode-button" id="formalViewButton" type="button" data-view="formal" aria-pressed="false">正式追蹤</button>
+          </div>
           <div class="search-row" style="margin-top:12px">
             <input id="searchInput" type="search" placeholder="搜尋股票代號、名稱、出場原因或狀態">
             <button class="mode-button" id="clearSearch" type="button">清除搜尋</button>
@@ -260,7 +266,9 @@
     const MANIFEST_URL = "reports/stock_data_manifest.json";
     const state = {
       payload: null,
-      groups: [],
+      activeView: "historical",
+      historicalGroups: [],
+      formalGroups: [],
       filteredGroups: [],
       selectedKey: null,
       selectedTradeId: null,
@@ -288,6 +296,8 @@
       forwardUnrealizedMeta: document.getElementById("forwardUnrealizedMeta"),
       groupCount: document.getElementById("groupCount"),
       stockList: document.getElementById("stockList"),
+      historyViewButton: document.getElementById("historyViewButton"),
+      formalViewButton: document.getElementById("formalViewButton"),
       searchInput: document.getElementById("searchInput"),
       clearSearch: document.getElementById("clearSearch"),
       chartTitle: document.getElementById("chartTitle"),
@@ -490,6 +500,53 @@
       el.forwardUnrealizedMeta.textContent = `平均未實現報酬 ${fmtPct(unrealizedAverageReturnPct)}｜持有中 ${fmtNum(unrealizedCount)}`;
     }
 
+    function currentGroups() {
+      return state.activeView === "formal" ? state.formalGroups : state.historicalGroups;
+    }
+
+    function currentViewLabels() {
+      return state.activeView === "formal"
+        ? { realized: "已出場", unrealized: "持有中", empty: "找不到符合搜尋條件的正式追蹤股票。" }
+        : { realized: "已實現", unrealized: "未實現", empty: "找不到符合搜尋條件的股票。" };
+    }
+
+    function updateViewButtons() {
+      const historicalActive = state.activeView === "historical";
+      el.historyViewButton.classList.toggle("active", historicalActive);
+      el.formalViewButton.classList.toggle("active", !historicalActive);
+      el.historyViewButton.setAttribute("aria-pressed", historicalActive ? "true" : "false");
+      el.formalViewButton.setAttribute("aria-pressed", historicalActive ? "false" : "true");
+    }
+
+    function resetChartPanel() {
+      el.chartTitle.textContent = "個股 K 線圖";
+      el.chartSubtitle.textContent = "請先從左側選擇股票";
+      state.chart.sourceRows = [];
+      state.chart.markers = [];
+      drawEmptyChart("請先從左側選擇股票");
+    }
+
+    function resetSelectionToFirstGroup(groups = currentGroups()) {
+      state.selectedKey = groups[0]?.key || null;
+      state.selectedTradeId = groups[0]?.trades[0]?.id || null;
+    }
+
+    async function switchActiveView(view) {
+      const nextView = view === "formal" ? "formal" : "historical";
+      if (state.activeView === nextView) {
+        return;
+      }
+      state.activeView = nextView;
+      el.searchInput.value = "";
+      resetSelectionToFirstGroup();
+      renderGroups();
+      if (state.selectedKey) {
+        await selectGroup(state.selectedKey);
+      } else {
+        resetChartPanel();
+      }
+    }
+
     function tradeUnitLabel(trade) {
       return trade.unitType === "addon" ? `加碼單 #${esc(trade.addonNumber)}` : "母單";
     }
@@ -497,7 +554,7 @@
     function tradeRowHtml(trade, index) {
       const active = trade.id === state.selectedTradeId;
       const statusClass = trade.unresolved ? "unrealized" : "realized";
-      const exitVerb = trade.unresolved ? "Latest close" : "Exit";
+      const exitVerb = trade.exitVerb || (trade.unresolved ? "Latest close" : "Exit");
       return `<button class="trade-row ${statusClass} ${active ? "active" : ""}" type="button" data-trade-id="${esc(trade.id)}">
         <span class="trade-index">#${index + 1}</span>
         <span>
@@ -510,13 +567,14 @@
 
     function groupHtml(group) {
       const selected = group.key === state.selectedKey;
+      const labels = currentViewLabels();
       return `<article class="stock-group ${selected ? "selected" : ""}" data-group-key="${esc(group.key)}">
         <button class="stock-head" type="button" data-select-group="${esc(group.key)}">
           <span class="symbol"><strong>${esc(group.label)}</strong><small>${esc(marketLabel(group.market))} | 最近事件 ${esc(group.latestExit)}</small></span>
           <span class="group-stats">
-            <span class="pill ${pnlClass(group.realizedPnl)}">已實 ${fmtMoney(group.realizedPnl)}</span>
-            <span class="pill ${pnlClass(group.unrealizedPnl)}">未實 ${fmtMoney(group.unrealizedPnl)}</span>
-            <span class="pill">已實 ${fmtNum(group.realizedCount)} / 未實 ${fmtNum(group.unrealizedCount)}</span>
+            <span class="pill ${pnlClass(group.realizedPnl)}">${labels.realized} ${fmtMoney(group.realizedPnl)}</span>
+            <span class="pill ${pnlClass(group.unrealizedPnl)}">${labels.unrealized} ${fmtMoney(group.unrealizedPnl)}</span>
+            <span class="pill">${labels.realized} ${fmtNum(group.realizedCount)} / ${labels.unrealized} ${fmtNum(group.unrealizedCount)}</span>
           </span>
         </button>
         <div class="trade-details">${group.trades.map(tradeRowHtml).join("")}</div>
@@ -524,19 +582,22 @@
     }
 
     function renderGroups() {
+      updateViewButtons();
+      const labels = currentViewLabels();
       const query = el.searchInput.value.trim().toLowerCase();
-      state.filteredGroups = state.groups.filter(group => {
+      state.filteredGroups = currentGroups().filter(group => {
         const text = `${group.market} ${group.stockNo} ${group.stockName} ${group.label} ${group.trades.map(trade => `${trade.statusLabel} ${trade.entryDate} ${trade.exitDate} ${trade.exitReason} ${trade.unitType}`).join(" ")}`.toLowerCase();
         return !query || text.includes(query);
       });
       if (state.selectedKey && !state.filteredGroups.some(group => group.key === state.selectedKey)) {
         state.selectedKey = null;
         state.selectedTradeId = null;
-        drawEmptyChart("請先從左側選擇股票");
+        resetChartPanel();
       }
+      el.groupCount.textContent = `${state.filteredGroups.length} 檔`;
       el.stockList.innerHTML = state.filteredGroups.length
         ? state.filteredGroups.map(groupHtml).join("")
-        : `<div class="empty">找不到符合搜尋條件的股票。</div>`;
+        : `<div class="empty">${esc(labels.empty)}</div>`;
     }
 
     function parseDate(value) {
@@ -554,7 +615,7 @@
     }
 
     function selectedGroup() {
-      return state.groups.find(group => group.key === state.selectedKey) || null;
+      return currentGroups().find(group => group.key === state.selectedKey) || null;
     }
 
     function selectedTrade() {
@@ -884,15 +945,16 @@
     }, { passive: false });
 
     async function selectGroup(key) {
-      const group = state.groups.find(item => item.key === key);
+      const group = currentGroups().find(item => item.key === key);
       if (!group) return;
       state.selectedKey = key;
       state.selectedTradeId = state.selectedTradeId && group.trades.some(trade => trade.id === state.selectedTradeId)
         ? state.selectedTradeId
         : group.trades[0]?.id || null;
       renderGroups();
+      const labels = currentViewLabels();
       el.chartTitle.textContent = `${group.label} 個股 K 線圖`;
-      el.chartSubtitle.textContent = `${group.trades.length} 筆交易 | 已實現 ${group.realizedCount} / 未實現 ${group.unrealizedCount} | 標記 ${group.trades.length * 2}`;
+      el.chartSubtitle.textContent = `${group.trades.length} 筆交易 | ${labels.realized} ${group.realizedCount} / ${labels.unrealized} ${group.unrealizedCount} | 標記 ${group.trades.length * 2}`;
       drawEmptyChart("載入 K 線資料中...");
       try {
         const rows = await loadCandles(group);
@@ -918,6 +980,11 @@
     }
 
     document.addEventListener("click", event => {
+      const viewButton = event.target.closest?.("[data-view]");
+      if (viewButton) {
+        switchActiveView(viewButton.dataset.view);
+        return;
+      }
       const groupButton = event.target.closest?.("[data-select-group]");
       if (groupButton) {
         const key = groupButton.dataset.selectGroup;
@@ -925,11 +992,7 @@
           state.selectedKey = null;
           state.selectedTradeId = null;
           renderGroups();
-          el.chartTitle.textContent = "個股 K 線圖";
-          el.chartSubtitle.textContent = "請先從左側選擇股票";
-          state.chart.sourceRows = [];
-          state.chart.markers = [];
-          drawEmptyChart("請先從左側選擇股票");
+          resetChartPanel();
         } else selectGroup(key);
         return;
       }
@@ -956,23 +1019,29 @@
         await loadManifest();
         const payload = await fetchJson(DATA_URL);
         state.payload = payload;
+        const formalRecords = payload.tracking?.formal_forward_records || [];
         const forwardSummary = window.mwpCStrategyHelpers?.buildFormalForwardSummary
           ? window.mwpCStrategyHelpers.buildFormalForwardSummary(
-              payload.tracking?.formal_forward_records || []
+              formalRecords
             )
           : null;
         const realizedRows = (payload.tracking?.historical_realized_units || []).map(row => ({ ...row, unresolved: false, positionStatus: "realized" }));
         const unrealizedRows = (payload.tracking?.historical_unresolved_units || []).map(row => ({ ...row, unresolved: true, positionStatus: "unrealized" }));
         const rows = [...realizedRows, ...unrealizedRows];
-        state.groups = groupRealizedTrades(rows);
-        state.selectedKey = state.groups[0]?.key || null;
-        state.selectedTradeId = state.groups[0]?.trades[0]?.id || null;
-        renderMetrics(rows, state.groups);
+        state.historicalGroups = groupRealizedTrades(rows);
+        state.formalGroups = window.mwpCStrategyHelpers?.buildFormalForwardGroups
+          ? window.mwpCStrategyHelpers.buildFormalForwardGroups(
+              formalRecords,
+              payload.tracking?.as_of_daily_signal_date || ""
+            )
+          : [];
+        resetSelectionToFirstGroup();
+        renderMetrics(rows, state.historicalGroups);
         renderForwardSummary(forwardSummary);
         renderGroups();
-        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-C"} | 已實現 ${fmtNum(realizedRows.length)} | 未實現 ${fmtNum(unrealizedRows.length)} | 資料檔 ${fmtNum(state.manifest.size)}`;
+        el.dataMeta.textContent = `${payload.strategy?.code || "MWP-C"} | 已實現 ${fmtNum(realizedRows.length)} | 未實現 ${fmtNum(unrealizedRows.length)} | 正式追蹤 ${fmtNum(state.formalGroups.length)} | 資料檔 ${fmtNum(state.manifest.size)}`;
         if (state.selectedKey) await selectGroup(state.selectedKey);
-        else drawEmptyChart("請先從左側選擇股票");
+        else resetChartPanel();
       } catch (error) {
         const message = fetchErrorMessage(error, "mwp_c_realized_pnl.html");
         el.dataMeta.textContent = message;
@@ -984,7 +1053,8 @@
 
     applyTheme(localStorage.getItem("dailySignalTheme") || "light");
     renderForwardSummary(null);
-    drawEmptyChart("請先從左側選擇股票");
+    updateViewButtons();
+    resetChartPanel();
     loadData();
   </script>
 </body>

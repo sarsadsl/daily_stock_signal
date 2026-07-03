@@ -17,6 +17,8 @@ class RealizedPnlPageLabelTests(unittest.TestCase):
             "參數比較",
             "正式追蹤專屬摘要",
             "股票交易清單",
+            "歷史交易",
+            "正式追蹤",
             "個股 K 線圖",
             "清除搜尋",
             "放大",

@@ -46,6 +46,14 @@
     return (toNumber(returnPct) / 100) * NOTIONAL_CAPITAL_PER_UNIT;
   }
 
+  function estimateLatestPrice(entryPrice, returnPct) {
+    const base = toNumber(entryPrice);
+    if (!base) {
+      return null;
+    }
+    return base * (1 + toNumber(returnPct) / 100);
+  }
+
   function buildVisibleForwardRecords(records, asOfDate) {
     return [...(records || [])]
       .filter((row) => {
@@ -111,7 +119,139 @@
     };
   }
 
+  function buildFormalForwardGroups(records, asOfDate) {
+    const groups = new Map();
+
+    [...(records || [])]
+      .filter((row) => isActiveForwardStatus(row?.status))
+      .forEach((row, index) => {
+        const market = String(row?.market || "").toUpperCase();
+        const stockNo = String(row?.stock_no || "");
+        if (!market || !stockNo) {
+          return;
+        }
+
+        const key = `${market}:${stockNo}`;
+        const unresolved = !hasExitDate(row);
+        const returnPct = unresolved
+          ? toNumber(row?.unrealized_return_pct)
+          : toNumber(row?.return_pct);
+        const trade = {
+          ...row,
+          id:
+            row?.id ||
+            `${key}:${unresolved ? "holding" : "exited"}:${
+              row?.unit_type || "base"
+            }:${index}`,
+          key,
+          market,
+          stockNo,
+          stockName: row?.stock_name || "",
+          label: row?.label || `${stockNo} ${row?.stock_name || ""}`.trim(),
+          entryDate: row?.entry_date || "",
+          entryPrice: toNumber(row?.entry_price),
+          exitDate: unresolved
+            ? String(row?.latest_close_date || asOfDate || "")
+            : String(row?.exit_date || ""),
+          exitPrice: unresolved
+            ? toNumber(row?.latest_close) ||
+              estimateLatestPrice(row?.entry_price, row?.unrealized_return_pct)
+            : toNumber(row?.exit_price),
+          signalDate: row?.signal_date || "",
+          returnPct,
+          pnl: estimatePnlFromReturnPct(returnPct),
+          unitType: row?.unit_type || "base",
+          addonNumber: row?.addon_number || 0,
+          exitReason: unresolved ? "latest_close" : row?.exit_reason || "",
+          holdingDays: row?.holding_days ?? null,
+          unresolved,
+          status: unresolved ? "unrealized" : "realized",
+          statusLabel: unresolved ? "持有中" : "已出場",
+        };
+
+        if (!groups.has(key)) {
+          groups.set(key, {
+            key,
+            market,
+            stockNo,
+            stockName: trade.stockName,
+            label: trade.label,
+            trades: [],
+          });
+        }
+        groups.get(key).trades.push(trade);
+      });
+
+    return [...groups.values()]
+      .map((group) => {
+        group.trades.sort((left, right) => {
+          const leftRank = left.unresolved ? 0 : 1;
+          const rightRank = right.unresolved ? 0 : 1;
+          if (leftRank !== rightRank) {
+            return leftRank - rightRank;
+          }
+          return (
+            compareDesc(left?.exitDate, right?.exitDate) ||
+            compareDesc(left?.entryDate, right?.entryDate) ||
+            compareDesc(left?.id, right?.id)
+          );
+        });
+
+        const realizedTrades = group.trades.filter((trade) => !trade.unresolved);
+        const unrealizedTrades = group.trades.filter((trade) => trade.unresolved);
+        const realizedPnl = realizedTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+        const unrealizedPnl = unrealizedTrades.reduce(
+          (sum, trade) => sum + trade.pnl,
+          0
+        );
+        const totalPnl = realizedPnl + unrealizedPnl;
+        const realizedReturns = realizedTrades
+          .map((trade) => trade.returnPct)
+          .sort((left, right) => left - right);
+        const wins = realizedTrades.filter((trade) => trade.pnl >= 0).length;
+        const losses = realizedTrades.length - wins;
+        const mid = Math.floor(realizedReturns.length / 2);
+        const eventDates = group.trades
+          .flatMap((trade) => [trade.exitDate, trade.entryDate, trade.signalDate])
+          .filter(Boolean)
+          .sort();
+
+        return {
+          ...group,
+          realizedPnl,
+          unrealizedPnl,
+          totalPnl,
+          realizedCount: realizedTrades.length,
+          unrealizedCount: unrealizedTrades.length,
+          wins,
+          losses,
+          winRate: realizedTrades.length
+            ? (wins / realizedTrades.length) * 100
+            : 0,
+          avgReturn: realizedReturns.length
+            ? realizedReturns.reduce((sum, value) => sum + value, 0) /
+              realizedReturns.length
+            : null,
+          medianReturn: realizedReturns.length
+            ? realizedReturns.length % 2
+              ? realizedReturns[mid]
+              : (realizedReturns[mid - 1] + realizedReturns[mid]) / 2
+            : null,
+          latestExit: eventDates.length ? eventDates[eventDates.length - 1] : "",
+          holdingCount: unrealizedTrades.length,
+        };
+      })
+      .sort(
+        (left, right) =>
+          right.holdingCount - left.holdingCount ||
+          compareDesc(left?.latestExit, right?.latestExit) ||
+          right.totalPnl - left.totalPnl ||
+          compareDesc(left?.key, right?.key)
+      );
+  }
+
   return {
+    buildFormalForwardGroups,
     buildFormalForwardSummary,
     buildVisibleForwardRecords,
     isActiveForwardStatus,
