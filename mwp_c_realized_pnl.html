@@ -501,7 +501,7 @@
       return `<button class="trade-row ${statusClass} ${active ? "active" : ""}" type="button" data-trade-id="${esc(trade.id)}">
         <span class="trade-index">#${index + 1}</span>
         <span>
-          <strong class="trade-title-line"><span class="status-chip ${statusClass}">${trade.statusLabel}</span><span class="trade-separator">?</span><span>${tradeUnitLabel(trade)}</span></strong>
+          <strong class="trade-title-line"><span class="status-chip ${statusClass}">${trade.statusLabel}</span><span class="trade-separator">·</span><span>${tradeUnitLabel(trade)}</span></strong>
           <span class="trade-meta">Entry ${esc(trade.entryDate)} @ ${fmtPrice(trade.entryPrice)} | ${exitVerb} ${esc(trade.exitDate)} @ ${fmtPrice(trade.exitPrice)} | Hold ${fmtNum(trade.holdingDays)} days | ${esc(trade.exitReason)}</span>
         </span>
         <strong class="${pnlClass(trade.pnl)}">${fmtMoney(trade.pnl)}<br><small>${fmtPct(trade.returnPct)}</small></strong>
@@ -591,7 +591,7 @@
       if (location.protocol === "file:") {
         return `載入資料失敗。請不要直接用 file:// 開啟頁面；請先在 daily_stock_signal_git 目錄啟動 python -m http.server 8000，再改用 http://localhost:8000/site/${pagePath}`;
       }
-      return `載入資料失敗?${error.message}`;
+      return `載入資料失敗：${error.message}`;
     }
 
     async function fetchJson(url) {
@@ -904,7 +904,7 @@
       } catch (error) {
         state.chart.sourceRows = [];
         state.chart.markers = [];
-        drawEmptyChart(`K 線圖載入失敗?${error.message}`);
+        drawEmptyChart(`K 線圖載入失敗：${error.message}`);
       }
     }
 
