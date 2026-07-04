@@ -33,6 +33,37 @@ class DashboardControlTests(unittest.TestCase):
             self.signal_html,
         )
 
+    def test_signal_dashboard_toolbar_labels_are_readable(self) -> None:
+        expected_labels = [
+            'aria-label="工具列"',
+            ">同步今日資料</button>",
+            ">MWP-C追蹤</button>",
+            ">MWP-C已/未損益</button>",
+            ">Pullback總覽</button>",
+            'aria-label="策略"',
+            'aria-label="訊號"',
+            ">夜間</button>",
+            ">表格</button>",
+            ">卡片</button>",
+            'aria-label="重新讀取">↻</button>',
+        ]
+
+        for label in expected_labels:
+            with self.subTest(label=label):
+                self.assertIn(label, self.signal_html)
+
+        forbidden_fragments = [
+            'aria-label="???"',
+            ">??????</button>",
+            ">MWP-C??</button>",
+            ">MWP-C?/???</button>",
+            ">Pullback??</button>",
+        ]
+
+        for fragment in forbidden_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertNotIn(fragment, self.signal_html)
+
     def test_mwp_c_pages_use_button_navigation_in_topbar(self) -> None:
         for html in (self.strategy_html, self.realized_html):
             self.assertIn("data-nav-url=", html)
