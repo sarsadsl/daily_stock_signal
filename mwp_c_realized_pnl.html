@@ -186,10 +186,10 @@
         <div class="meta" id="dataMeta">載入中...</div>
       </div>
       <div class="actions" aria-label="頁面捷徑">
-        <a class="primary-button" href="mwp_c_strategy.html">MWP-C 正式追蹤</a>
-        <a class="mode-button" href="index.html">首頁總覽</a>
-        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">策略報告</a>
-        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">參數比較</a>
+        <button class="primary-button" type="button" data-nav-url="mwp_c_strategy.html">MWP-C 正式追蹤</button>
+        <button class="mode-button" type="button" data-nav-url="index.html">首頁總覽</button>
+        <button class="mode-button" type="button" data-nav-url="reports/mwp_c_return_first_capped.html" data-nav-external="true">策略報告</button>
+        <button class="mode-button" type="button" data-nav-url="reports/mwp_c_parameter_compare.html" data-nav-external="true">參數比較</button>
         <button class="mode-button theme-button" id="themeToggle" type="button">深色</button>
         <button class="icon-button" id="reloadButton" type="button">重載</button>
       </div>
@@ -979,7 +979,21 @@
       document.querySelector(`[data-trade-id="${CSS.escape(tradeId)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
     }
 
+    function navigateToUrl(url, external = false) {
+      if (!url) return;
+      if (external) {
+        window.open(url, "_blank", "noopener");
+        return;
+      }
+      window.location.href = url;
+    }
+
     document.addEventListener("click", event => {
+      const navButton = event.target.closest?.("[data-nav-url]");
+      if (navButton) {
+        navigateToUrl(navButton.dataset.navUrl, navButton.dataset.navExternal === "true");
+        return;
+      }
       const viewButton = event.target.closest?.("[data-view]");
       if (viewButton) {
         switchActiveView(viewButton.dataset.view);

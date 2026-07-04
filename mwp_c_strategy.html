@@ -222,11 +222,11 @@
         <div class="meta" id="dataMeta">讀取中</div>
       </div>
       <div class="actions" aria-label="工具列">
-        <a class="primary-button" href="index.html">每日策略訊號</a>
-        <a class="mode-button active" href="mwp_c_realized_pnl.html">MWP-C 已/未損益</a>
-        <a class="mode-button" href="reports/mwp_c_return_first_capped.html" target="_blank" rel="noopener">MWP-C報告</a>
-        <a class="mode-button" href="reports/mwp_c_parameter_compare.html" target="_blank" rel="noopener">參數比較</a>
-        <a class="mode-button" href="reports/pullback_experiment_summary.html" target="_blank" rel="noopener">Pullback總覽</a>
+        <button class="primary-button" type="button" data-nav-url="index.html">每日策略訊號</button>
+        <button class="mode-button active" type="button" data-nav-url="mwp_c_realized_pnl.html">MWP-C 已/未損益</button>
+        <button class="mode-button" type="button" data-nav-url="reports/mwp_c_return_first_capped.html" data-nav-external="true">MWP-C報告</button>
+        <button class="mode-button" type="button" data-nav-url="reports/mwp_c_parameter_compare.html" data-nav-external="true">參數比較</button>
+        <button class="mode-button" type="button" data-nav-url="reports/pullback_experiment_summary.html" data-nav-external="true">Pullback總覽</button>
         <button class="mode-button theme-button" id="themeToggle" type="button">夜間</button>
         <button class="icon-button" id="reloadButton" type="button">↻</button>
       </div>
@@ -358,6 +358,20 @@
       if (btn) btn.textContent = theme === "dark" ? "日間" : "夜間";
     }
     applyTheme(localStorage.getItem("dailySignalTheme") || "light");
+    function navigateToUrl(url, external = false) {
+      if (!url) return;
+      if (external) {
+        window.open(url, "_blank", "noopener");
+        return;
+      }
+      window.location.href = url;
+    }
+
+    document.addEventListener("click", event => {
+      const navButton = event.target.closest("[data-nav-url]");
+      if (!navButton) return;
+      navigateToUrl(navButton.dataset.navUrl, navButton.dataset.navExternal === "true");
+    });
     document.getElementById("themeToggle").addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
     document.getElementById("reloadButton").addEventListener("click", () => loadData());
 
