@@ -10,6 +10,14 @@ on:
         description: "Target market date in YYYY-MM-DD. Leave blank for today."
         required: false
         type: string
+      telegram_test:
+        description: "Send one Telegram test message and stop."
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 concurrency:
   group: daily-stock-signal-main
@@ -21,7 +29,33 @@ permissions:
   id-token: write
 
 jobs:
+  telegram-test:
+    if: ${{ inputs.telegram_test == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Send Telegram test message
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python send_telegram_test_message.py
+
   build:
+    if: ${{ inputs.telegram_test != 'true' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
