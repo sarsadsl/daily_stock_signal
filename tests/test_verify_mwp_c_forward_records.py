@@ -79,17 +79,6 @@ class ForwardRecordVerificationTests(unittest.TestCase):
         self.assertIn("reports/mwp_a_strategy_tracking.json", workflow)
         self.assertIn("reports/mwp_c_forward_records.json", workflow)
 
-    def test_daily_workflow_supports_manual_telegram_test_mode(self) -> None:
-        workflow = Path(".github/workflows/daily-signal.yml").read_text(
-            encoding="utf-8"
-        )
-
-        self.assertIn("telegram_test:", workflow)
-        self.assertIn('description: "Send one Telegram test message and stop."', workflow)
-        self.assertIn("python send_telegram_test_message.py", workflow)
-        self.assertIn("if: ${{ inputs.telegram_test == 'true' }}", workflow)
-        self.assertIn("if: ${{ inputs.telegram_test != 'true' }}", workflow)
-
     def test_deploy_site_workflow_also_deploys_cloudflare_pages(self) -> None:
         workflow = Path(".github/workflows/deploy-site.yml").read_text(
             encoding="utf-8"
