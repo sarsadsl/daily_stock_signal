@@ -98,6 +98,19 @@ class ForwardRecordVerificationTests(unittest.TestCase):
             github_pages_index, workflow.index("- name: Deploy to Cloudflare Pages")
         )
 
+    def test_open_entry_call_workflow_runs_after_open_with_telegram(self) -> None:
+        workflow = Path(".github/workflows/mwp-c-open-entry-call.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('cron: "6 1 * * 1-5"', workflow)
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("python send_mwp_c_open_entry_calls.py", workflow)
+        self.assertIn("TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}", workflow)
+        self.assertIn("TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}", workflow)
+        self.assertIn('if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then', workflow)
+        self.assertIn("pip install -r requirements.txt", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
