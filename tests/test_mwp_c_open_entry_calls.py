@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from datetime import date
@@ -10,6 +11,7 @@ from send_mwp_c_open_entry_calls import (
     MIS_API_URL,
     PENDING_NEXT_OPEN_STATUS,
     build_open_entry_call_decisions,
+    fetch_market_closed_dates,
     fetch_realtime_open_snapshot,
     load_call_log,
     record_call_key,
@@ -114,6 +116,12 @@ class OpenEntryCallSelectionTests(unittest.TestCase):
 
 
 class RealtimeOpenSnapshotTests(unittest.TestCase):
+    @patch("send_mwp_c_open_entry_calls.request_json")
+    def test_fetch_market_closed_dates_tolerates_malformed_holiday_feed(self, mock_request_json) -> None:
+        mock_request_json.side_effect = json.JSONDecodeError("Expecting value", "", 0)
+
+        self.assertEqual(fetch_market_closed_dates(), set())
+
     @patch("send_mwp_c_open_entry_calls.request_json")
     def test_fetch_realtime_open_snapshot_reads_mis_open_for_target_date(self, mock_request_json) -> None:
         records = [

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from datetime import date, timedelta
 from pathlib import Path
@@ -94,7 +95,14 @@ def is_market_closed_holiday(row: dict[str, Any]) -> bool:
 
 
 def fetch_market_closed_dates() -> ClosedDates:
-    rows = request_json(HOLIDAY_SCHEDULE_URL, {})
+    try:
+        rows = request_json(HOLIDAY_SCHEDULE_URL, {})
+    except (RuntimeError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        print(
+            f"Warning: unable to read TWSE holiday schedule, falling back to weekend-only trading calendar: {exc}",
+            file=sys.stderr,
+        )
+        return set()
     closed_dates: ClosedDates = set()
     for row in rows:
         if not isinstance(row, dict):
