@@ -215,12 +215,20 @@ Register-ScheduledTask -TaskName "DailyStockSignalAlert" -Action $Action -Trigge
 
 Phase 1 的 execution agent 會在 GCP Compute Engine VM 上常駐執行，讀取正式追蹤 JSON、判斷 `待次日開盤` 清單，並在符合條件時送出 Telegram call。
 
+部署目標固定為：
+
+- Google Cloud Compute Engine
+- Region: `asia-east1`
+- OS: Ubuntu LTS
+
 在 VM 上準備部署檔：
 
 1. 進入 `execution_agent` 目錄。
 2. 複製 `execution_agent/.env.example` 為 `execution_agent/.env`。
 3. 設定 `TRACKING_JSON_URL`、`STATE_DB_PATH`、`SIGNAL_DATE`，需要先演練時保留 `DRY_RUN=1`。
-4. 啟動容器：
+4. 設定 Telegram secrets：`TELEGRAM_BOT_TOKEN` 與 `TELEGRAM_CHAT_ID`。
+5. 如果要先驗證流程，保留 `DRY_RUN=1`；要真的送出 Telegram open-entry call 時，將它改為 `0`。
+6. 啟動容器：
 
 ```bash
 cd execution_agent
