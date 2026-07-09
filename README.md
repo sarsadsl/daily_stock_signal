@@ -211,6 +211,24 @@ Register-ScheduledTask -TaskName "DailyStockSignalAlert" -Action $Action -Trigge
 .\run_daily_alert.ps1
 ```
 
+## GCP VM Execution Agent
+
+Phase 1 的 execution agent 會在 GCP Compute Engine VM 上常駐執行，讀取正式追蹤 JSON、判斷 `待次日開盤` 清單，並在符合條件時送出 Telegram call。
+
+在 VM 上準備部署檔：
+
+1. 進入 `execution_agent` 目錄。
+2. 複製 `execution_agent/.env.example` 為 `execution_agent/.env`。
+3. 設定 `TRACKING_JSON_URL`、`STATE_DB_PATH`、`SIGNAL_DATE`，需要先演練時保留 `DRY_RUN=1`。
+4. 啟動容器：
+
+```bash
+cd execution_agent
+docker compose up -d execution-agent
+```
+
+Docker Compose 會把 `./state` 掛載到容器內的 `/app/state`，SQLite 狀態檔會存成 `agent.db`，重啟後仍可保留已處理的 call log。
+
 ### 網頁訊號看板
 
 啟動本機網頁服務：
