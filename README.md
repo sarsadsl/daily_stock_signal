@@ -221,21 +221,24 @@ Phase 1 的 execution agent 會在 GCP Compute Engine VM 上常駐執行，讀�
 - Region: `asia-east1`
 - OS: Ubuntu LTS
 
+這是一個 one-shot runner，不是長駐 daemon。每次執行都會讀取 remote tracking JSON，並依據本機 `data/*.csv` 推算 next-trading-date。
+
 在 VM 上準備部署檔：
 
 1. 進入 `execution_agent` 目錄。
 2. 複製 `execution_agent/.env.example` 為 `execution_agent/.env`。
-3. 設定 `TRACKING_JSON_URL`、`STATE_DB_PATH`、`SIGNAL_DATE`，需要先演練時保留 `DRY_RUN=1`。
-4. 設定 Telegram secrets：`TELEGRAM_BOT_TOKEN` 與 `TELEGRAM_CHAT_ID`。
-5. 如果要先驗證流程，保留 `DRY_RUN=1`；要真的送出 Telegram open-entry call 時，將它改為 `0`。
-6. 啟動容器：
+3. 確認 `data/*.csv` 已同步到 VM 的 repo checkout，因為 runner 會掃描這些本地 CSV 來推算 next-trading-date。
+4. 設定 `TRACKING_JSON_URL`、`STATE_DB_PATH`、`SIGNAL_DATE`，需要先演練時保留 `DRY_RUN=1`。
+5. 設定 Telegram secrets：`TELEGRAM_BOT_TOKEN` 與 `TELEGRAM_CHAT_ID`。
+6. 如果要先驗證流程，保留 `DRY_RUN=1`；要真的送出 Telegram open-entry call 時，將它改為 `0`。
+7. 啟動一次性容器：
 
 ```bash
 cd execution_agent
-docker compose up -d execution-agent
+docker compose run --rm execution-agent
 ```
 
-Docker Compose 會把 `./state` 掛載到容器內的 `/app/state`，SQLite 狀態檔會存成 `agent.db`，重啟後仍可保留已處理的 call log。
+Docker Compose 會把 `./state` 掛載到容器內的 `/app/state`，並把上層的 `../data` 以唯讀方式掛到 `/app/data`。SQLite 狀態檔會存成 `agent.db`，而 next-trading-date 會依據這些本地 CSV 計算。
 
 ### 網頁訊號看板
 

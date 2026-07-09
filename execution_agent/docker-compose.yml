@@ -7,4 +7,4 @@ services:
       - .env
     volumes:
       - ./state:/app/state
-    restart: unless-stopped
+      - ../data:/app/data:ro
