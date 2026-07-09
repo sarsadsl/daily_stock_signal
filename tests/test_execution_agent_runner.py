@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import execution_agent.runner as runner
 from execution_agent.state_store import SQLiteStateStore
-from execution_agent.tracking_source import PendingOpenEntry
+from execution_agent.tracking_source import PENDING_NEXT_OPEN_STATUS, PendingOpenEntry
 
 
 class FakeNotifier:
@@ -139,8 +139,8 @@ class RunnerTests(unittest.TestCase):
                             "market": "TWSE",
                             "stock_no": "3094",
                             "stock_name": "???",
-                            "signal_date": "2026-07-08",
-                            "status": "敺活?仿???",
+                            "signal_date": "2026-07-07",
+                            "status": PENDING_NEXT_OPEN_STATUS,
                             "entry_limit_price": 41.65,
                             "signal_close": 42.5,
                             "unit_type": "base",
@@ -169,12 +169,93 @@ class RunnerTests(unittest.TestCase):
                 with patch.object(runner, "load_tracking_payload_text", return_value=payload_text, create=True):
                     with patch.object(
                         runner,
-                        "wait_for_realtime_open_snapshot",
-                        return_value={("TWSE", "3094"): 41.35},
+                        "build_trading_dates",
+                        return_value={("TWSE", "3094"): ["2026-07-07", "2026-07-08"]},
                         create=True,
                     ):
-                        exit_code = main()
+                        with patch.object(
+                            runner,
+                            "wait_for_realtime_open_snapshot",
+                            return_value={("TWSE", "3094"): 41.35},
+                            create=True,
+                        ):
+                            exit_code = main()
 
             self.assertFalse(db_path.exists())
 
         self.assertEqual(exit_code, 0)
+
+    def test_run_from_config_uses_next_trading_date_selection_semantics(self) -> None:
+        payload_text = json.dumps(
+            {
+                "tracking": {
+                    "formal_forward_records": [
+                        {
+                            "market": "TWSE",
+                            "stock_no": "3094",
+                            "stock_name": "???",
+                            "signal_date": "2026-07-08",
+                            "status": PENDING_NEXT_OPEN_STATUS,
+                            "entry_limit_price": 41.65,
+                            "signal_close": 42.5,
+                            "unit_type": "base",
+                            "addon_number": None,
+                        }
+                    ]
+                }
+            }
+        )
+
+        config = runner.ExecutionAgentConfig(
+            tracking_json_url="https://example.test/tracking.json",
+            state_db_path="state/agent.db",
+            signal_date="2026-07-09",
+            dry_run=True,
+        )
+
+        with patch.object(runner, "load_tracking_payload_text", return_value=payload_text):
+            with patch.object(
+                runner,
+                "build_trading_dates",
+                return_value={("TWSE", "3094"): ["2026-07-08", "2026-07-09"]},
+                create=True,
+            ):
+                with patch.object(
+                    runner,
+                    "wait_for_realtime_open_snapshot",
+                    return_value={("TWSE", "3094"): 41.35},
+                    create=True,
+                ):
+                    decisions = runner.run_from_config(config, notifier=FakeNotifier())
+
+        self.assertEqual([item.call_key for item in decisions], ["TWSE:3094:2026-07-08:base:-"])
+
+    def test_run_open_entry_cycle_creates_parent_directory_for_db_path(self) -> None:
+        entries = [
+            PendingOpenEntry(
+                market="TWSE",
+                stock_no="3094",
+                stock_name="???",
+                signal_date="2026-07-08",
+                entry_limit_price=41.65,
+                signal_close=42.5,
+                unit_type="base",
+                addon_number=None,
+            )
+        ]
+        notifier = FakeNotifier()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "state" / "agent.db"
+            decisions = runner.run_open_entry_cycle(
+                entries=entries,
+                quote_lookup=lambda entry: 41.35,
+                notifier=notifier,
+                db_path=str(db_path),
+                dry_run=False,
+            )
+
+            self.assertTrue(db_path.parent.exists())
+            self.assertTrue(db_path.exists())
+
+        self.assertEqual([item.result for item in decisions], ["called"])

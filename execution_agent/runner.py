@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import date
+from pathlib import Path
 from urllib.request import urlopen
 
 from execution_agent.config import ExecutionAgentConfig
@@ -11,9 +12,12 @@ from execution_agent.state_store import SQLiteStateStore
 from execution_agent.tracking_source import (
     PendingOpenEntry,
     load_tracking_payload_from_text,
-    select_pending_open_entries,
 )
-from send_mwp_c_open_entry_calls import wait_for_realtime_open_snapshot
+from send_mwp_c_open_entry_calls import (
+    build_trading_dates,
+    select_pending_open_call_candidates,
+    wait_for_realtime_open_snapshot,
+)
 
 
 def load_tracking_payload_text(tracking_json_url: str) -> str:
@@ -46,6 +50,39 @@ def build_open_snapshot(
     )
 
 
+def select_entries_for_run_date(
+    payload: dict,
+    run_date: str,
+    trading_dates: dict[tuple[str, str], list[str]] | None = None,
+) -> list[PendingOpenEntry]:
+    records = payload.get("tracking", {}).get("formal_forward_records", [])
+    selected = select_pending_open_call_candidates(
+        records,
+        as_of_date=run_date,
+        sent_log={"calls": []},
+        trading_dates=trading_dates or build_trading_dates(),
+    )
+    return [
+        PendingOpenEntry(
+            market=str(record.get("market") or "").upper(),
+            stock_no=str(record.get("stock_no") or ""),
+            stock_name=str(record.get("stock_name") or ""),
+            signal_date=str(record.get("signal_date") or ""),
+            entry_limit_price=float(record.get("entry_limit_price") or 0.0),
+            signal_close=float(record.get("signal_close") or 0.0),
+            unit_type=str(record.get("unit_type") or "base"),
+            addon_number=record.get("addon_number"),
+        )
+        for record in selected
+    ]
+
+
+def ensure_db_parent_dir(db_path: str) -> None:
+    parent = Path(db_path).parent
+    if str(parent) and str(parent) != ".":
+        parent.mkdir(parents=True, exist_ok=True)
+
+
 def run_open_entry_cycle(
     entries: list[PendingOpenEntry],
     quote_lookup: Callable[[PendingOpenEntry], float],
@@ -53,6 +90,8 @@ def run_open_entry_cycle(
     db_path: str,
     dry_run: bool,
 ) -> list[OpenEntryDecision]:
+    if not dry_run:
+        ensure_db_parent_dir(db_path)
     store = None if dry_run else SQLiteStateStore(db_path)
     decisions: list[OpenEntryDecision] = []
     for entry in entries:
@@ -77,7 +116,7 @@ def run_from_config(
     poll_interval_seconds: float = 15.0,
 ) -> list[OpenEntryDecision]:
     payload = load_tracking_payload_from_text(load_tracking_payload_text(config.tracking_json_url))
-    entries = select_pending_open_entries(payload, signal_date=config.signal_date)
+    entries = select_entries_for_run_date(payload, run_date=config.signal_date)
     open_snapshot = build_open_snapshot(
         entries,
         signal_date=config.signal_date,
