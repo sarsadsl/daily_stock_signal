@@ -32,13 +32,16 @@ def select_pending_open_entries(payload: dict[str, Any], signal_date: str) -> li
             continue
         if str(row.get("signal_date") or "") != signal_date:
             continue
+        entry_limit_price = row.get("entry_limit_price")
+        if entry_limit_price in {None, ""}:
+            continue
         selected.append(
             PendingOpenEntry(
                 market=str(row.get("market") or "").upper(),
                 stock_no=str(row.get("stock_no") or ""),
                 stock_name=str(row.get("stock_name") or ""),
                 signal_date=str(row.get("signal_date") or ""),
-                entry_limit_price=float(row.get("entry_limit_price") or 0.0),
+                entry_limit_price=float(entry_limit_price),
                 signal_close=float(row.get("signal_close") or 0.0),
                 unit_type=str(row.get("unit_type") or "base"),
                 addon_number=row.get("addon_number"),

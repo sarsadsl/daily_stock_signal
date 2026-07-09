@@ -43,3 +43,25 @@ class TrackingSourceTests(unittest.TestCase):
 
         self.assertEqual([row.stock_no for row in rows], ["3094"])
         self.assertEqual(rows[0].entry_limit_price, 41.65)
+
+    def test_select_pending_open_entries_skips_missing_entry_limit_price(self) -> None:
+        payload = {
+            "tracking": {
+                "formal_forward_records": [
+                    {
+                        "market": "TWSE",
+                        "stock_no": "3094",
+                        "stock_name": "xx",
+                        "signal_date": "2026-07-08",
+                        "status": "待次日開盤",
+                        "signal_close": 42.5,
+                        "unit_type": "base",
+                        "addon_number": None,
+                    }
+                ]
+            }
+        }
+
+        rows = select_pending_open_entries(payload, signal_date="2026-07-08")
+
+        self.assertEqual(rows, [])
