@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 
 import execution_agent.runner as runner
+from execution_agent.broker_adapter import SandboxOrderResult
 from execution_agent.state_store import SQLiteStateStore
 from execution_agent.tracking_source import PENDING_NEXT_OPEN_STATUS, PendingOpenEntry
 
@@ -18,6 +19,21 @@ class FakeNotifier:
     def send_open_entry_call(self, decision) -> bool:
         self.sent.append(decision.call_key)
         return self.should_succeed
+
+
+class FakeBroker:
+    def __init__(self) -> None:
+        self.requests = []
+
+    def submit_buy_order(self, request):
+        self.requests.append(request)
+        return SandboxOrderResult(
+            call_key=request.call_key,
+            accepted=True,
+            broker_order_id=f"fake-{len(self.requests)}",
+            submitted_at="2026-07-10T09:00:00+08:00",
+            message="accepted",
+        )
 
 
 class RunnerTests(unittest.TestCase):
@@ -259,3 +275,66 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(db_path.exists())
 
         self.assertEqual([item.result for item in decisions], ["called"])
+
+    def test_run_from_config_executes_sandbox_orders_when_enabled(self) -> None:
+        payload_text = json.dumps(
+            {
+                "tracking": {
+                    "formal_forward_records": [
+                        {
+                            "market": "TWSE",
+                            "stock_no": "3094",
+                            "stock_name": "聯傑",
+                            "signal_date": "2026-07-08",
+                            "status": PENDING_NEXT_OPEN_STATUS,
+                            "entry_limit_price": 41.65,
+                            "signal_close": 42.5,
+                            "unit_type": "base",
+                            "addon_number": None,
+                        }
+                    ]
+                }
+            }
+        )
+        broker_config = runner.BrokerConfig.from_env(
+            {
+                "BROKER_MODE": "sandbox",
+                "SANDBOX_ONLY": "1",
+                "SHIOAJI_API_KEY": "key",
+                "SHIOAJI_SECRET_KEY": "secret",
+            }
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config = runner.ExecutionAgentConfig(
+                tracking_json_url="https://example.test/tracking.json",
+                state_db_path=str(Path(tmpdir) / "agent.db"),
+                signal_date="2026-07-09",
+                dry_run=False,
+            )
+            ledger = runner.SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
+            broker = FakeBroker()
+            with patch.object(runner, "load_tracking_payload_text", return_value=payload_text):
+                with patch.object(
+                    runner,
+                    "build_trading_dates",
+                    return_value={("TWSE", "3094"): ["2026-07-08", "2026-07-09"]},
+                    create=True,
+                ):
+                    with patch.object(
+                        runner,
+                        "wait_for_realtime_open_snapshot",
+                        return_value={("TWSE", "3094"): 41.35},
+                        create=True,
+                    ):
+                        decisions = runner.run_from_config(
+                            config,
+                            notifier=FakeNotifier(),
+                            broker_config=broker_config,
+                            sandbox_ledger=ledger,
+                            broker=broker,
+                        )
+
+            self.assertEqual([item.result for item in decisions], ["called"])
+            self.assertEqual(len(broker.requests), 1)
+            self.assertEqual(len(ledger.list_orders()), 1)

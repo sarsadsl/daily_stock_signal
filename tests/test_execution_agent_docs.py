@@ -23,6 +23,13 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
         self.assertIn("TELEGRAM_BOT_TOKEN=", text)
         self.assertIn("TELEGRAM_CHAT_ID=", text)
 
+    def test_env_example_documents_sandbox_broker_safety(self) -> None:
+        text = pathlib.Path("execution_agent/.env.example").read_text(encoding="utf-8")
+        self.assertIn("BROKER_MODE=noop", text)
+        self.assertIn("SANDBOX_ONLY=1", text)
+        self.assertIn("SHIOAJI_API_KEY=", text)
+        self.assertIn("SHIOAJI_SECRET_KEY=", text)
+
     def test_compose_mounts_data_directory_for_trading_date_lookup(self) -> None:
         text = pathlib.Path("execution_agent/docker-compose.yml").read_text(encoding="utf-8")
         self.assertIn("../data:/app/data:ro", text)

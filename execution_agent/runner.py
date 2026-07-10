@@ -5,9 +5,13 @@ from datetime import date
 from pathlib import Path
 from urllib.request import urlopen
 
+from execution_agent.broker_adapter import BrokerAdapter
+from execution_agent.broker_config import BrokerConfig
 from execution_agent.config import ExecutionAgentConfig
 from execution_agent.notifier import TelegramNotifier
 from execution_agent.open_entry_core import OpenEntryDecision, build_open_entry_decision
+from execution_agent.sandbox_executor import execute_sandbox_orders
+from execution_agent.sandbox_ledger import SandboxLedger
 from execution_agent.state_store import SQLiteStateStore
 from execution_agent.tracking_source import (
     PendingOpenEntry,
@@ -112,6 +116,9 @@ def run_open_entry_cycle(
 def run_from_config(
     config: ExecutionAgentConfig,
     notifier: TelegramNotifier | None = None,
+    broker_config: BrokerConfig | None = None,
+    sandbox_ledger: SandboxLedger | None = None,
+    broker: BrokerAdapter | None = None,
     poll_attempts: int = 20,
     poll_interval_seconds: float = 15.0,
 ) -> list[OpenEntryDecision]:
@@ -129,23 +136,40 @@ def run_from_config(
         for entry in entries
         if (entry.market, entry.stock_no) in open_snapshot
     ]
-    return run_open_entry_cycle(
+    decisions = run_open_entry_cycle(
         entries=ready_entries,
         quote_lookup=lambda entry: open_snapshot[(entry.market, entry.stock_no)],
         notifier=notifier or TelegramNotifier(),
         db_path=config.state_db_path,
         dry_run=config.dry_run,
     )
+    if not config.dry_run:
+        active_broker_config = broker_config or BrokerConfig.from_env()
+        if active_broker_config.should_submit_orders():
+            active_ledger = sandbox_ledger or SandboxLedger(config.state_db_path)
+            execute_sandbox_orders(
+                decisions,
+                config=active_broker_config,
+                ledger=active_ledger,
+                broker=broker,
+            )
+    return decisions
 
 
 def run_from_env(
     notifier: TelegramNotifier | None = None,
+    broker_config: BrokerConfig | None = None,
+    sandbox_ledger: SandboxLedger | None = None,
+    broker: BrokerAdapter | None = None,
     poll_attempts: int = 20,
     poll_interval_seconds: float = 15.0,
 ) -> list[OpenEntryDecision]:
     return run_from_config(
         ExecutionAgentConfig.from_env(),
         notifier=notifier,
+        broker_config=broker_config,
+        sandbox_ledger=sandbox_ledger,
+        broker=broker,
         poll_attempts=poll_attempts,
         poll_interval_seconds=poll_interval_seconds,
     )
