@@ -41,3 +41,7 @@ class BrokerConfigTests(unittest.TestCase):
 
         self.assertTrue(config.should_submit_orders())
         self.assertEqual(config.order_cash_per_trade, 50000.0)
+
+    def test_rejects_unknown_order_lot_mode(self) -> None:
+        with self.assertRaisesRegex(BrokerConfigError, "ORDER_LOT_MODE"):
+            BrokerConfig.from_env({"ORDER_LOT_MODE": "unsupported"})

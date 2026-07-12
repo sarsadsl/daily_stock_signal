@@ -34,3 +34,10 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
         text = pathlib.Path("execution_agent/docker-compose.yml").read_text(encoding="utf-8")
         self.assertIn("../data:/app/data:ro", text)
         self.assertNotIn("restart: unless-stopped", text)
+
+    def test_docker_installs_execution_agent_shioaji_dependency(self) -> None:
+        dockerfile = pathlib.Path("execution_agent/Dockerfile").read_text(encoding="utf-8")
+        requirements = pathlib.Path("execution_agent/requirements.txt").read_text(encoding="utf-8")
+
+        self.assertIn("execution_agent/requirements.txt", dockerfile)
+        self.assertIn("shioaji==1.5.4", requirements)

@@ -32,6 +32,8 @@ class BrokerConfig:
         secret_key = _blank_to_none(env.get("SHIOAJI_SECRET_KEY"))
         cash_per_trade = _parse_cash_budget(env.get("ORDER_CASH_PER_TRADE"))
         order_lot_mode = str(env.get("ORDER_LOT_MODE") or "odd_lot_or_round_down").strip()
+        if order_lot_mode != "odd_lot_or_round_down":
+            raise BrokerConfigError(f"Unsupported ORDER_LOT_MODE: {order_lot_mode}")
 
         if broker_mode == "sandbox":
             if not sandbox_only:
