@@ -41,3 +41,12 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
 
         self.assertIn("execution_agent/requirements.txt", dockerfile)
         self.assertIn("shioaji==1.5.4", requirements)
+
+    def test_github_scans_full_history_for_secrets(self) -> None:
+        workflow = pathlib.Path(".github/workflows/secret-scan.yml").read_text(encoding="utf-8")
+
+        self.assertIn("fetch-depth: 0", workflow)
+        self.assertIn(
+            "gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc",
+            workflow,
+        )
