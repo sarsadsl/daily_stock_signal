@@ -93,6 +93,7 @@ def run_open_entry_cycle(
     notifier: TelegramNotifier,
     db_path: str,
     dry_run: bool,
+    include_processed_called: bool = False,
 ) -> list[OpenEntryDecision]:
     if not dry_run:
         ensure_db_parent_dir(db_path)
@@ -101,6 +102,8 @@ def run_open_entry_cycle(
     for entry in entries:
         decision = build_open_entry_decision(entry, open_price=quote_lookup(entry))
         if store is not None and store.has_processed(decision.call_key):
+            if include_processed_called and decision.result == "called":
+                decisions.append(decision)
             continue
         if dry_run:
             decisions.append(decision)
@@ -122,6 +125,12 @@ def run_from_config(
     poll_attempts: int = 20,
     poll_interval_seconds: float = 15.0,
 ) -> list[OpenEntryDecision]:
+    active_broker_config = None
+    should_submit_orders = False
+    if not config.dry_run:
+        active_broker_config = broker_config or BrokerConfig.from_env()
+        should_submit_orders = active_broker_config.should_submit_orders()
+
     payload = load_tracking_payload_from_text(load_tracking_payload_text(config.tracking_json_url))
     entries = select_entries_for_run_date(payload, run_date=config.signal_date)
     open_snapshot = build_open_snapshot(
@@ -142,17 +151,16 @@ def run_from_config(
         notifier=notifier or TelegramNotifier(),
         db_path=config.state_db_path,
         dry_run=config.dry_run,
+        include_processed_called=should_submit_orders,
     )
-    if not config.dry_run:
-        active_broker_config = broker_config or BrokerConfig.from_env()
-        if active_broker_config.should_submit_orders():
-            active_ledger = sandbox_ledger or SandboxLedger(config.state_db_path)
-            execute_sandbox_orders(
-                decisions,
-                config=active_broker_config,
-                ledger=active_ledger,
-                broker=broker,
-            )
+    if should_submit_orders and active_broker_config is not None:
+        active_ledger = sandbox_ledger or SandboxLedger(config.state_db_path)
+        execute_sandbox_orders(
+            decisions,
+            config=active_broker_config,
+            ledger=active_ledger,
+            broker=broker,
+        )
     return decisions
 
 
