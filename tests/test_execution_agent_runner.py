@@ -49,6 +49,19 @@ class FailingBroker:
 
 
 class RunnerTests(unittest.TestCase):
+    def test_live_run_rejects_overlapping_process_before_fetching_tracking(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = str(Path(tmpdir) / "agent.db")
+            config = runner.ExecutionAgentConfig(
+                tracking_json_url="https://example.test/tracking.json",
+                state_db_path=db_path,
+                signal_date="2026-07-09",
+                dry_run=False,
+            )
+            with runner.execution_agent_lock(db_path):
+                with self.assertRaises(runner.ExecutionAgentAlreadyRunningError):
+                    runner.run_from_config(config, notifier=FakeNotifier())
+
     def test_run_open_entry_cycle_records_called_and_sends_notification(self) -> None:
         entries = [
             PendingOpenEntry(

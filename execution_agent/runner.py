@@ -10,6 +10,7 @@ from execution_agent.broker_config import BrokerConfig
 from execution_agent.config import ExecutionAgentConfig
 from execution_agent.notifier import TelegramNotifier
 from execution_agent.open_entry_core import OpenEntryDecision, build_open_entry_decision
+from execution_agent.run_lock import ExecutionAgentAlreadyRunningError, execution_agent_lock
 from execution_agent.sandbox_executor import execute_sandbox_orders
 from execution_agent.sandbox_ledger import SandboxLedger
 from execution_agent.state_store import SQLiteStateStore
@@ -117,6 +118,38 @@ def run_open_entry_cycle(
 
 
 def run_from_config(
+    config: ExecutionAgentConfig,
+    notifier: TelegramNotifier | None = None,
+    broker_config: BrokerConfig | None = None,
+    sandbox_ledger: SandboxLedger | None = None,
+    broker: BrokerAdapter | None = None,
+    poll_attempts: int = 20,
+    poll_interval_seconds: float = 15.0,
+) -> list[OpenEntryDecision]:
+    if config.dry_run:
+        return _run_from_config_unlocked(
+            config,
+            notifier=notifier,
+            broker_config=broker_config,
+            sandbox_ledger=sandbox_ledger,
+            broker=broker,
+            poll_attempts=poll_attempts,
+            poll_interval_seconds=poll_interval_seconds,
+        )
+    ensure_db_parent_dir(config.state_db_path)
+    with execution_agent_lock(config.state_db_path):
+        return _run_from_config_unlocked(
+            config,
+            notifier=notifier,
+            broker_config=broker_config,
+            sandbox_ledger=sandbox_ledger,
+            broker=broker,
+            poll_attempts=poll_attempts,
+            poll_interval_seconds=poll_interval_seconds,
+        )
+
+
+def _run_from_config_unlocked(
     config: ExecutionAgentConfig,
     notifier: TelegramNotifier | None = None,
     broker_config: BrokerConfig | None = None,

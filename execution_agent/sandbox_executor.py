@@ -36,7 +36,9 @@ def execute_sandbox_orders(
 
     active_broker = broker or ShioajiSandboxBrokerAdapter(config)
     counts = _MutableCounts()
+    handled_call_keys: set[str] = set()
     for decision in decisions:
+        handled_call_keys.add(decision.call_key)
         if decision.result != "called":
             counts.skipped_non_called += 1
             ledger.record_event(decision.call_key, "skipped_non_called", decision.result)
@@ -44,17 +46,7 @@ def execute_sandbox_orders(
         existing_order = ledger.get_order(decision.call_key)
         if existing_order is not None:
             if ledger.order_needs_reconciliation(existing_order):
-                try:
-                    result = active_broker.refresh_buy_order(
-                        _request_from_order(existing_order),
-                        str(existing_order.get("broker_order_id") or ""),
-                    )
-                except Exception as exc:
-                    counts.broker_errors += 1
-                    ledger.record_event(decision.call_key, "broker_refresh_error", _safe_error_message(exc))
-                    continue
-                ledger.record_order(_request_from_order(existing_order), result)
-                counts.reconciled += 1
+                _refresh_existing_order(existing_order, active_broker, ledger, counts)
                 continue
             counts.skipped_duplicate += 1
             ledger.record_event(decision.call_key, "skipped_duplicate", "sandbox order already exists")
@@ -78,6 +70,12 @@ def execute_sandbox_orders(
         else:
             counts.rejected += 1
             ledger.record_event(decision.call_key, "broker_rejected", result.message)
+
+    for order in ledger.list_orders():
+        call_key = str(order.get("call_key") or "")
+        if call_key in handled_call_keys or not ledger.order_needs_reconciliation(order):
+            continue
+        _refresh_existing_order(order, active_broker, ledger, counts)
 
     return counts.to_summary()
 
@@ -122,3 +120,23 @@ def _request_from_order(order: dict) -> SandboxOrderRequest:
         price=float(order["price"]),
         order_type=str(order["order_type"]),
     )
+
+
+def _refresh_existing_order(
+    order: dict,
+    broker: BrokerAdapter,
+    ledger: SandboxLedger,
+    counts: _MutableCounts,
+) -> None:
+    request = _request_from_order(order)
+    try:
+        result = broker.refresh_buy_order(
+            request,
+            str(order.get("broker_order_id") or ""),
+        )
+    except Exception as exc:
+        counts.broker_errors += 1
+        ledger.record_event(request.call_key, "broker_refresh_error", _safe_error_message(exc))
+        return
+    ledger.record_order(request, result)
+    counts.reconciled += 1

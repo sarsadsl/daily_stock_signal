@@ -127,7 +127,7 @@ class SandboxExecutorTests(unittest.TestCase):
             config = self.sandbox_config()
 
             first = execute_sandbox_orders([decision()], config=config, ledger=ledger, broker=broker)
-            second = execute_sandbox_orders([decision()], config=config, ledger=ledger, broker=broker)
+            second = execute_sandbox_orders([], config=config, ledger=ledger, broker=broker)
 
             self.assertEqual(first.submitted, 1)
             self.assertEqual(second.reconciled, 1)
