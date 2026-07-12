@@ -19,11 +19,9 @@ def build_buy_order_request(decision: OpenEntryDecision, cash_budget: float) -> 
     affordable_quantity = int(cash_budget // decision.open_price)
     if affordable_quantity <= 0:
         raise OrderSizingError("Calculated quantity must be at least 1")
-    quantity = (
-        (affordable_quantity // 1000) * 1000
-        if affordable_quantity >= 1000
-        else affordable_quantity
-    )
+    if affordable_quantity < 1000:
+        raise OrderSizingError("Sandbox mode requires enough cash for one common lot")
+    quantity = (affordable_quantity // 1000) * 1000
 
     return SandboxOrderRequest(
         call_key=decision.call_key,

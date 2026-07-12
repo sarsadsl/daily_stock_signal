@@ -29,6 +29,7 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
         self.assertIn("SANDBOX_ONLY=1", text)
         self.assertIn("SHIOAJI_API_KEY=", text)
         self.assertIn("SHIOAJI_SECRET_KEY=", text)
+        self.assertIn("ORDER_LOT_MODE=common_lot_round_down", text)
 
     def test_compose_mounts_data_directory_for_trading_date_lookup(self) -> None:
         text = pathlib.Path("execution_agent/docker-compose.yml").read_text(encoding="utf-8")
@@ -46,7 +47,6 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
         workflow = pathlib.Path(".github/workflows/secret-scan.yml").read_text(encoding="utf-8")
 
         self.assertIn("fetch-depth: 0", workflow)
-        self.assertIn(
-            "gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc",
-            workflow,
-        )
+        self.assertIn("gitleaks_8.30.1_linux_x64.tar.gz", workflow)
+        self.assertIn("551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb", workflow)
+        self.assertIn('git . --log-opts="--all" --redact', workflow)

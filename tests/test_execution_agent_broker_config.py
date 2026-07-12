@@ -10,6 +10,7 @@ class BrokerConfigTests(unittest.TestCase):
         self.assertEqual(config.broker_mode, "noop")
         self.assertFalse(config.should_submit_orders())
         self.assertEqual(config.order_cash_per_trade, 100000.0)
+        self.assertEqual(config.order_lot_mode, "common_lot_round_down")
 
     def test_rejects_live_mode(self) -> None:
         with self.assertRaisesRegex(BrokerConfigError, "live"):

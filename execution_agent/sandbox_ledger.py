@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 import sqlite3
-from typing import Any
+from typing import Any, Iterator
 
 from execution_agent.broker_adapter import SandboxOrderRequest, SandboxOrderResult
 
@@ -17,12 +18,25 @@ class SandboxLedger:
         self._ensure_schema()
 
     def has_order(self, call_key: str) -> bool:
+        return self.get_order(call_key) is not None
+
+    def get_order(self, call_key: str) -> dict[str, Any] | None:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT 1 FROM sandbox_orders WHERE call_key = ? LIMIT 1",
+                "SELECT * FROM sandbox_orders WHERE call_key = ? LIMIT 1",
                 (call_key,),
             ).fetchone()
-        return row is not None
+        return dict(row) if row is not None else None
+
+    @staticmethod
+    def order_needs_reconciliation(order: dict[str, Any]) -> bool:
+        return str(order.get("status") or "").casefold() in {
+            "pendingsubmit",
+            "presubmitted",
+            "submitted",
+            "partfilled",
+            "filling",
+        }
 
     def record_order(self, request: SandboxOrderRequest, result: SandboxOrderResult) -> None:
         created_at = _now_iso()
@@ -67,11 +81,16 @@ class SandboxLedger:
             if result.filled_quantity > 0:
                 conn.execute(
                     """
-                    INSERT OR IGNORE INTO sandbox_positions (
+                    INSERT INTO sandbox_positions (
                         call_key, market, stock_no, stock_name, entry_date,
                         entry_price, quantity, status, created_at, updated_at
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(call_key) DO UPDATE SET
+                        entry_price = excluded.entry_price,
+                        quantity = excluded.quantity,
+                        status = excluded.status,
+                        updated_at = excluded.updated_at
                     """,
                     (
                         request.call_key,
@@ -156,6 +175,16 @@ class SandboxLedger:
             )
             self._ensure_column(conn, "sandbox_orders", "filled_quantity", "INTEGER NOT NULL DEFAULT 0")
             self._ensure_column(conn, "sandbox_orders", "filled_price", "REAL")
+            conn.execute(
+                """
+                DELETE FROM sandbox_positions
+                WHERE call_key IN (
+                    SELECT call_key
+                    FROM sandbox_orders
+                    WHERE filled_quantity = 0
+                )
+                """
+            )
 
     @staticmethod
     def _ensure_column(
@@ -171,10 +200,15 @@ class SandboxLedger:
         if column_name not in columns:
             conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}")
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
-        return conn
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def _list_table(self, table_name: str) -> list[dict[str, Any]]:
         with self._connect() as conn:

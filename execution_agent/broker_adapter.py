@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+import hashlib
 from typing import Any
 
 from execution_agent.broker_config import BrokerConfig
@@ -38,6 +39,13 @@ class BrokerAdapter:
     def submit_buy_order(self, request: SandboxOrderRequest) -> SandboxOrderResult:
         raise NotImplementedError
 
+    def refresh_buy_order(
+        self,
+        request: SandboxOrderRequest,
+        broker_order_id: str,
+    ) -> SandboxOrderResult:
+        raise NotImplementedError
+
 
 class NoopBrokerAdapter(BrokerAdapter):
     def submit_buy_order(self, request: SandboxOrderRequest) -> SandboxOrderResult:
@@ -50,13 +58,21 @@ class NoopBrokerAdapter(BrokerAdapter):
             status="Noop",
         )
 
+    def refresh_buy_order(
+        self,
+        request: SandboxOrderRequest,
+        broker_order_id: str,
+    ) -> SandboxOrderResult:
+        return self.submit_buy_order(request)
+
 
 class ShioajiSandboxBrokerAdapter(BrokerAdapter):
-    def __init__(self, config: BrokerConfig) -> None:
+    def __init__(self, config: BrokerConfig, shioaji_module: Any | None = None) -> None:
         self.config = config
+        self._shioaji_module = shioaji_module
 
     def submit_buy_order(self, request: SandboxOrderRequest) -> SandboxOrderResult:
-        import shioaji as sj
+        sj = self._load_shioaji()
 
         api = sj.Shioaji(simulation=True)
         try:
@@ -64,6 +80,14 @@ class ShioajiSandboxBrokerAdapter(BrokerAdapter):
                 api_key=self.config.shioaji_api_key or "",
                 secret_key=self.config.shioaji_secret_key or "",
             )
+            api.update_status(api.stock_account)
+            existing_trade = _find_trade(
+                api.list_trades(),
+                broker_order_id="",
+                custom_field=_order_custom_field(request.call_key),
+            )
+            if existing_trade is not None:
+                return _result_from_trade(request, existing_trade)
             contract = api.Contracts.Stocks[request.stock_no]
             order = api.Order(
                 price=request.price,
@@ -73,12 +97,47 @@ class ShioajiSandboxBrokerAdapter(BrokerAdapter):
                 order_type=sj.constant.OrderType.ROD,
                 order_lot=_shioaji_lot(request.quantity, sj),
                 account=api.stock_account,
+                custom_field=_order_custom_field(request.call_key),
             )
             trade = api.place_order(contract, order)
-            api.update_status(trade=trade)
+            try:
+                api.update_status(trade=trade)
+            except Exception:
+                pass
             return _result_from_trade(request, trade)
         finally:
-            api.logout()
+            _safe_logout(api)
+
+    def refresh_buy_order(
+        self,
+        request: SandboxOrderRequest,
+        broker_order_id: str,
+    ) -> SandboxOrderResult:
+        sj = self._load_shioaji()
+        api = sj.Shioaji(simulation=True)
+        try:
+            api.login(
+                api_key=self.config.shioaji_api_key or "",
+                secret_key=self.config.shioaji_secret_key or "",
+            )
+            api.update_status(api.stock_account)
+            trade = _find_trade(
+                api.list_trades(),
+                broker_order_id=broker_order_id,
+                custom_field=_order_custom_field(request.call_key),
+            )
+            if trade is None:
+                raise RuntimeError(f"broker_order_not_found:{broker_order_id}")
+            return _result_from_trade(request, trade)
+        finally:
+            _safe_logout(api)
+
+    def _load_shioaji(self) -> Any:
+        if self._shioaji_module is not None:
+            return self._shioaji_module
+        import shioaji as sj
+
+        return sj
 
 
 def _shioaji_quantity(quantity: int) -> int:
@@ -112,8 +171,15 @@ def _result_from_trade(request: SandboxOrderRequest, trade: Any) -> SandboxOrder
     raw_status = _enum_value(getattr(status, "status", "")) or "Unknown"
     operation = getattr(trade, "operation", None)
     operation_code = str(getattr(operation, "op_code", "") or "").strip()
-    failed_statuses = {"failed", "cancelled", "inactive"}
-    accepted = raw_status.casefold() not in failed_statuses and operation_code in {"", "00"}
+    accepted_statuses = {
+        "pendingsubmit",
+        "presubmitted",
+        "submitted",
+        "partfilled",
+        "filling",
+        "filled",
+    }
+    accepted = raw_status.casefold() in accepted_statuses and operation_code in {"", "00"}
 
     broker_quantity = int(getattr(status, "deal_quantity", 0) or 0)
     filled_quantity = broker_quantity * 1000 if request.quantity >= 1000 else broker_quantity
@@ -156,3 +222,28 @@ def _average_fill_price(status: Any, request: SandboxOrderRequest) -> float | No
     if int(getattr(status, "deal_quantity", 0) or 0) > 0:
         return request.price
     return None
+
+
+def _order_custom_field(call_key: str) -> str:
+    return hashlib.sha256(call_key.encode("utf-8")).hexdigest()[:6].upper()
+
+
+def _find_trade(
+    trades: list[Any],
+    broker_order_id: str,
+    custom_field: str,
+) -> Any | None:
+    for trade in trades:
+        order = getattr(trade, "order", None)
+        if broker_order_id and _trade_order_id(trade) == broker_order_id:
+            return trade
+        if str(getattr(order, "custom_field", "") or "").strip() == custom_field:
+            return trade
+    return None
+
+
+def _safe_logout(api: Any) -> None:
+    try:
+        api.logout()
+    except Exception:
+        pass

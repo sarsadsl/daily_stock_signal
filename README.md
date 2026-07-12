@@ -242,7 +242,7 @@ docker compose run --rm execution-agent
 
 Broker execution is disabled by default with `BROKER_MODE=noop`. To test Shioaji sandbox order submission, set `BROKER_MODE=sandbox`, keep `SANDBOX_ONLY=1`, and provide `SHIOAJI_API_KEY` plus `SHIOAJI_SECRET_KEY` through the runtime environment or local `.env`. `BROKER_MODE=live` is intentionally unsupported in this phase.
 
-When sandbox mode is enabled, only Phase 1 `called` decisions are converted into sandbox buy orders. `open_failed` and missing-quote decisions are audit-only and never submit broker orders. Sandbox orders and simulated positions are written to the SQLite state DB; the formal tracking JSON and existing website pages remain unchanged.
+When sandbox mode is enabled, only Phase 1 `called` decisions are converted into sandbox buy orders. `open_failed` and missing-quote decisions are audit-only and never submit broker orders. Shioaji simulation uses common lots only, so `ORDER_CASH_PER_TRADE` must cover at least 1,000 shares at the entry price. Submitted and partially filled orders are reconciled by broker order ID instead of being resubmitted, and a simulated position is created only after an actual fill. Sandbox orders and simulated positions are written to the SQLite state DB; the formal tracking JSON and existing website pages remain unchanged.
 
 Docker Compose 會把 `./state` 掛載到容器內的 `/app/state`，並把上層的 `../data` 以唯讀方式掛到 `/app/data`。SQLite 狀態檔會存成 `agent.db`，而 next-trading-date 會依據這些本地 CSV 計算。
 

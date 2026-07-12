@@ -1,6 +1,8 @@
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
+import sqlite3
 
 from execution_agent.broker_adapter import SandboxOrderRequest, SandboxOrderResult
 from execution_agent.sandbox_ledger import SandboxLedger
@@ -16,7 +18,7 @@ def sample_request() -> SandboxOrderRequest:
         open_price=41.35,
         entry_limit_price=41.65,
         cash_budget=100000,
-        quantity=2418,
+        quantity=2000,
         price=41.35,
         order_type="sandbox_buy_open",
     )
@@ -73,6 +75,86 @@ class SandboxLedgerTests(unittest.TestCase):
             self.assertEqual(order["filled_quantity"], 2000)
             self.assertEqual(position["quantity"], 2000)
             self.assertEqual(position["entry_price"], 41.3)
+
+    def test_later_fill_reconciles_existing_partial_position(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ledger = SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
+            request = sample_request()
+            partial = SandboxOrderResult(
+                call_key=request.call_key,
+                accepted=True,
+                broker_order_id="sandbox-1",
+                submitted_at="2026-07-10T09:00:00+08:00",
+                message="part filled",
+                status="PartFilled",
+                filled_quantity=1000,
+                average_fill_price=41.2,
+            )
+
+            ledger.record_order(request, partial)
+            ledger.record_order(request, filled_result(request))
+
+            positions = ledger.list_positions()
+            self.assertEqual(len(positions), 1)
+            self.assertEqual(positions[0]["quantity"], 2000)
+            self.assertEqual(positions[0]["entry_price"], 41.3)
+
+    def test_migration_removes_legacy_accepted_but_unfilled_position(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = str(Path(tmpdir) / "sandbox.db")
+            with closing(sqlite3.connect(db_path)) as conn:
+                with conn:
+                    conn.executescript(
+                        """
+                    CREATE TABLE sandbox_orders (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        call_key TEXT NOT NULL UNIQUE,
+                        market TEXT NOT NULL,
+                        stock_no TEXT NOT NULL,
+                        stock_name TEXT NOT NULL,
+                        signal_date TEXT NOT NULL,
+                        open_price REAL NOT NULL,
+                        entry_limit_price REAL NOT NULL,
+                        cash_budget REAL NOT NULL,
+                        quantity INTEGER NOT NULL,
+                        price REAL NOT NULL,
+                        order_type TEXT NOT NULL,
+                        broker_order_id TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        message TEXT NOT NULL,
+                        created_at TEXT NOT NULL
+                    );
+                    CREATE TABLE sandbox_positions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        call_key TEXT NOT NULL UNIQUE,
+                        market TEXT NOT NULL,
+                        stock_no TEXT NOT NULL,
+                        stock_name TEXT NOT NULL,
+                        entry_date TEXT NOT NULL,
+                        entry_price REAL NOT NULL,
+                        quantity INTEGER NOT NULL,
+                        status TEXT NOT NULL,
+                        created_at TEXT NOT NULL,
+                        updated_at TEXT NOT NULL
+                    );
+                    INSERT INTO sandbox_orders VALUES (
+                        1, 'legacy-key', 'TWSE', '3094', 'test', '2026-07-08',
+                        41.35, 41.65, 100000, 2000, 41.35, 'sandbox_buy_open',
+                        'legacy-order', 'accepted', 'accepted', '2026-07-10T09:00:00+08:00'
+                    );
+                    INSERT INTO sandbox_positions VALUES (
+                        1, 'legacy-key', 'TWSE', '3094', 'test', '2026-07-08',
+                        41.35, 2000, 'open', '2026-07-10T09:00:00+08:00',
+                        '2026-07-10T09:00:00+08:00'
+                    );
+                        """
+                    )
+
+            ledger = SandboxLedger(db_path)
+
+            self.assertEqual(ledger.list_positions(), [])
+            order = ledger.list_orders()[0]
+            self.assertEqual(order["filled_quantity"], 0)
 
     def test_record_event_does_not_create_position(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

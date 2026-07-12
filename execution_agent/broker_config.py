@@ -16,7 +16,7 @@ class BrokerConfig:
     shioaji_api_key: str | None
     shioaji_secret_key: str | None
     order_cash_per_trade: float = 100000.0
-    order_lot_mode: str = "odd_lot_or_round_down"
+    order_lot_mode: str = "common_lot_round_down"
 
     @classmethod
     def from_env(cls, environ: Mapping[str, str] | None = None) -> "BrokerConfig":
@@ -31,8 +31,8 @@ class BrokerConfig:
         api_key = _blank_to_none(env.get("SHIOAJI_API_KEY"))
         secret_key = _blank_to_none(env.get("SHIOAJI_SECRET_KEY"))
         cash_per_trade = _parse_cash_budget(env.get("ORDER_CASH_PER_TRADE"))
-        order_lot_mode = str(env.get("ORDER_LOT_MODE") or "odd_lot_or_round_down").strip()
-        if order_lot_mode != "odd_lot_or_round_down":
+        order_lot_mode = str(env.get("ORDER_LOT_MODE") or "common_lot_round_down").strip()
+        if order_lot_mode != "common_lot_round_down":
             raise BrokerConfigError(f"Unsupported ORDER_LOT_MODE: {order_lot_mode}")
 
         if broker_mode == "sandbox":

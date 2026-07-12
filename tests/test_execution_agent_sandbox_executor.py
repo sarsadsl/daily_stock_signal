@@ -28,6 +28,39 @@ class FakeBroker:
             average_fill_price=request.price if self.accepted else None,
         )
 
+    def refresh_buy_order(self, request, broker_order_id):
+        raise AssertionError("filled fake orders should not be reconciled")
+
+
+class PendingThenFilledBroker:
+    def __init__(self) -> None:
+        self.submitted = []
+        self.refreshed = []
+
+    def submit_buy_order(self, request):
+        self.submitted.append(request)
+        return SandboxOrderResult(
+            call_key=request.call_key,
+            accepted=True,
+            broker_order_id="pending-1",
+            submitted_at="2026-07-10T09:00:00+08:00",
+            message="submitted",
+            status="Submitted",
+        )
+
+    def refresh_buy_order(self, request, broker_order_id):
+        self.refreshed.append((request, broker_order_id))
+        return SandboxOrderResult(
+            call_key=request.call_key,
+            accepted=True,
+            broker_order_id=broker_order_id,
+            submitted_at="2026-07-10T09:01:00+08:00",
+            message="filled",
+            status="Filled",
+            filled_quantity=request.quantity,
+            average_fill_price=request.price,
+        )
+
 
 def decision(stock_no="3094", open_price=41.35, limit=41.65):
     entry = PendingOpenEntry(
@@ -86,3 +119,18 @@ class SandboxExecutorTests(unittest.TestCase):
             self.assertEqual(summary.skipped_duplicate, 1)
             self.assertEqual(len(broker.requests), 1)
             self.assertEqual(len(ledger.list_orders()), 1)
+
+    def test_pending_order_is_reconciled_without_resubmission(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ledger = SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
+            broker = PendingThenFilledBroker()
+            config = self.sandbox_config()
+
+            first = execute_sandbox_orders([decision()], config=config, ledger=ledger, broker=broker)
+            second = execute_sandbox_orders([decision()], config=config, ledger=ledger, broker=broker)
+
+            self.assertEqual(first.submitted, 1)
+            self.assertEqual(second.reconciled, 1)
+            self.assertEqual(len(broker.submitted), 1)
+            self.assertEqual(len(broker.refreshed), 1)
+            self.assertEqual(len(ledger.list_positions()), 1)
