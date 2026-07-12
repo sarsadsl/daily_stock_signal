@@ -26,16 +26,23 @@ class SandboxLedger:
 
     def record_order(self, request: SandboxOrderRequest, result: SandboxOrderResult) -> None:
         created_at = _now_iso()
-        status = "accepted" if result.accepted else "rejected"
+        status = result.status or ("accepted" if result.accepted else "rejected")
         with self._connect() as conn:
             conn.execute(
                 """
-                INSERT OR IGNORE INTO sandbox_orders (
+                INSERT INTO sandbox_orders (
                     call_key, market, stock_no, stock_name, signal_date,
                     open_price, entry_limit_price, cash_budget, quantity, price,
-                    order_type, broker_order_id, status, message, created_at
+                    order_type, broker_order_id, status, message, filled_quantity,
+                    filled_price, created_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(call_key) DO UPDATE SET
+                    broker_order_id = excluded.broker_order_id,
+                    status = excluded.status,
+                    message = excluded.message,
+                    filled_quantity = excluded.filled_quantity,
+                    filled_price = excluded.filled_price
                 """,
                 (
                     request.call_key,
@@ -52,10 +59,12 @@ class SandboxLedger:
                     result.broker_order_id,
                     status,
                     result.message,
+                    result.filled_quantity,
+                    result.average_fill_price,
                     created_at,
                 ),
             )
-            if result.accepted:
+            if result.filled_quantity > 0:
                 conn.execute(
                     """
                     INSERT OR IGNORE INTO sandbox_positions (
@@ -70,8 +79,8 @@ class SandboxLedger:
                         request.stock_no,
                         request.stock_name,
                         request.signal_date,
-                        request.price,
-                        request.quantity,
+                        result.average_fill_price or request.price,
+                        result.filled_quantity,
                         "open",
                         created_at,
                         created_at,
@@ -117,6 +126,8 @@ class SandboxLedger:
                     broker_order_id TEXT NOT NULL,
                     status TEXT NOT NULL,
                     message TEXT NOT NULL,
+                    filled_quantity INTEGER NOT NULL DEFAULT 0,
+                    filled_price REAL,
                     created_at TEXT NOT NULL
                 );
 
@@ -143,6 +154,22 @@ class SandboxLedger:
                 );
                 """
             )
+            self._ensure_column(conn, "sandbox_orders", "filled_quantity", "INTEGER NOT NULL DEFAULT 0")
+            self._ensure_column(conn, "sandbox_orders", "filled_price", "REAL")
+
+    @staticmethod
+    def _ensure_column(
+        conn: sqlite3.Connection,
+        table_name: str,
+        column_name: str,
+        definition: str,
+    ) -> None:
+        columns = {
+            str(row[1])
+            for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+        }
+        if column_name not in columns:
+            conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}")
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)

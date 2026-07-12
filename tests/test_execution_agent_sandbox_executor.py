@@ -23,6 +23,9 @@ class FakeBroker:
             broker_order_id=f"fake-{len(self.requests)}",
             submitted_at="2026-07-10T09:00:00+08:00",
             message="accepted" if self.accepted else "rejected",
+            status="Filled" if self.accepted else "Failed",
+            filled_quantity=request.quantity if self.accepted else 0,
+            average_fill_price=request.price if self.accepted else None,
         )
 
 

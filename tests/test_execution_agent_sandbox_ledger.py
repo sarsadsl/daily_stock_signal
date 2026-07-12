@@ -28,12 +28,28 @@ def accepted_result(request: SandboxOrderRequest) -> SandboxOrderResult:
         accepted=True,
         broker_order_id="sandbox-1",
         submitted_at="2026-07-10T09:00:00+08:00",
-        message="accepted",
+        message="submitted",
+        status="Submitted",
+        filled_quantity=0,
+        average_fill_price=None,
+    )
+
+
+def filled_result(request: SandboxOrderRequest) -> SandboxOrderResult:
+    return SandboxOrderResult(
+        call_key=request.call_key,
+        accepted=True,
+        broker_order_id="sandbox-1",
+        submitted_at="2026-07-10T09:00:00+08:00",
+        message="filled",
+        status="Filled",
+        filled_quantity=2000,
+        average_fill_price=41.3,
     )
 
 
 class SandboxLedgerTests(unittest.TestCase):
-    def test_record_order_creates_order_and_position(self) -> None:
+    def test_submitted_order_does_not_create_position_before_fill(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             ledger = SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
             request = sample_request()
@@ -42,7 +58,21 @@ class SandboxLedgerTests(unittest.TestCase):
 
             self.assertTrue(ledger.has_order(request.call_key))
             self.assertEqual(len(ledger.list_orders()), 1)
-            self.assertEqual(len(ledger.list_positions()), 1)
+            self.assertEqual(ledger.list_positions(), [])
+
+    def test_filled_order_creates_position_from_actual_fill(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ledger = SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
+            request = sample_request()
+
+            ledger.record_order(request, filled_result(request))
+
+            order = ledger.list_orders()[0]
+            position = ledger.list_positions()[0]
+            self.assertEqual(order["status"], "Filled")
+            self.assertEqual(order["filled_quantity"], 2000)
+            self.assertEqual(position["quantity"], 2000)
+            self.assertEqual(position["entry_price"], 41.3)
 
     def test_record_event_does_not_create_position(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

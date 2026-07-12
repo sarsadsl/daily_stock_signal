@@ -33,6 +33,9 @@ class FakeBroker:
             broker_order_id=f"fake-{len(self.requests)}",
             submitted_at="2026-07-10T09:00:00+08:00",
             message="accepted",
+            status="Filled",
+            filled_quantity=request.quantity,
+            average_fill_price=request.price,
         )
 
 

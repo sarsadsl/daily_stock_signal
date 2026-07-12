@@ -25,9 +25,14 @@ class OrderSizingTests(unittest.TestCase):
 
         self.assertEqual(request.call_key, "TWSE:3094:2026-07-08:base:-")
         self.assertEqual(request.stock_no, "3094")
-        self.assertEqual(request.quantity, 2418)
+        self.assertEqual(request.quantity, 2000)
         self.assertEqual(request.price, 41.35)
         self.assertLessEqual(request.quantity * request.price, 100000)
+
+    def test_keeps_odd_lot_quantity_below_one_thousand_shares(self) -> None:
+        request = build_buy_order_request(called_decision(), cash_budget=30000)
+
+        self.assertEqual(request.quantity, 725)
 
     def test_rejects_non_called_decision(self) -> None:
         decision = called_decision()

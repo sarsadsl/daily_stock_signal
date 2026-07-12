@@ -29,6 +29,9 @@ class SandboxOrderResult:
     broker_order_id: str
     submitted_at: str
     message: str
+    status: str = ""
+    filled_quantity: int = 0
+    average_fill_price: float | None = None
 
 
 class BrokerAdapter:
@@ -44,6 +47,7 @@ class NoopBrokerAdapter(BrokerAdapter):
             broker_order_id="",
             submitted_at=datetime.now().astimezone().isoformat(),
             message="noop broker adapter did not submit order",
+            status="Noop",
         )
 
 
@@ -71,13 +75,8 @@ class ShioajiSandboxBrokerAdapter(BrokerAdapter):
                 account=api.stock_account,
             )
             trade = api.place_order(contract, order)
-            return SandboxOrderResult(
-                call_key=request.call_key,
-                accepted=True,
-                broker_order_id=_trade_order_id(trade),
-                submitted_at=datetime.now().astimezone().isoformat(),
-                message="accepted",
-            )
+            api.update_status(trade=trade)
+            return _result_from_trade(request, trade)
         finally:
             api.logout()
 
@@ -106,3 +105,54 @@ def _trade_order_id(trade: Any) -> str:
         if order_id:
             return str(order_id)
     return ""
+
+
+def _result_from_trade(request: SandboxOrderRequest, trade: Any) -> SandboxOrderResult:
+    status = getattr(trade, "status", None)
+    raw_status = _enum_value(getattr(status, "status", "")) or "Unknown"
+    operation = getattr(trade, "operation", None)
+    operation_code = str(getattr(operation, "op_code", "") or "").strip()
+    failed_statuses = {"failed", "cancelled", "inactive"}
+    accepted = raw_status.casefold() not in failed_statuses and operation_code in {"", "00"}
+
+    broker_quantity = int(getattr(status, "deal_quantity", 0) or 0)
+    filled_quantity = broker_quantity * 1000 if request.quantity >= 1000 else broker_quantity
+    filled_quantity = min(request.quantity, filled_quantity)
+    average_fill_price = _average_fill_price(status, request)
+
+    operation_message = str(getattr(operation, "op_msg", "") or "").strip()
+    status_message = str(getattr(status, "msg", "") or "").strip()
+    message = operation_message or status_message or raw_status
+    return SandboxOrderResult(
+        call_key=request.call_key,
+        accepted=accepted,
+        broker_order_id=_trade_order_id(trade),
+        submitted_at=datetime.now().astimezone().isoformat(),
+        message=message,
+        status=raw_status,
+        filled_quantity=filled_quantity,
+        average_fill_price=average_fill_price,
+    )
+
+
+def _enum_value(value: Any) -> str:
+    raw = getattr(value, "value", value)
+    text = str(raw or "").strip()
+    return text.rsplit(".", 1)[-1]
+
+
+def _average_fill_price(status: Any, request: SandboxOrderRequest) -> float | None:
+    deals = list(getattr(status, "deals", None) or [])
+    weighted_total = 0.0
+    total_quantity = 0
+    for deal in deals:
+        quantity = int(getattr(deal, "quantity", 0) or 0)
+        price = float(getattr(deal, "price", 0.0) or 0.0)
+        if quantity > 0 and price > 0:
+            weighted_total += price * quantity
+            total_quantity += quantity
+    if total_quantity:
+        return weighted_total / total_quantity
+    if int(getattr(status, "deal_quantity", 0) or 0) > 0:
+        return request.price
+    return None
