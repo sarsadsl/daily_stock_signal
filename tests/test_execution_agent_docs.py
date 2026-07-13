@@ -49,4 +49,8 @@ class ReadmeExecutionAgentDocsTests(unittest.TestCase):
         self.assertIn("fetch-depth: 0", workflow)
         self.assertIn("gitleaks_8.30.1_linux_x64.tar.gz", workflow)
         self.assertIn("551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb", workflow)
+        self.assertIn(
+            'run: |\n          "$RUNNER_TEMP/gitleaks" git . --log-opts="--all" --redact',
+            workflow,
+        )
         self.assertIn('git . --log-opts="--all" --redact', workflow)
