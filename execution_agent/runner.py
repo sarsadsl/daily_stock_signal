@@ -191,12 +191,24 @@ def _run_from_config_unlocked(
             dry_run=config.dry_run,
             include_processed_called=should_submit_orders,
         )
-    finally:
-        if (
-            should_submit_orders
-            and active_broker_config is not None
-            and active_ledger is not None
-        ):
+    except Exception as primary_error:
+        try:
+            if (
+                should_submit_orders
+                and active_broker_config is not None
+                and active_ledger is not None
+            ):
+                execute_sandbox_orders(
+                    decisions,
+                    config=active_broker_config,
+                    ledger=active_ledger,
+                    broker=broker,
+                )
+        except Exception as reconciliation_error:
+            raise primary_error from reconciliation_error
+        raise
+    else:
+        if should_submit_orders and active_broker_config is not None and active_ledger is not None:
             execute_sandbox_orders(
                 decisions,
                 config=active_broker_config,

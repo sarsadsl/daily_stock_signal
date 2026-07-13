@@ -69,6 +69,11 @@ class ReconcilingBroker:
         )
 
 
+class FailingReconciliationLedger:
+    def list_orders(self):
+        raise RuntimeError("ledger recovery failed")
+
+
 class RunnerTests(unittest.TestCase):
     def test_noop_broker_mode_does_not_initialize_sandbox_ledger(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -545,3 +550,36 @@ class RunnerTests(unittest.TestCase):
 
             self.assertEqual(len(broker.refreshed), 1)
             self.assertEqual(len(ledger.list_positions()), 1)
+
+    def test_tracking_error_remains_primary_when_reconciliation_also_fails(self) -> None:
+        broker_config = runner.BrokerConfig.from_env(
+            {
+                "BROKER_MODE": "sandbox",
+                "SANDBOX_ONLY": "1",
+                "SHIOAJI_API_KEY": "key",
+                "SHIOAJI_SECRET_KEY": "secret",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config = runner.ExecutionAgentConfig(
+                tracking_json_url="https://example.test/tracking.json",
+                state_db_path=str(Path(tmpdir) / "agent.db"),
+                signal_date="2026-07-09",
+                dry_run=False,
+            )
+            with patch.object(
+                runner,
+                "load_tracking_payload_text",
+                side_effect=ValueError("tracking parse failed"),
+            ):
+                with self.assertRaisesRegex(ValueError, "tracking parse failed") as raised:
+                    runner.run_from_config(
+                        config,
+                        notifier=FakeNotifier(),
+                        broker_config=broker_config,
+                        sandbox_ledger=FailingReconciliationLedger(),
+                        broker=FakeBroker(),
+                    )
+
+        self.assertIsInstance(raised.exception.__cause__, RuntimeError)
+        self.assertIn("ledger recovery failed", str(raised.exception.__cause__))
