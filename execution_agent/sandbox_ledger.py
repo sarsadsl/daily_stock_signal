@@ -31,12 +31,26 @@ class SandboxLedger:
     @staticmethod
     def order_needs_reconciliation(order: dict[str, Any]) -> bool:
         return str(order.get("status") or "").casefold() in {
+            "submitpending",
             "pendingsubmit",
             "presubmitted",
             "submitted",
             "partfilled",
             "filling",
         }
+
+    def record_submit_intent(self, request: SandboxOrderRequest) -> None:
+        self.record_order(
+            request,
+            SandboxOrderResult(
+                call_key=request.call_key,
+                accepted=True,
+                broker_order_id="",
+                submitted_at=_now_iso(),
+                message="sandbox order submission pending broker confirmation",
+                status="SubmitPending",
+            ),
+        )
 
     def record_order(self, request: SandboxOrderRequest, result: SandboxOrderResult) -> None:
         created_at = _now_iso()
@@ -175,6 +189,14 @@ class SandboxLedger:
             )
             self._ensure_column(conn, "sandbox_orders", "filled_quantity", "INTEGER NOT NULL DEFAULT 0")
             self._ensure_column(conn, "sandbox_orders", "filled_price", "REAL")
+            conn.execute(
+                """
+                UPDATE sandbox_orders
+                SET status = 'Submitted'
+                WHERE lower(status) = 'accepted'
+                  AND filled_quantity = 0
+                """
+            )
             conn.execute(
                 """
                 DELETE FROM sandbox_positions

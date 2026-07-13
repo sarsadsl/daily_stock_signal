@@ -159,41 +159,50 @@ def _run_from_config_unlocked(
     poll_interval_seconds: float = 15.0,
 ) -> list[OpenEntryDecision]:
     active_broker_config = None
+    active_ledger = None
     should_submit_orders = False
     if not config.dry_run:
         active_broker_config = broker_config or BrokerConfig.from_env()
         should_submit_orders = active_broker_config.should_submit_orders()
-
-    payload = load_tracking_payload_from_text(load_tracking_payload_text(config.tracking_json_url))
-    entries = select_entries_for_run_date(payload, run_date=config.signal_date)
-    open_snapshot = build_open_snapshot(
-        entries,
-        signal_date=config.signal_date,
-        dry_run=config.dry_run,
-        poll_attempts=poll_attempts,
-        poll_interval_seconds=poll_interval_seconds,
-    )
-    ready_entries = [
-        entry
-        for entry in entries
-        if (entry.market, entry.stock_no) in open_snapshot
-    ]
-    decisions = run_open_entry_cycle(
-        entries=ready_entries,
-        quote_lookup=lambda entry: open_snapshot[(entry.market, entry.stock_no)],
-        notifier=notifier or TelegramNotifier(),
-        db_path=config.state_db_path,
-        dry_run=config.dry_run,
-        include_processed_called=should_submit_orders,
-    )
-    if should_submit_orders and active_broker_config is not None:
+    if should_submit_orders:
         active_ledger = sandbox_ledger or SandboxLedger(config.state_db_path)
-        execute_sandbox_orders(
-            decisions,
-            config=active_broker_config,
-            ledger=active_ledger,
-            broker=broker,
+
+    decisions: list[OpenEntryDecision] = []
+    try:
+        payload = load_tracking_payload_from_text(load_tracking_payload_text(config.tracking_json_url))
+        entries = select_entries_for_run_date(payload, run_date=config.signal_date)
+        open_snapshot = build_open_snapshot(
+            entries,
+            signal_date=config.signal_date,
+            dry_run=config.dry_run,
+            poll_attempts=poll_attempts,
+            poll_interval_seconds=poll_interval_seconds,
         )
+        ready_entries = [
+            entry
+            for entry in entries
+            if (entry.market, entry.stock_no) in open_snapshot
+        ]
+        decisions = run_open_entry_cycle(
+            entries=ready_entries,
+            quote_lookup=lambda entry: open_snapshot[(entry.market, entry.stock_no)],
+            notifier=notifier or TelegramNotifier(),
+            db_path=config.state_db_path,
+            dry_run=config.dry_run,
+            include_processed_called=should_submit_orders,
+        )
+    finally:
+        if (
+            should_submit_orders
+            and active_broker_config is not None
+            and active_ledger is not None
+        ):
+            execute_sandbox_orders(
+                decisions,
+                config=active_broker_config,
+                ledger=active_ledger,
+                broker=broker,
+            )
     return decisions
 
 

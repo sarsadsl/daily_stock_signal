@@ -46,7 +46,7 @@ def execute_sandbox_orders(
         existing_order = ledger.get_order(decision.call_key)
         if existing_order is not None:
             if ledger.order_needs_reconciliation(existing_order):
-                _refresh_existing_order(existing_order, active_broker, ledger, counts)
+                _reconcile_existing_order(existing_order, active_broker, ledger, counts)
                 continue
             counts.skipped_duplicate += 1
             ledger.record_event(decision.call_key, "skipped_duplicate", "sandbox order already exists")
@@ -57,6 +57,7 @@ def execute_sandbox_orders(
             counts.sizing_rejected += 1
             ledger.record_event(decision.call_key, "sizing_rejected", str(exc))
             continue
+        ledger.record_submit_intent(request)
         try:
             result = active_broker.submit_buy_order(request)
         except Exception as exc:  # pragma: no cover - covered through behavior, not broker internals
@@ -75,7 +76,7 @@ def execute_sandbox_orders(
         call_key = str(order.get("call_key") or "")
         if call_key in handled_call_keys or not ledger.order_needs_reconciliation(order):
             continue
-        _refresh_existing_order(order, active_broker, ledger, counts)
+        _reconcile_existing_order(order, active_broker, ledger, counts)
 
     return counts.to_summary()
 
@@ -122,7 +123,7 @@ def _request_from_order(order: dict) -> SandboxOrderRequest:
     )
 
 
-def _refresh_existing_order(
+def _reconcile_existing_order(
     order: dict,
     broker: BrokerAdapter,
     ledger: SandboxLedger,
@@ -130,13 +131,16 @@ def _refresh_existing_order(
 ) -> None:
     request = _request_from_order(order)
     try:
-        result = broker.refresh_buy_order(
-            request,
-            str(order.get("broker_order_id") or ""),
-        )
+        if str(order.get("status") or "").casefold() == "submitpending":
+            result = broker.submit_buy_order(request)
+        else:
+            result = broker.refresh_buy_order(
+                request,
+                str(order.get("broker_order_id") or ""),
+            )
     except Exception as exc:
         counts.broker_errors += 1
-        ledger.record_event(request.call_key, "broker_refresh_error", _safe_error_message(exc))
+        ledger.record_event(request.call_key, "broker_reconcile_error", _safe_error_message(exc))
         return
     ledger.record_order(request, result)
     counts.reconciled += 1

@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 import execution_agent.runner as runner
-from execution_agent.broker_adapter import SandboxOrderResult
+from execution_agent.broker_adapter import SandboxOrderRequest, SandboxOrderResult
 from execution_agent.state_store import SQLiteStateStore
 from execution_agent.tracking_source import PENDING_NEXT_OPEN_STATUS, PendingOpenEntry
 
@@ -48,7 +48,54 @@ class FailingBroker:
         raise RuntimeError("temporary broker outage")
 
 
+class ReconcilingBroker:
+    def __init__(self) -> None:
+        self.refreshed = []
+
+    def submit_buy_order(self, request):
+        raise AssertionError("existing submitted order must be refreshed")
+
+    def refresh_buy_order(self, request, broker_order_id):
+        self.refreshed.append((request, broker_order_id))
+        return SandboxOrderResult(
+            call_key=request.call_key,
+            accepted=True,
+            broker_order_id=broker_order_id,
+            submitted_at="2026-07-10T09:01:00+08:00",
+            message="filled",
+            status="Filled",
+            filled_quantity=request.quantity,
+            average_fill_price=request.price,
+        )
+
+
 class RunnerTests(unittest.TestCase):
+    def test_noop_broker_mode_does_not_initialize_sandbox_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config = runner.ExecutionAgentConfig(
+                tracking_json_url="https://example.test/tracking.json",
+                state_db_path=str(Path(tmpdir) / "agent.db"),
+                signal_date="2026-07-09",
+                dry_run=False,
+            )
+            broker_config = runner.BrokerConfig.from_env({})
+            payload_text = json.dumps({"tracking": {"formal_forward_records": []}})
+
+            with patch.object(runner, "load_tracking_payload_text", return_value=payload_text):
+                with patch.object(runner, "build_trading_dates", return_value={}):
+                    with patch.object(
+                        runner,
+                        "SandboxLedger",
+                        side_effect=AssertionError("noop mode must not initialize sandbox ledger"),
+                    ):
+                        decisions = runner.run_from_config(
+                            config,
+                            notifier=FakeNotifier(),
+                            broker_config=broker_config,
+                        )
+
+        self.assertEqual(decisions, [])
+
     def test_live_run_rejects_overlapping_process_before_fetching_tracking(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             db_path = str(Path(tmpdir) / "agent.db")
@@ -437,3 +484,64 @@ class RunnerTests(unittest.TestCase):
             self.assertEqual(len(successful_broker.requests), 1)
             self.assertEqual(len(ledger.list_orders()), 1)
             self.assertEqual(notifier.sent, ["TWSE:3094:2026-07-08:base:-"])
+
+    def test_run_from_config_reconciles_existing_order_when_tracking_fetch_fails(self) -> None:
+        broker_config = runner.BrokerConfig.from_env(
+            {
+                "BROKER_MODE": "sandbox",
+                "SANDBOX_ONLY": "1",
+                "SHIOAJI_API_KEY": "key",
+                "SHIOAJI_SECRET_KEY": "secret",
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = str(Path(tmpdir) / "agent.db")
+            config = runner.ExecutionAgentConfig(
+                tracking_json_url="https://example.test/tracking.json",
+                state_db_path=db_path,
+                signal_date="2026-07-09",
+                dry_run=False,
+            )
+            ledger = runner.SandboxLedger(db_path)
+            request = SandboxOrderRequest(
+                call_key="TWSE:3094:2026-07-08:base:-",
+                market="TWSE",
+                stock_no="3094",
+                stock_name="test",
+                signal_date="2026-07-08",
+                open_price=41.35,
+                entry_limit_price=41.65,
+                cash_budget=100000,
+                quantity=2000,
+                price=41.35,
+                order_type="sandbox_buy_open",
+            )
+            ledger.record_order(
+                request,
+                SandboxOrderResult(
+                    call_key=request.call_key,
+                    accepted=True,
+                    broker_order_id="pending-1",
+                    submitted_at="2026-07-10T09:00:00+08:00",
+                    message="submitted",
+                    status="Submitted",
+                ),
+            )
+            broker = ReconcilingBroker()
+
+            with patch.object(
+                runner,
+                "load_tracking_payload_text",
+                side_effect=RuntimeError("tracking unavailable"),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "tracking unavailable"):
+                    runner.run_from_config(
+                        config,
+                        notifier=FakeNotifier(),
+                        broker_config=broker_config,
+                        sandbox_ledger=ledger,
+                        broker=broker,
+                    )
+
+            self.assertEqual(len(broker.refreshed), 1)
+            self.assertEqual(len(ledger.list_positions()), 1)

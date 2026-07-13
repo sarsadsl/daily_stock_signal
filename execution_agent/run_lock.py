@@ -3,9 +3,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 import os
 from pathlib import Path
-import time
-from typing import Iterator
-import uuid
+from typing import BinaryIO, Iterator
 
 
 class ExecutionAgentAlreadyRunningError(RuntimeError):
@@ -13,52 +11,53 @@ class ExecutionAgentAlreadyRunningError(RuntimeError):
 
 
 @contextmanager
-def execution_agent_lock(db_path: str, stale_after_seconds: float = 900.0) -> Iterator[None]:
+def execution_agent_lock(db_path: str) -> Iterator[None]:
     lock_path = Path(f"{db_path}.lock")
     lock_path.parent.mkdir(parents=True, exist_ok=True)
-    owner_token = uuid.uuid4().hex
-    fd = _acquire_lock_file(lock_path, owner_token, stale_after_seconds)
+    lock_file = lock_path.open("a+b")
     try:
-        yield
-    finally:
-        os.close(fd)
-        _release_owned_lock(lock_path, owner_token)
-
-
-def _acquire_lock_file(lock_path: Path, owner_token: str, stale_after_seconds: float) -> int:
-    for attempt in range(2):
         try:
-            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(fd, owner_token.encode("ascii"))
-            return fd
-        except FileExistsError as exc:
-            if attempt == 0 and _is_stale(lock_path, stale_after_seconds):
-                try:
-                    lock_path.unlink()
-                except FileNotFoundError:
-                    pass
-                continue
+            _acquire_os_lock(lock_file)
+        except OSError as exc:
             raise ExecutionAgentAlreadyRunningError(
-                f"Execution agent lock already exists: {lock_path}"
+                f"Execution agent lock is already held: {lock_path}"
             ) from exc
-    raise ExecutionAgentAlreadyRunningError(f"Unable to acquire execution agent lock: {lock_path}")
-
-
-def _is_stale(lock_path: Path, stale_after_seconds: float) -> bool:
-    try:
-        age_seconds = time.time() - lock_path.stat().st_mtime
-    except FileNotFoundError:
-        return False
-    return age_seconds > stale_after_seconds
-
-
-def _release_owned_lock(lock_path: Path, owner_token: str) -> None:
-    try:
-        current_token = lock_path.read_text(encoding="ascii")
-    except (FileNotFoundError, OSError):
-        return
-    if current_token == owner_token:
         try:
-            lock_path.unlink()
-        except FileNotFoundError:
+            yield
+        finally:
+            _release_os_lock(lock_file)
+    finally:
+        lock_file.close()
+
+
+def _acquire_os_lock(lock_file: BinaryIO) -> None:
+    if os.name == "nt":
+        import msvcrt
+
+        lock_file.seek(0, os.SEEK_END)
+        if lock_file.tell() == 0:
+            lock_file.write(b"\0")
+            lock_file.flush()
+        lock_file.seek(0)
+        msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+        return
+
+    import fcntl
+
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+def _release_os_lock(lock_file: BinaryIO) -> None:
+    if os.name == "nt":
+        import msvcrt
+
+        lock_file.seek(0)
+        try:
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+        except OSError:
             pass
+        return
+
+    import fcntl
+
+    fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)

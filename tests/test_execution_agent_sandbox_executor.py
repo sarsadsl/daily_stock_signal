@@ -62,6 +62,29 @@ class PendingThenFilledBroker:
         )
 
 
+class TimeoutThenRecoveredBroker:
+    def __init__(self) -> None:
+        self.submitted = []
+
+    def submit_buy_order(self, request):
+        self.submitted.append(request)
+        if len(self.submitted) == 1:
+            raise TimeoutError("broker response timed out after accepting the order")
+        return SandboxOrderResult(
+            call_key=request.call_key,
+            accepted=True,
+            broker_order_id="recovered-1",
+            submitted_at="2026-07-10T09:01:00+08:00",
+            message="filled",
+            status="Filled",
+            filled_quantity=request.quantity,
+            average_fill_price=request.price,
+        )
+
+    def refresh_buy_order(self, request, broker_order_id):
+        raise AssertionError("submit intent recovery must use idempotent submit lookup")
+
+
 def decision(stock_no="3094", open_price=41.35, limit=41.65):
     entry = PendingOpenEntry(
         market="TWSE",
@@ -133,4 +156,20 @@ class SandboxExecutorTests(unittest.TestCase):
             self.assertEqual(second.reconciled, 1)
             self.assertEqual(len(broker.submitted), 1)
             self.assertEqual(len(broker.refreshed), 1)
+            self.assertEqual(len(ledger.list_positions()), 1)
+
+    def test_submit_timeout_is_recovered_after_decision_disappears(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ledger = SandboxLedger(str(Path(tmpdir) / "sandbox.db"))
+            broker = TimeoutThenRecoveredBroker()
+            config = self.sandbox_config()
+
+            first = execute_sandbox_orders([decision()], config=config, ledger=ledger, broker=broker)
+            intent = ledger.list_orders()[0]
+            second = execute_sandbox_orders([], config=config, ledger=ledger, broker=broker)
+
+            self.assertEqual(first.broker_errors, 1)
+            self.assertEqual(intent["status"], "SubmitPending")
+            self.assertEqual(second.reconciled, 1)
+            self.assertEqual(len(broker.submitted), 2)
             self.assertEqual(len(ledger.list_positions()), 1)

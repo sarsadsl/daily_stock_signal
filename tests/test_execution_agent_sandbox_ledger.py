@@ -155,6 +155,8 @@ class SandboxLedgerTests(unittest.TestCase):
             self.assertEqual(ledger.list_positions(), [])
             order = ledger.list_orders()[0]
             self.assertEqual(order["filled_quantity"], 0)
+            self.assertEqual(order["status"], "Submitted")
+            self.assertTrue(ledger.order_needs_reconciliation(order))
 
     def test_record_event_does_not_create_position(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
