@@ -40,6 +40,10 @@ ADDON_MIN_WAIT = 2
 ADDON_MAX_WAIT = 8
 COOLDOWN_TRADING_DAYS = 10
 BASE_EXIT_POLICY = make_base_exit(30, "high")
+FORWARD_ACTIVE_STATUSES = {"持有中", "已進場", "open"}
+FORWARD_PENDING_STATUSES = {"待次日開盤", "pending_next_open"}
+FORWARD_FAILED_ENTRY_STATUSES = {"次日開盤未達進場條件", "entry_filter_failed"}
+FORWARD_DUPLICATE_STATUS = "同股生命週期重複建單（已排除）"
 
 
 SeriesMap = dict[tuple[str, str], tuple[list[Row], dict[str, list[float | None]], dict[str, int]]]
@@ -249,6 +253,146 @@ def recent_historical_buy_block(row: dict[str, Any], packages: list[dict[str, An
     return None
 
 
+def forward_record_entry_index(
+    record: dict[str, Any],
+    rows: list[Row],
+    dates: dict[str, int],
+    target_index: int,
+) -> int | None:
+    """Return a formal forward record's actual or determinable base-entry index.
+
+    The daily radar is built before forward records are updated for the current
+    market date. For a prior pending record, derive today's next-open outcome
+    so its same-stock lifecycle can still block a duplicate signal.
+    """
+
+    status = normalize_status_text(record.get("status"))
+    if status in FORWARD_FAILED_ENTRY_STATUSES or status == FORWARD_DUPLICATE_STATUS:
+        return None
+
+    entry_index = dates.get(str(record.get("entry_date") or ""))
+    if entry_index is not None:
+        return entry_index
+
+    if status not in FORWARD_PENDING_STATUSES:
+        return None
+
+    signal_index = dates.get(str(record.get("signal_date") or ""))
+    if signal_index is None:
+        return None
+    expected_entry_index = signal_index + 1
+    if expected_entry_index > target_index or expected_entry_index >= len(rows):
+        return None
+
+    limit = float(record.get("entry_limit_price") or 0)
+    if limit and rows[expected_entry_index].open > limit:
+        return None
+    return expected_entry_index
+
+
+def forward_record_lifecycle_block(
+    row: dict[str, Any],
+    forward_records: list[dict[str, Any]],
+    series: SeriesMap,
+    signal_date: str,
+) -> str | None:
+    """Return a same-stock blocker from formal tracking records, if any.
+
+    Backtest packages do not contain forward trades created after the frozen
+    backtest date. Those records must therefore participate in both the active
+    mother check and the same-stock buy cooldown.
+    """
+
+    bundle = find_series(series, str(row.get("market")), str(row.get("stock_no")))
+    if not bundle:
+        return None
+    rows, _, dates = bundle
+    target_index = dates.get(signal_date)
+    if target_index is None:
+        return None
+
+    for record in forward_records:
+        if record.get("unit_type") not in {None, "base"} or stock_key(record) != stock_key(row):
+            continue
+        if str(record.get("signal_date") or "") == signal_date:
+            # A same-date rebuild is evaluating the record already created for
+            # this candidate, so it must not block itself.
+            continue
+
+        status = normalize_status_text(record.get("status"))
+        entry_index = forward_record_entry_index(record, rows, dates, target_index)
+        entry_date = rows[entry_index].date if entry_index is not None else record.get("entry_date")
+
+        if status in FORWARD_ACTIVE_STATUSES:
+            return f"same-stock active formal mother: {entry_date or 'pending entry'}"
+
+        if entry_index is not None:
+            distance = target_index - entry_index
+            if 0 <= distance <= COOLDOWN_TRADING_DAYS:
+                return f"same-stock formal buy cooldown: {entry_date}"
+    return None
+
+
+def reconcile_duplicate_forward_mothers(
+    records: list[dict[str, Any]],
+    series: SeriesMap,
+) -> bool:
+    """Retire already-recorded duplicate forward mothers without deleting audit data."""
+
+    changed = False
+    accepted_by_stock: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    ordered = sorted(
+        (record for record in records if record.get("unit_type") in {None, "base"}),
+        key=lambda record: (str(record.get("signal_date") or ""), str(record.get("id") or "")),
+    )
+
+    for record in ordered:
+        status = normalize_status_text(record.get("status"))
+        if status in FORWARD_FAILED_ENTRY_STATUSES or status == FORWARD_DUPLICATE_STATUS:
+            continue
+
+        bundle = find_series(series, str(record.get("market")), str(record.get("stock_no")))
+        if not bundle:
+            continue
+        rows, _, dates = bundle
+        signal_date = str(record.get("signal_date") or "")
+        signal_index = dates.get(signal_date)
+        if signal_index is None:
+            continue
+        entry_index = forward_record_entry_index(record, rows, dates, signal_index)
+        if entry_index is None:
+            continue
+
+        reject_reason = None
+        for prior in accepted_by_stock.get(stock_key(record), []):
+            prior_entry_index = forward_record_entry_index(prior, rows, dates, signal_index)
+            if prior_entry_index is None:
+                continue
+            prior_exit_index = dates.get(str(prior.get("exit_date") or ""))
+            if prior_entry_index <= signal_index and (
+                prior_exit_index is None or signal_index <= prior_exit_index
+            ):
+                reject_reason = f"same-stock active formal mother: {rows[prior_entry_index].date}"
+                break
+            if 0 <= signal_index - prior_entry_index <= COOLDOWN_TRADING_DAYS:
+                reject_reason = f"same-stock formal buy cooldown: {rows[prior_entry_index].date}"
+                break
+
+        if reject_reason:
+            if record.get("status") != FORWARD_DUPLICATE_STATUS:
+                record.update({
+                    "status": FORWARD_DUPLICATE_STATUS,
+                    "base_status": FORWARD_DUPLICATE_STATUS,
+                    "unresolved": False,
+                    "lifecycle_filter_reject_reason": reject_reason,
+                })
+                changed = True
+            continue
+
+        accepted_by_stock.setdefault(stock_key(record), []).append(record)
+    return changed
+
+
 def radar_row(kind: str, row: dict[str, Any], **extra: Any) -> dict[str, Any]:
     label = extra.pop("label", None) or stock_label(row)
     return {
@@ -282,11 +426,13 @@ def mother_candidate_rows(
     target_date: str,
     series: SeriesMap,
     packages: list[dict[str, Any]],
+    forward_records: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     new_mothers: list[dict[str, Any]] = []
     watchlist: list[dict[str, Any]] = []
     blocked: list[dict[str, Any]] = []
     active_by_stock = active_package_by_stock(packages)
+    forward_records = forward_records or []
 
     for item in latest_pullback_matches(target_date):
         bundle = find_series(series, str(item.get("market")), str(item.get("stock_no")))
@@ -308,6 +454,7 @@ def mother_candidate_rows(
         enriched = {**item, "ma20_slope5_pct": slope, "entry_limit_price": max_entry, "next_open": next_open}
         active = active_by_stock.get(stock_key(item), [])
         cooldown_reason = recent_historical_buy_block(item, packages, series, target_date)
+        forward_block_reason = forward_record_lifecycle_block(item, forward_records, series, target_date)
         if active:
             blocked.append(
                 radar_row(
@@ -315,6 +462,15 @@ def mother_candidate_rows(
                     enriched,
                     tracking_note="此檔個股已有母單生命週期仍在進行中，因此本次禁止重複建立新母單。",
                     block_reason=f"同股已有母單，禁止重複建單（母單進場日：{active[0].get('entry_date')}）",
+                )
+            )
+        elif forward_block_reason:
+            blocked.append(
+                radar_row(
+                    "cooldown_blocked",
+                    enriched,
+                    tracking_note="正式追蹤已有同股母單生命週期或近期買進紀錄，因此本次不建立新母單。",
+                    block_reason=forward_block_reason,
                 )
             )
         elif cooldown_reason and not failed:
@@ -463,7 +619,11 @@ def exit_candidate_for_unit(unit: dict[str, Any], series: SeriesMap, target_date
     )
 
 
-def build_daily_radar(backtest: dict[str, Any], series: SeriesMap) -> dict[str, Any]:
+def build_daily_radar(
+    backtest: dict[str, Any],
+    series: SeriesMap,
+    forward_records: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     target_date = latest_market_date(series)
     empty = {
         "as_of_date": target_date,
@@ -479,7 +639,12 @@ def build_daily_radar(backtest: dict[str, Any], series: SeriesMap) -> dict[str, 
 
     packages = backtest.get("packages", [])
     units = backtest.get("units", [])
-    new_mothers, watchlist, blocked = mother_candidate_rows(target_date, series, packages)
+    new_mothers, watchlist, blocked = mother_candidate_rows(
+        target_date,
+        series,
+        packages,
+        forward_records,
+    )
 
     addon_candidates: list[dict[str, Any]] = []
     for package in packages:
@@ -582,7 +747,7 @@ def append_forward_candidates(records: list[dict[str, Any]], radar: dict[str, An
 
 
 def update_forward_record(record: dict[str, Any], series: SeriesMap) -> bool:
-    if record.get("status") in {"已出場", "次日開盤未達進場條件"}:
+    if record.get("status") in {"已出場", "次日開盤未達進場條件", FORWARD_DUPLICATE_STATUS}:
         return False
     bundle = find_series(series, str(record.get("market")), str(record.get("stock_no")))
     if not bundle:
@@ -657,8 +822,13 @@ def update_forward_record(record: dict[str, Any], series: SeriesMap) -> bool:
     return changed
 
 
-def sync_forward_records(radar: dict[str, Any], series: SeriesMap) -> list[dict[str, Any]]:
-    records = load_json(FORWARD_JSON, [])
+def sync_forward_records(
+    radar: dict[str, Any],
+    series: SeriesMap,
+    records: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    if records is None:
+        records = load_json(FORWARD_JSON, [])
     changed = append_forward_candidates(records, radar)
     for record in records:
         for key in ("status", "base_status", "addon_status"):
@@ -667,6 +837,7 @@ def sync_forward_records(radar: dict[str, Any], series: SeriesMap) -> list[dict[
                 record[key] = normalized
                 changed = True
         changed = update_forward_record(record, series) or changed
+    changed = reconcile_duplicate_forward_mothers(records, series) or changed
     records.sort(key=lambda row: (str(row.get("signal_date") or ""), str(row.get("id") or "")), reverse=True)
     if changed or not FORWARD_JSON.exists():
         write_json(FORWARD_JSON, records)
@@ -720,8 +891,9 @@ def run() -> dict[str, Any]:
     packages = backtest.get("packages", [])
     baseline = backtest.get("baseline_without_filter", {})
     series = make_series_map()
-    radar = build_daily_radar(backtest, series)
-    forward_records = sync_forward_records(radar, series)
+    forward_records = load_json(FORWARD_JSON, [])
+    radar = build_daily_radar(backtest, series, forward_records)
+    forward_records = sync_forward_records(radar, series, forward_records)
 
     unresolved_units = [compact_unit(row) for row in units if row.get("unresolved")]
     realized_units = [compact_unit(row) for row in units if not row.get("unresolved")]
