@@ -1201,8 +1201,8 @@
   {
     "id": "TPEX:5425:2026-07-13:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "持有中",
-    "base_status": "持有中",
+    "status": "同股生命週期重複建單（已排除）",
+    "base_status": "同股生命週期重複建單（已排除）",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TPEX",
@@ -1214,12 +1214,13 @@
     "entry_limit_price": 115.15,
     "ma20_slope5_pct": 8.3018,
     "created_from_radar_date": "2026-07-13",
-    "unresolved": true,
+    "unresolved": false,
     "entry_date": "2026-07-14",
     "entry_price": 113.0,
     "unrealized_return_pct": -5.31,
     "dynamic_structure_update_count": 0,
-    "dynamic_structure_policy": "consolidation30_high_base"
+    "dynamic_structure_policy": "consolidation30_high_base",
+    "lifecycle_filter_reject_reason": "same-stock active formal mother: 2026-07-13"
   },
   {
     "id": "TPEX:5392:2026-07-13:base",
@@ -3669,8 +3670,8 @@
   {
     "id": "TWSE:3060:2026-07-02:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "已出場",
-    "base_status": "已出場",
+    "status": "同股生命週期重複建單（已排除）",
+    "base_status": "同股生命週期重複建單（已排除）",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -3692,7 +3693,8 @@
     "exit_price": 33.2475,
     "exit_reason": "base_hard_stop7",
     "return_pct": -7.0,
-    "holding_days": 6
+    "holding_days": 6,
+    "lifecycle_filter_reject_reason": "same-stock active formal mother: 2026-07-02"
   },
   {
     "id": "TWSE:3059:2026-07-02:base",
