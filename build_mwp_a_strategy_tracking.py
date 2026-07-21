@@ -126,7 +126,10 @@ def compact_unit(row: dict[str, Any]) -> dict[str, Any]:
         "addon_number": row.get("addon_number"),
         "unresolved": bool(row.get("unresolved")),
         "holding_days": row.get("holding_days"),
-        "source": "historical_backtest_mwp_c",
+        "valuation_date": row.get("valuation_date"),
+        "latest_close": row.get("latest_close"),
+        "historical_source_as_of_date": row.get("historical_source_as_of_date"),
+        "source": row.get("source", "historical_backtest_mwp_c"),
     }
 
 
@@ -233,7 +236,143 @@ def active_package_by_stock(packages: list[dict[str, Any]]) -> dict[tuple[str, s
     return output
 
 
-def recent_historical_buy_block(row: dict[str, Any], packages: list[dict[str, Any]], series: SeriesMap, signal_date: str) -> str | None:
+def historical_unit_key(row: dict[str, Any]) -> tuple[str, str, str]:
+    """Return the mother-lifecycle key shared by a base and its add-ons."""
+
+    return lifecycle_key(row)
+
+
+def historical_unit_refresh_failure(row: dict[str, Any], reason: str) -> dict[str, Any]:
+    """Keep an historical unit visible when its continuation cannot be calculated."""
+
+    return {
+        **row,
+        "source": "historical_backtest_mwp_c_continued",
+        "historical_refresh_status": reason,
+    }
+
+
+def refresh_historical_unresolved_units(
+    units: list[dict[str, Any]],
+    series: SeriesMap,
+) -> list[dict[str, Any]]:
+    """Continue historical open units without making them formal forward positions.
+
+    The MWP-C backtest is a frozen historical cohort.  Its rows marked
+    ``unresolved`` must nevertheless continue through newly synced market data:
+    an open unit is revalued at each latest close, and a triggered exit becomes a
+    historical realized unit.  This function is intentionally pure and only
+    receives backtest rows, so historical positions can never affect the formal
+    forward-record lifecycle, radar, or same-stock cooldown.
+    """
+
+    source_units = [row for row in units if row.get("unresolved")]
+    base_exits: dict[tuple[str, str, str], tuple[dict[str, Any], int, dict[str, int]]] = {}
+
+    for unit in source_units:
+        if unit.get("unit_type") != "base":
+            continue
+        bundle = find_series(series, str(unit.get("market")), str(unit.get("stock_no")))
+        if not bundle:
+            continue
+        rows, indicators, dates = bundle
+        signal_index = dates.get(str(unit.get("signal_date") or ""))
+        entry_index = dates.get(str(unit.get("entry_date") or ""))
+        if signal_index is None or entry_index is None:
+            continue
+        confirm_index, _ = pbv23.first_confirmation_index(rows, indicators, signal_index, entry_index, [], {})
+        base_exits[historical_unit_key(unit)] = (
+            BASE_EXIT_POLICY(rows[entry_index], rows, indicators, signal_index, entry_index, confirm_index),
+            entry_index,
+            dates,
+        )
+
+    refreshed: list[dict[str, Any]] = []
+    for unit in source_units:
+        bundle = find_series(series, str(unit.get("market")), str(unit.get("stock_no")))
+        if not bundle:
+            refreshed.append(historical_unit_refresh_failure(unit, "series unavailable"))
+            continue
+        rows, indicators, dates = bundle
+        signal_index = dates.get(str(unit.get("signal_date") or ""))
+        entry_index = dates.get(str(unit.get("entry_date") or ""))
+        if signal_index is None or entry_index is None:
+            refreshed.append(historical_unit_refresh_failure(unit, "signal or entry date unavailable"))
+            continue
+
+        entry = rows[entry_index]
+        if unit.get("unit_type") == "base":
+            cached_base = base_exits.get(historical_unit_key(unit))
+            if not cached_base:
+                refreshed.append(historical_unit_refresh_failure(unit, "base exit unavailable"))
+                continue
+            exit_data = cached_base[0]
+        else:
+            confirm_index = dates.get(str(unit.get("confirm_date") or ""))
+            if confirm_index is None:
+                refreshed.append(historical_unit_refresh_failure(unit, "add-on confirmation unavailable"))
+                continue
+            exit_data = pbv23.structure_addon_exit(entry, rows, indicators, signal_index, entry_index, confirm_index)
+            mother = base_exits.get(historical_unit_key(unit))
+            if mother:
+                base_exit_data, _, base_dates = mother
+                base_exit_index = base_dates.get(str(base_exit_data.get("exit_date") or ""))
+                exit_data = pbv23.sync_addon_exit_with_mother(
+                    exit_data, entry, entry_index, base_exit_index, base_exit_data, dates,
+                )
+
+        refreshed.append({
+            **unit,
+            **exit_data,
+            "source": "historical_backtest_mwp_c_continued",
+            "historical_source_as_of_date": unit.get("exit_date"),
+            "valuation_date": rows[-1].date,
+            "latest_close": rows[-1].close,
+            "historical_refresh_status": "continued",
+        })
+    return refreshed
+
+
+def formal_forward_packages(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Build package-like views for active formal mothers only."""
+
+    output: list[dict[str, Any]] = []
+    for record in records:
+        if record.get("unit_type") not in {None, "base"}:
+            continue
+        if normalize_status_text(record.get("status")) not in FORWARD_ACTIVE_STATUSES:
+            continue
+        mother_signal_date = str(record.get("signal_date") or "")
+        children = [
+            candidate for candidate in records
+            if candidate.get("unit_type") == "addon"
+            and stock_key(candidate) == stock_key(record)
+            and str(candidate.get("mother_signal_date") or "") == mother_signal_date
+        ]
+        same_stock_buy_dates = [
+            str(candidate.get("entry_date")) for candidate in records
+            if stock_key(candidate) == stock_key(record) and candidate.get("entry_date")
+        ]
+        output.append({
+            **record,
+            "addon_count": len(children),
+            "same_stock_buy_signal_entry_dates": same_stock_buy_dates,
+            "source": "formal_forward_record",
+        })
+    return output
+
+
+def formal_forward_open_units(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return actual formal positions for the dashboard's exit radar."""
+
+    return [
+        {**record, "unit_type": record.get("unit_type") or "base"}
+        for record in records
+        if normalize_status_text(record.get("status")) in FORWARD_ACTIVE_STATUSES and record.get("entry_date")
+    ]
+
+
+def recent_formal_buy_block(row: dict[str, Any], packages: list[dict[str, Any]], series: SeriesMap, signal_date: str) -> str | None:
     bundle = find_series(series, str(row.get("market")), str(row.get("stock_no")))
     if not bundle:
         return None
@@ -453,7 +592,7 @@ def mother_candidate_rows(
 
         enriched = {**item, "ma20_slope5_pct": slope, "entry_limit_price": max_entry, "next_open": next_open}
         active = active_by_stock.get(stock_key(item), [])
-        cooldown_reason = recent_historical_buy_block(item, packages, series, target_date)
+        cooldown_reason = recent_formal_buy_block(item, packages, series, target_date)
         forward_block_reason = forward_record_lifecycle_block(item, forward_records, series, target_date)
         if active:
             blocked.append(
@@ -637,8 +776,11 @@ def build_daily_radar(
     if not target_date:
         return empty
 
-    packages = backtest.get("packages", [])
-    units = backtest.get("units", [])
+    # Daily radar is the formal tracking stream. Historical backtest positions
+    # never create or block formal candidates, add-ons, or exit alerts.
+    forward_records = forward_records or []
+    packages = formal_forward_packages(forward_records)
+    units = formal_forward_open_units(forward_records)
     new_mothers, watchlist, blocked = mother_candidate_rows(
         target_date,
         series,
@@ -895,8 +1037,10 @@ def run() -> dict[str, Any]:
     radar = build_daily_radar(backtest, series, forward_records)
     forward_records = sync_forward_records(radar, series, forward_records)
 
-    unresolved_units = [compact_unit(row) for row in units if row.get("unresolved")]
+    continued_historical_units = refresh_historical_unresolved_units(units, series)
+    unresolved_units = [compact_unit(row) for row in continued_historical_units if row.get("unresolved")]
     realized_units = [compact_unit(row) for row in units if not row.get("unresolved")]
+    realized_units.extend(compact_unit(row) for row in continued_historical_units if not row.get("unresolved"))
     unresolved_packages = [compact_package(row) for row in packages if row.get("unresolved")]
     unresolved_units.sort(key=lambda row: (float(row.get("return_pct") or 0), str(row.get("signal_date") or "")), reverse=True)
     realized_units.sort(key=lambda row: (str(row.get("exit_date") or ""), float(row.get("pnl") or 0)), reverse=True)
@@ -934,6 +1078,7 @@ def run() -> dict[str, Any]:
             "daily_pullback_radar_candidates": radar.get("all", []),
             "formal_forward_records": forward_records,
             "formal_forward_note": "這裡只記錄正式追蹤名單。訊號一旦在當日成立，就以該訊號日鎖定 cohort，之後只用未來資料更新進場、持有、出場與報酬，不回頭補做事後挑選。",
+            "historical_tracking_note": "歷史回測在資料截止日仍未出場的單位會每日續算；持有中的單位以最新收盤估值，觸發出場後會轉入歷史已實現損益。這條歷史資料流不參與正式追蹤、雷達或同股冷卻判定。",
             "historical_unresolved_units": unresolved_units,
             "historical_realized_units": realized_units,
             "historical_unresolved_packages": unresolved_packages,
