@@ -85,6 +85,7 @@ def verify_freshness(
     expected_date: str,
     now: datetime | None = None,
     report_path: Path = REPORT_PATH,
+    check_report: bool = True,
 ) -> dict[str, Any]:
     today, current = resolve_expected_date(expected_date, now=now)
     if current.weekday() >= 5:
@@ -110,9 +111,9 @@ def verify_freshness(
         raise ValueError("No latest-date symbols passed the volume gate.")
     if result["signal_match_count"] <= 0:
         raise ValueError("No latest-date signals were found after sync.")
-    if not result["report_exists"]:
+    if check_report and not result["report_exists"]:
         raise ValueError(f"{report_path.as_posix()} was not generated.")
-    if result["latest_report_date"] != today:
+    if check_report and result["latest_report_date"] != today:
         raise ValueError(
             f"Latest report date mismatch: expected {today}, got {result['latest_report_date']}."
         )
@@ -142,13 +143,18 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Target market date in YYYY-MM-DD. Leave blank for today in Asia/Taipei.",
     )
+    parser.add_argument(
+        "--skip-report-check",
+        action="store_true",
+        help="Validate synced market data only; use before generating the report.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     try:
-        result = verify_freshness(args.expected_date)
+        result = verify_freshness(args.expected_date, check_report=not args.skip_report_check)
     except ValueError as exc:
         fallback_now = datetime.now(TAIPEI_TZ)
         today, _ = resolve_expected_date(args.expected_date, now=fallback_now)

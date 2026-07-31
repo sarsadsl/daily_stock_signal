@@ -410,7 +410,12 @@ def sync_one_symbol(market: str, symbol: Symbol, start: date, today: date) -> tu
     return [], f"{symbol.code} 完成，無訊號", False
 
 
-def sync_daily_market_data(markets: list[str], limit: int | None = None, target_date: date | None = None) -> bool:
+def sync_daily_market_data(
+    markets: list[str],
+    limit: int | None = None,
+    target_date: date | None = None,
+    require_target_date: bool = False,
+) -> bool:
     today = target_date or date.today()
     update_status(message="載入股票清單", current="TWSE + TPEx")
     symbols_by_market = {market: load_symbols(market, limit) for market in markets}
@@ -434,6 +439,11 @@ def sync_daily_market_data(markets: list[str], limit: int | None = None, target_
 
     update_status(message="尋找最近已公布交易日", current=today.isoformat())
     target_date, daily_rows = fetch_latest_daily_rows(markets, today)
+    if require_target_date and target_date != today:
+        raise RuntimeError(
+            f"Market data for {today.isoformat()} has not been published; latest available is "
+            f"{target_date.isoformat()}."
+        )
     start = target_date - timedelta(days=365)
     if target_date != today:
         append_log(f"{today} 尚未公布收盤資料，改用 {target_date}")
@@ -498,10 +508,11 @@ def sync_market_data(
     workers: int = DEFAULT_WORKERS,
     mode: str = "auto",
     target_date: date | None = None,
+    require_target_date: bool = False,
 ) -> None:
     if mode in {"auto", "daily"} and limit is None:
         try:
-            sync_daily_market_data(markets, limit, target_date)
+            sync_daily_market_data(markets, limit, target_date, require_target_date)
             return
         except Exception as exc:
             append_log(f"快速同步失敗：{exc}")
@@ -510,6 +521,8 @@ def sync_market_data(
                 finished_at=time.strftime("%Y-%m-%d %H:%M:%S"),
                 message=f"快速同步失敗：{exc}",
             )
+            if require_target_date:
+                raise
             return
 
     today = target_date or date.today()

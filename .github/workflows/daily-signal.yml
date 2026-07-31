@@ -43,15 +43,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Sync market data
+      - name: Resolve Taiwan market date
+        id: market_date
+        shell: bash
+        env:
+          REQUESTED_DATE: ${{ inputs.as_of }}
         run: |
-          if [ -n "${{ inputs.as_of }}" ]; then
-            python sync_today.py --workers 6 --mode auto --as-of "${{ inputs.as_of }}"
-          else
-            python sync_today.py --workers 6 --mode auto
-          fi
+          python market_calendar.py --date "$REQUESTED_DATE" --github-output "$GITHUB_OUTPUT"
+
+      - name: Sync and verify market data
+        if: steps.market_date.outputs.is_trading_day == 'true'
+        shell: bash
+        env:
+          TARGET_DATE: ${{ steps.market_date.outputs.target_date }}
+        run: |
+          for attempt in 1 2 3 4; do
+            echo "Sync attempt $attempt/4 for $TARGET_DATE"
+            if python sync_today.py --workers 6 --mode auto --as-of "$TARGET_DATE" --require-date && \
+              python verify_daily_signal_freshness.py --expected-date "$TARGET_DATE" --skip-report-check; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 4 ]; then
+              echo "Market data for $TARGET_DATE was still unavailable after four attempts."
+              exit 1
+            fi
+            echo "Waiting 15 minutes for upstream TWSE/TPEx data."
+            sleep 900
+          done
 
       - name: Build signal reports
+        if: steps.market_date.outputs.is_trading_day == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -65,19 +86,23 @@ jobs:
           fi
 
       - name: Verify report freshness
+        if: steps.market_date.outputs.is_trading_day == 'true'
         run: |
-          python verify_daily_signal_freshness.py --expected-date "${{ inputs.as_of }}"
+          python verify_daily_signal_freshness.py --expected-date "${{ steps.market_date.outputs.target_date }}"
 
       - name: Update and verify MWP-C forward cohort
+        if: steps.market_date.outputs.is_trading_day == 'true'
         run: |
           python build_mwp_a_strategy_tracking.py
-          python verify_mwp_c_forward_records.py --expected-date "${{ inputs.as_of }}"
+          python verify_mwp_c_forward_records.py --expected-date "${{ steps.market_date.outputs.target_date }}"
 
       - name: Build static site
+        if: steps.market_date.outputs.is_trading_day == 'true'
         shell: pwsh
         run: ./build_site.ps1
 
       - name: Commit generated data and reports
+        if: steps.market_date.outputs.is_trading_day == 'true'
         shell: bash
         run: |
           shopt -s nullglob
@@ -107,18 +132,22 @@ jobs:
           fi
 
       - name: Configure GitHub Pages
+        if: steps.market_date.outputs.is_trading_day == 'true'
         uses: actions/configure-pages@v5
 
       - name: Upload GitHub Pages artifact
+        if: steps.market_date.outputs.is_trading_day == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
       - name: Deploy to GitHub Pages
+        if: steps.market_date.outputs.is_trading_day == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Deploy to Cloudflare Pages
+        if: steps.market_date.outputs.is_trading_day == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLUDFLARE_API_TOKEN }}

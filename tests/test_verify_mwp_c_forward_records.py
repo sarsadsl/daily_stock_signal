@@ -63,14 +63,20 @@ class ForwardRecordVerificationTests(unittest.TestCase):
             encoding="utf-8"
         )
 
+        market_date_index = workflow.index("- name: Resolve Taiwan market date")
+        sync_index = workflow.index("- name: Sync and verify market data")
+        reports_index = workflow.index("- name: Build signal reports")
         freshness_index = workflow.index("- name: Verify report freshness")
         freshness_command_index = workflow.index(
-            'python verify_daily_signal_freshness.py --expected-date "${{ inputs.as_of }}"'
+            'python verify_daily_signal_freshness.py --expected-date "${{ steps.market_date.outputs.target_date }}"'
         )
         tracker_index = workflow.index("python build_mwp_a_strategy_tracking.py")
         verifier_index = workflow.index("python verify_mwp_c_forward_records.py")
         site_index = workflow.index("- name: Build static site")
 
+        self.assertLess(market_date_index, sync_index)
+        self.assertLess(sync_index, reports_index)
+        self.assertLess(reports_index, freshness_index)
         self.assertLess(freshness_index, tracker_index)
         self.assertLess(freshness_index, freshness_command_index)
         self.assertLess(freshness_command_index, tracker_index)
@@ -78,6 +84,9 @@ class ForwardRecordVerificationTests(unittest.TestCase):
         self.assertLess(verifier_index, site_index)
         self.assertIn("reports/mwp_a_strategy_tracking.json", workflow)
         self.assertIn("reports/mwp_c_forward_records.json", workflow)
+        self.assertIn("--require-date", workflow)
+        self.assertIn("--skip-report-check", workflow)
+        self.assertIn("steps.market_date.outputs.is_trading_day == 'true'", workflow)
 
     def test_deploy_site_workflow_also_deploys_cloudflare_pages(self) -> None:
         workflow = Path(".github/workflows/deploy-site.yml").read_text(

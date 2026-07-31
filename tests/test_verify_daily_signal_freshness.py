@@ -130,6 +130,28 @@ class DailySignalFreshnessTests(unittest.TestCase):
         self.assertEqual(result["signal_match_count"], 1)
         self.assertEqual(result["latest_report_date"], "2026-07-01")
 
+    def test_data_only_check_does_not_require_a_report(self) -> None:
+        rows_by_path = {
+            "a.csv": make_history("2330", "2026-07-01", 2_000_000),
+        }
+        with tempfile.TemporaryDirectory() as tmpdir, patch(
+            "verify_daily_signal_freshness.csv_files", return_value=["a.csv"]
+        ), patch(
+            "verify_daily_signal_freshness.read_rows",
+            side_effect=lambda path: rows_by_path[path],
+        ), patch("verify_daily_signal_freshness.prepare", return_value={}), patch(
+            "verify_daily_signal_freshness.STRATEGIES",
+            {"demo": lambda rows, indicators, index: "signal"},
+        ):
+            result = verify_freshness(
+                "2026-07-01",
+                now=self.now,
+                report_path=Path(tmpdir) / "not-created.csv",
+                check_report=False,
+            )
+
+        self.assertFalse(result["report_exists"])
+
 
 if __name__ == "__main__":
     unittest.main()

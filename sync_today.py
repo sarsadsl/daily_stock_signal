@@ -21,6 +21,11 @@ def parse_args() -> argparse.Namespace:
         help="auto uses whole-market daily sync first, symbol forces per-stock sync.",
     )
     parser.add_argument("--as-of", help="Target market date in YYYY-MM-DD. Defaults to today.")
+    parser.add_argument(
+        "--require-date",
+        action="store_true",
+        help="Fail instead of falling back when --as-of data has not been published yet.",
+    )
     return parser.parse_args()
 
 
@@ -28,7 +33,14 @@ def main() -> int:
     args = parse_args()
     markets = [market for market in args.market.split(",") if market in {"twse", "tpex"}]
     target_date = parse_iso_date(args.as_of) if args.as_of else None
-    sync_market_data(markets or ["twse", "tpex"], args.limit, args.workers, args.mode, target_date)
+    sync_market_data(
+        markets or ["twse", "tpex"],
+        args.limit,
+        args.workers,
+        args.mode,
+        target_date,
+        require_target_date=args.require_date,
+    )
     return 0
 
 
