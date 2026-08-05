@@ -6,10 +6,20 @@ from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from market_calendar import is_twse_trading_day, resolve_target_date, write_github_output
+from market_calendar import fetch_twse_calendar, is_twse_trading_day, resolve_target_date, write_github_output
 
 
 class MarketCalendarTests(unittest.TestCase):
+    def test_retries_temporary_calendar_request_failures(self) -> None:
+        payload = {"stat": "ok", "data": []}
+        with patch(
+            "market_calendar.request_json",
+            side_effect=[RuntimeError("HTTP 307 from TWSE"), payload],
+        ), patch("market_calendar.time.sleep") as sleep:
+            self.assertEqual(fetch_twse_calendar(2026), [])
+
+        sleep.assert_called_once_with(5)
+
     def test_weekends_do_not_request_the_calendar(self) -> None:
         with patch("market_calendar.fetch_twse_calendar") as calendar:
             self.assertFalse(is_twse_trading_day(date(2026, 8, 1)))

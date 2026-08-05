@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,8 @@ from fetch_daily_trades import parse_iso_date, request_json
 TAIPEI_TZ = timezone(timedelta(hours=8), name="Asia/Taipei")
 TWSE_HOLIDAY_URL = "https://www.twse.com.tw/holidaySchedule/holidaySchedule"
 TRADING_DAY_MARKERS = ("開始交易", "最後交易日")
+CALENDAR_REQUEST_ATTEMPTS = 3
+CALENDAR_RETRY_DELAY_SECONDS = 5
 
 
 def resolve_target_date(value: str, now: datetime | None = None) -> date:
@@ -22,10 +25,23 @@ def resolve_target_date(value: str, now: datetime | None = None) -> date:
 
 
 def fetch_twse_calendar(year: int) -> list[list[str]]:
-    payload: dict[str, Any] = request_json(
-        TWSE_HOLIDAY_URL,
-        {"response": "json", "queryYear": str(year - 1911)},
-    )
+    for attempt in range(1, CALENDAR_REQUEST_ATTEMPTS + 1):
+        try:
+            payload: dict[str, Any] = request_json(
+                TWSE_HOLIDAY_URL,
+                {"response": "json", "queryYear": str(year - 1911)},
+            )
+            break
+        except RuntimeError:
+            if attempt == CALENDAR_REQUEST_ATTEMPTS:
+                raise
+            delay = CALENDAR_RETRY_DELAY_SECONDS * attempt
+            print(
+                f"TWSE holiday calendar request failed (attempt "
+                f"{attempt}/{CALENDAR_REQUEST_ATTEMPTS}); retrying in {delay}s."
+            )
+            time.sleep(delay)
+
     if payload.get("stat") != "ok":
         raise RuntimeError(f"TWSE holiday calendar returned {payload.get('stat')!r}.")
     return payload.get("data", [])
