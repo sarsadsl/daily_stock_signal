@@ -1,9 +1,27 @@
 [
   {
-    "id": "TWSE:2359:2026-08-12:base",
+    "id": "TWSE:1736:2026-08-13:base",
     "source": "mwp_c_exact_daily_scanner",
     "status": "待次日開盤",
     "base_status": "待次日開盤",
+    "addon_status": "-",
+    "unit_type": "base",
+    "market": "TWSE",
+    "stock_no": "1736",
+    "stock_name": "喬山",
+    "label": "1736 喬山",
+    "signal_date": "2026-08-13",
+    "signal_close": 140.5,
+    "entry_limit_price": 137.69,
+    "ma20_slope5_pct": 2.0794,
+    "created_from_radar_date": "2026-08-13",
+    "unresolved": true
+  },
+  {
+    "id": "TWSE:2359:2026-08-12:base",
+    "source": "mwp_c_exact_daily_scanner",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -15,7 +33,9 @@
     "entry_limit_price": 140.14,
     "ma20_slope5_pct": 1.136,
     "created_from_radar_date": "2026-08-12",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-13",
+    "entry_price": 151.0
   },
   {
     "id": "TWSE:8033:2026-08-11:base",
@@ -36,7 +56,7 @@
     "unresolved": true,
     "entry_date": "2026-08-12",
     "entry_price": 185.0,
-    "unrealized_return_pct": -6.49,
+    "unrealized_return_pct": -0.81,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -359,7 +379,7 @@
     "unresolved": true,
     "entry_date": "2026-08-10",
     "entry_price": 30.75,
-    "unrealized_return_pct": -0.65,
+    "unrealized_return_pct": -0.33,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -542,7 +562,7 @@
     "unresolved": true,
     "entry_date": "2026-08-03",
     "entry_price": 20.8,
-    "unrealized_return_pct": 7.21,
+    "unrealized_return_pct": 8.89,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -605,7 +625,7 @@
     "unresolved": true,
     "entry_date": "2026-07-31",
     "entry_price": 171.0,
-    "unrealized_return_pct": 32.75,
+    "unrealized_return_pct": 45.91,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1791,7 +1811,7 @@
     "unresolved": true,
     "entry_date": "2026-07-22",
     "entry_price": 17.7,
-    "unrealized_return_pct": 14.69,
+    "unrealized_return_pct": 10.73,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1834,7 +1854,7 @@
     "unresolved": true,
     "entry_date": "2026-07-22",
     "entry_price": 34.25,
-    "unrealized_return_pct": 4.09,
+    "unrealized_return_pct": 5.69,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2197,7 +2217,7 @@
     "unresolved": true,
     "entry_date": "2026-07-20",
     "entry_price": 55.0,
-    "unrealized_return_pct": 6.91,
+    "unrealized_return_pct": 6.55,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2668,7 +2688,7 @@
     "unresolved": true,
     "entry_date": "2026-07-16",
     "entry_price": 46.0,
-    "unrealized_return_pct": 5.87,
+    "unrealized_return_pct": -0.33,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2711,7 +2731,7 @@
     "unresolved": true,
     "entry_date": "2026-07-16",
     "entry_price": 21.0,
-    "unrealized_return_pct": -5.24,
+    "unrealized_return_pct": -4.05,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -4378,7 +4398,7 @@
     "unresolved": true,
     "entry_date": "2026-07-13",
     "entry_price": 56.0,
-    "unrealized_return_pct": 0.36,
+    "unrealized_return_pct": 2.68,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -7782,7 +7802,7 @@
     "unresolved": true,
     "entry_date": "2026-06-30",
     "entry_price": 96.8,
-    "unrealized_return_pct": 3.0,
+    "unrealized_return_pct": 2.79,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
