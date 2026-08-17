@@ -1,9 +1,27 @@
 [
   {
-    "id": "TWSE:9939:2026-08-14:base",
+    "id": "TWSE:4763:2026-08-17:base",
     "source": "mwp_c_exact_daily_scanner",
     "status": "待次日開盤",
     "base_status": "待次日開盤",
+    "addon_status": "-",
+    "unit_type": "base",
+    "market": "TWSE",
+    "stock_no": "4763",
+    "stock_name": "材料*-KY",
+    "label": "4763 材料*-KY",
+    "signal_date": "2026-08-17",
+    "signal_close": 50.1,
+    "entry_limit_price": 49.098,
+    "ma20_slope5_pct": 1.1028,
+    "created_from_radar_date": "2026-08-17",
+    "unresolved": true
+  },
+  {
+    "id": "TWSE:9939:2026-08-14:base",
+    "source": "mwp_c_exact_daily_scanner",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -15,13 +33,15 @@
     "entry_limit_price": 129.36,
     "ma20_slope5_pct": 2.6836,
     "created_from_radar_date": "2026-08-14",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-17",
+    "entry_price": 131.0
   },
   {
     "id": "TWSE:9934:2026-08-14:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "待次日開盤",
-    "base_status": "待次日開盤",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -33,13 +53,15 @@
     "entry_limit_price": 10.927,
     "ma20_slope5_pct": 2.8106,
     "created_from_radar_date": "2026-08-14",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-17",
+    "entry_price": 11.2
   },
   {
     "id": "TWSE:9914:2026-08-14:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "待次日開盤",
-    "base_status": "待次日開盤",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -51,13 +73,15 @@
     "entry_limit_price": 81.634,
     "ma20_slope5_pct": 4.2306,
     "created_from_radar_date": "2026-08-14",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-17",
+    "entry_price": 87.5
   },
   {
     "id": "TWSE:3022:2026-08-14:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "待次日開盤",
-    "base_status": "待次日開盤",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TWSE",
@@ -69,13 +93,15 @@
     "entry_limit_price": 92.316,
     "ma20_slope5_pct": 4.267,
     "created_from_radar_date": "2026-08-14",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-17",
+    "entry_price": 94.4
   },
   {
     "id": "TPEX:3362:2026-08-14:base",
     "source": "mwp_c_exact_daily_scanner",
-    "status": "待次日開盤",
-    "base_status": "待次日開盤",
+    "status": "次日開盤未達進場條件",
+    "base_status": "次日開盤未達進場條件",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TPEX",
@@ -87,7 +113,9 @@
     "entry_limit_price": 168.56,
     "ma20_slope5_pct": 0.3257,
     "created_from_radar_date": "2026-08-14",
-    "unresolved": true
+    "unresolved": false,
+    "entry_date": "2026-08-17",
+    "entry_price": 173.0
   },
   {
     "id": "TWSE:1736:2026-08-13:base",
@@ -148,7 +176,7 @@
     "unresolved": true,
     "entry_date": "2026-08-12",
     "entry_price": 185.0,
-    "unrealized_return_pct": 8.92,
+    "unrealized_return_pct": 3.51,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -654,7 +682,7 @@
     "unresolved": true,
     "entry_date": "2026-08-03",
     "entry_price": 20.8,
-    "unrealized_return_pct": 8.65,
+    "unrealized_return_pct": 5.77,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -717,7 +745,7 @@
     "unresolved": true,
     "entry_date": "2026-07-31",
     "entry_price": 171.0,
-    "unrealized_return_pct": 59.36,
+    "unrealized_return_pct": 51.46,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1500,7 +1528,7 @@
     "unresolved": true,
     "entry_date": "2026-07-24",
     "entry_price": 33.4,
-    "unrealized_return_pct": -0.15,
+    "unrealized_return_pct": 0.0,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1903,7 +1931,7 @@
     "unresolved": true,
     "entry_date": "2026-07-22",
     "entry_price": 17.7,
-    "unrealized_return_pct": 7.63,
+    "unrealized_return_pct": 8.47,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1946,7 +1974,7 @@
     "unresolved": true,
     "entry_date": "2026-07-22",
     "entry_price": 34.25,
-    "unrealized_return_pct": 10.22,
+    "unrealized_return_pct": 8.47,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2309,7 +2337,7 @@
     "unresolved": true,
     "entry_date": "2026-07-20",
     "entry_price": 55.0,
-    "unrealized_return_pct": 5.45,
+    "unrealized_return_pct": 4.18,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2780,7 +2808,7 @@
     "unresolved": true,
     "entry_date": "2026-07-16",
     "entry_price": 46.0,
-    "unrealized_return_pct": 2.93,
+    "unrealized_return_pct": 1.3,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -2823,7 +2851,7 @@
     "unresolved": true,
     "entry_date": "2026-07-16",
     "entry_price": 21.0,
-    "unrealized_return_pct": -5.24,
+    "unrealized_return_pct": -5.0,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -4490,7 +4518,7 @@
     "unresolved": true,
     "entry_date": "2026-07-13",
     "entry_price": 56.0,
-    "unrealized_return_pct": 7.14,
+    "unrealized_return_pct": 5.54,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -7894,7 +7922,7 @@
     "unresolved": true,
     "entry_date": "2026-06-30",
     "entry_price": 96.8,
-    "unrealized_return_pct": 4.86,
+    "unrealized_return_pct": 1.34,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
