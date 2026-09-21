@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 import json
 import sys
 import time
@@ -12,6 +13,9 @@ from pathlib import Path
 from typing import Any
 
 from alert_signals import send_message
+from execution_agent.notifier import render_open_entry_call_message as render_open_entry_call_message_from_decision
+from execution_agent.open_entry_core import build_open_entry_decision
+from execution_agent.tracking_source import PendingOpenEntry
 from fetch_daily_trades import request_json
 from run_market_backtest import csv_files, read_rows
 
@@ -250,37 +254,36 @@ def build_open_entry_call_decisions(
         open_price = open_snapshot.get(key)
         if open_price is None:
             continue
-        entry_limit_price = float(record.get("entry_limit_price") or 0)
-        decisions.append(
-            {
-                **record,
-                "key": record_call_key(record),
-                "open_price": open_price,
-                "entry_limit_price": entry_limit_price,
-                "result": "called" if open_price <= entry_limit_price else "open_failed",
-            }
+        entry = PendingOpenEntry(
+            market=str(record.get("market") or "").upper(),
+            stock_no=str(record.get("stock_no") or ""),
+            stock_name=str(record.get("stock_name") or ""),
+            signal_date=str(record.get("signal_date") or ""),
+            entry_limit_price=float(record.get("entry_limit_price") or 0.0),
+            signal_close=float(record.get("signal_close") or 0.0),
+            unit_type=str(record.get("unit_type") or "base"),
+            addon_number=record.get("addon_number"),
         )
+        decision = build_open_entry_decision(entry, open_price=open_price)
+        decisions.append({**record, **asdict(decision), "key": decision.call_key})
     return decisions
 
 
 def render_open_entry_call_message(decision: dict[str, Any]) -> str:
-    stock_no = str(decision.get("stock_no") or "")
-    stock_name = str(decision.get("stock_name") or "").strip()
-    signal_date = str(decision.get("signal_date") or "")
-    signal_close = decision.get("signal_close", "-")
-    entry_limit_price = decision.get("entry_limit_price", "-")
-    open_price = decision.get("open_price", "-")
-    stock_line = f"🏷️ {stock_no} {stock_name}".strip()
-    return "\n".join(
-        [
-            "🚨 MWP-C 正式追蹤",
-            stock_line,
-            f"📅 訊號日 {signal_date}",
-            f"💵 收盤 {signal_close}",
-            f"🎯 進場上限 {entry_limit_price}",
-            f"🟢 次日開盤 {open_price}",
-        ]
+    typed_decision = build_open_entry_decision(
+        PendingOpenEntry(
+            market=str(decision.get("market") or "").upper(),
+            stock_no=str(decision.get("stock_no") or ""),
+            stock_name=str(decision.get("stock_name") or ""),
+            signal_date=str(decision.get("signal_date") or ""),
+            entry_limit_price=float(decision.get("entry_limit_price") or 0.0),
+            signal_close=float(decision.get("signal_close") or 0.0),
+            unit_type=str(decision.get("unit_type") or "base"),
+            addon_number=decision.get("addon_number"),
+        ),
+        open_price=float(decision.get("open_price") or 0.0),
     )
+    return render_open_entry_call_message_from_decision(typed_decision)
 
 
 def run_open_entry_calls(
