@@ -1,0 +1,10 @@
+services:
+  execution-agent:
+    build:
+      context: ..
+      dockerfile: execution_agent/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./state:/app/state
+      - ../data:/app/data:ro
