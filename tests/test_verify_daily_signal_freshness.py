@@ -79,21 +79,36 @@ class DailySignalFreshnessTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Latest market date mismatch"):
                 verify_freshness("2026-07-01", now=self.now)
 
-    def test_fails_when_latest_market_has_no_signals(self) -> None:
+    def test_passes_when_latest_market_has_no_signals_and_report_is_empty(self) -> None:
         rows_by_path = {
             "a.csv": make_history("2330", "2026-07-01", 2_000_000),
             "b.csv": make_history("2317", "2026-07-01", 3_000_000),
         }
 
-        with patch("verify_daily_signal_freshness.csv_files", return_value=["a.csv", "b.csv"]), patch(
-            "verify_daily_signal_freshness.read_rows",
-            side_effect=lambda path: rows_by_path[path],
-        ), patch("verify_daily_signal_freshness.prepare", return_value={}), patch(
-            "verify_daily_signal_freshness.STRATEGIES",
-            {"demo": lambda rows, indicators, index: None},
-        ):
-            with self.assertRaisesRegex(ValueError, "No latest-date signals were found"):
-                verify_freshness("2026-07-01", now=self.now)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "daily_signal_alert.csv"
+            report_path.write_text("date\n", encoding="utf-8-sig")
+            with patch("verify_daily_signal_freshness.csv_files", return_value=["a.csv", "b.csv"]), patch(
+                "verify_daily_signal_freshness.read_rows",
+                side_effect=lambda path: rows_by_path[path],
+            ), patch("verify_daily_signal_freshness.prepare", return_value={}), patch(
+                "verify_daily_signal_freshness.STRATEGIES",
+                {"demo": lambda rows, indicators, index: None},
+            ):
+                result = verify_freshness("2026-07-01", now=self.now, report_path=report_path)
+
+        self.assertEqual(result["signal_match_count"], 0)
+        self.assertEqual(result["report_row_count"], 0)
+
+    def test_backfill_date_is_checked_even_when_run_on_weekend(self) -> None:
+        with patch("verify_daily_signal_freshness.summarize_latest_market", return_value={
+            "latest_market_date": "2026-10-02", "latest_symbol_count": 1,
+            "volume_qualified_count": 1, "signal_match_count": 0,
+        }), patch("verify_daily_signal_freshness.read_report_summary", return_value={
+            "report_exists": True, "latest_report_date": "", "report_row_count": 0,
+        }):
+            result = verify_freshness("2026-10-02", now=datetime(2026, 10, 3, 20, 0))
+        self.assertFalse(result.get("skipped", False))
 
     def test_passes_with_latest_date_signals_and_report_date(self) -> None:
         rows_by_path = {

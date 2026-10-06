@@ -64,18 +64,23 @@ class ForwardRecordVerificationTests(unittest.TestCase):
         )
 
         market_date_index = workflow.index("- name: Resolve Taiwan market date")
+        missing_index = workflow.index("- name: Resolve missing market dates")
+        backfill_index = workflow.index("- name: Backfill missing trading days")
         sync_index = workflow.index("- name: Sync and verify market data")
-        reports_index = workflow.index("- name: Build signal reports")
-        freshness_index = workflow.index("- name: Verify report freshness")
-        freshness_command_index = workflow.index(
+        daily_flow = workflow[sync_index:]
+        reports_index = daily_flow.index("- name: Build signal reports")
+        freshness_index = daily_flow.index("- name: Verify report freshness")
+        freshness_command_index = daily_flow.index(
             'python verify_daily_signal_freshness.py --expected-date "${{ steps.market_date.outputs.target_date }}"'
         )
-        tracker_index = workflow.index("python build_mwp_a_strategy_tracking.py")
-        verifier_index = workflow.index("python verify_mwp_c_forward_records.py")
-        site_index = workflow.index("- name: Build static site")
+        tracker_index = daily_flow.index("python build_mwp_a_strategy_tracking.py")
+        verifier_index = daily_flow.index("python verify_mwp_c_forward_records.py")
+        site_index = daily_flow.index("- name: Build static site")
 
-        self.assertLess(market_date_index, sync_index)
-        self.assertLess(sync_index, reports_index)
+        self.assertLess(market_date_index, missing_index)
+        self.assertLess(missing_index, backfill_index)
+        self.assertLess(backfill_index, sync_index)
+        self.assertIn("--missing-since-tracking reports/mwp_a_strategy_tracking.json", workflow)
         self.assertLess(reports_index, freshness_index)
         self.assertLess(freshness_index, tracker_index)
         self.assertLess(freshness_index, freshness_command_index)

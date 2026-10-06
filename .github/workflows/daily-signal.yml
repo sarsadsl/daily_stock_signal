@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       as_of:
-        description: "Target market date in YYYY-MM-DD. Leave blank for today."
+        description: "Target market date in YYYY-MM-DD. Leave blank for the latest completed market date."
         required: false
         type: string
 
@@ -51,6 +51,45 @@ jobs:
         run: |
           python market_calendar.py --date "$REQUESTED_DATE" --github-output "$GITHUB_OUTPUT"
 
+      - name: Resolve missing market dates
+        id: missed_dates
+        if: steps.market_date.outputs.is_trading_day == 'true'
+        shell: bash
+        run: |
+          python market_calendar.py \
+            --date "${{ steps.market_date.outputs.target_date }}" \
+            --missing-since-tracking reports/mwp_a_strategy_tracking.json \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Backfill missing trading days
+        if: steps.market_date.outputs.is_trading_day == 'true'
+        shell: bash
+        env:
+          MISSING_DATES: ${{ steps.missed_dates.outputs.missing_dates }}
+        run: |
+          IFS=',' read -ra dates <<< "$MISSING_DATES"
+          for backfill_date in "${dates[@]}"; do
+            if [ -z "$backfill_date" ]; then
+              continue
+            fi
+            echo "Backfilling $backfill_date"
+            for attempt in 1 2 3 4; do
+              if python sync_today.py --workers 6 --mode auto --as-of "$backfill_date" --require-date && \
+                python verify_daily_signal_freshness.py --expected-date "$backfill_date" --skip-report-check; then
+                break
+              fi
+              if [ "$attempt" -eq 4 ]; then
+                echo "Market data for $backfill_date was unavailable after four attempts."
+                exit 1
+              fi
+              sleep 900
+            done
+            python alert_signals.py --dry-run --top-lists --top-count 5
+            python verify_daily_signal_freshness.py --expected-date "$backfill_date"
+            python build_mwp_a_strategy_tracking.py
+            python verify_mwp_c_forward_records.py --expected-date "$backfill_date"
+          done
+
       - name: Sync and verify market data
         if: steps.market_date.outputs.is_trading_day == 'true'
         shell: bash
@@ -74,11 +113,15 @@ jobs:
       - name: Build signal reports
         if: steps.market_date.outputs.is_trading_day == 'true'
         env:
+          BACKFILL_DATE: ${{ inputs.as_of }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALERT_MAX_ITEMS: "30"
         run: |
-          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+          if [ -n "$BACKFILL_DATE" ]; then
+            echo "Backfill for $BACKFILL_DATE: generate reports without sending an old Telegram alert."
+            python alert_signals.py --dry-run --top-lists --top-count 5
+          elif [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
             python alert_signals.py --channel telegram --top-lists --top-count 5 --send-empty
           else
             echo "Telegram secrets are not configured; building reports without sending a notification."

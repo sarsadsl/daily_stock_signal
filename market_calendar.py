@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -16,12 +17,19 @@ TWSE_HOLIDAY_URL = "https://www.twse.com.tw/holidaySchedule/holidaySchedule"
 TRADING_DAY_MARKERS = ("開始交易", "最後交易日")
 CALENDAR_REQUEST_ATTEMPTS = 3
 CALENDAR_RETRY_DELAY_SECONDS = 5
+DAILY_DATA_READY_HOUR_TAIPEI = 18
 
 
 def resolve_target_date(value: str, now: datetime | None = None) -> date:
     if value:
         return parse_iso_date(value)
-    return (now or datetime.now(TAIPEI_TZ)).date()
+    current = now or datetime.now(TAIPEI_TZ)
+    if current.tzinfo is not None:
+        current = current.astimezone(TAIPEI_TZ)
+    target = current.date()
+    if current.hour < DAILY_DATA_READY_HOUR_TAIPEI:
+        target -= timedelta(days=1)
+    return target
 
 
 def fetch_twse_calendar(year: int) -> list[list[str]]:
@@ -71,12 +79,30 @@ def write_github_output(path: Path, target_date: date, is_trading_day: bool) -> 
         output.write(f"is_trading_day={'true' if is_trading_day else 'false'}\n")
 
 
+def missing_trading_dates(tracking_path: Path, target_date: date) -> list[date]:
+    tracking = json.loads(tracking_path.read_text(encoding="utf-8"))
+    last_date_text = tracking.get("tracking", {}).get("as_of_daily_signal_date")
+    if not last_date_text:
+        raise ValueError(f"Missing tracking.as_of_daily_signal_date in {tracking_path}.")
+    last_date = parse_iso_date(last_date_text)
+    if target_date < last_date:
+        raise ValueError(f"Target date {target_date} precedes completed tracking date {last_date}.")
+    missing: list[date] = []
+    cursor = last_date + timedelta(days=1)
+    while cursor < target_date:
+        if is_twse_trading_day(cursor):
+            missing.append(cursor)
+        cursor += timedelta(days=1)
+    return missing
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Resolve whether a Taiwan market date is an official TWSE trading day."
     )
-    parser.add_argument("--date", default="", help="Target date in YYYY-MM-DD. Defaults to today in Asia/Taipei.")
+    parser.add_argument("--date", default="", help="Target date in YYYY-MM-DD. By default, use the latest completed Taiwan market day: today from 18:00 Taipei time, otherwise yesterday.")
     parser.add_argument("--github-output", type=Path, help="Optional GitHub Actions output file.")
+    parser.add_argument("--missing-since-tracking", type=Path, help="List trading dates after the tracker's last completed date and before --date.")
     return parser.parse_args()
 
 
@@ -88,6 +114,13 @@ def main() -> int:
     print(f"TWSE trading day: {'yes' if is_trading_day else 'no'}")
     if args.github_output:
         write_github_output(args.github_output, target_date, is_trading_day)
+    if args.missing_since_tracking:
+        missing = missing_trading_dates(args.missing_since_tracking, target_date)
+        dates_text = ",".join(item.isoformat() for item in missing)
+        print(f"Missing trading dates: {dates_text or '(none)'}")
+        if args.github_output:
+            with args.github_output.open("a", encoding="utf-8") as output:
+                output.write(f"missing_dates={dates_text}\n")
     return 0
 
 

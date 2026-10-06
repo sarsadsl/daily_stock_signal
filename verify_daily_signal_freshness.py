@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +88,7 @@ def verify_freshness(
     check_report: bool = True,
 ) -> dict[str, Any]:
     today, current = resolve_expected_date(expected_date, now=now)
-    if current.weekday() >= 5:
+    if date.fromisoformat(today).weekday() >= 5:
         return {
             "expected_date": today,
             "skipped": True,
@@ -109,11 +109,11 @@ def verify_freshness(
         raise ValueError("No latest-date symbols were found in synced market data.")
     if result["volume_qualified_count"] <= 0:
         raise ValueError("No latest-date symbols passed the volume gate.")
-    if result["signal_match_count"] <= 0:
-        raise ValueError("No latest-date signals were found after sync.")
     if check_report and not result["report_exists"]:
         raise ValueError(f"{report_path.as_posix()} was not generated.")
-    if check_report and result["latest_report_date"] != today:
+    if check_report and result["signal_match_count"] > 0 and result["report_row_count"] == 0:
+        raise ValueError("Latest-date signals were found but the report is empty.")
+    if check_report and result["report_row_count"] > 0 and result["latest_report_date"] != today:
         raise ValueError(
             f"Latest report date mismatch: expected {today}, got {result['latest_report_date']}."
         )
