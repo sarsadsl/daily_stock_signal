@@ -1,10 +1,10 @@
 {
   "pullback": [
     {
-      "market": "TWSE",
-      "stock_no": "2884",
-      "stock_name": "玉山金",
-      "date": "2026-10-15",
+      "market": "TPEX",
+      "stock_no": "1815",
+      "stock_name": "富喬",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
       "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
@@ -14,18 +14,18 @@
         "月線與季線同步上揚",
         "季線站在半年線之上",
         "收盤仍在月線上方",
-        "K棒未轉弱"
+        "紅K收在當日相對高位"
       ],
-      "volume_ratio": 1.93,
-      "ma20_slope_pct": 4.21,
-      "ma60_slope_pct": 10.77,
-      "close": 48.8,
-      "volume": 63086494,
-      "ma5": 46.719999999999985,
-      "ma10": 46.03000000000001,
-      "ma20": 45.97,
-      "ma60": 40.4866666666667,
-      "source": "data/all_twse/2884_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 2.32,
+      "ma20_slope_pct": 1.95,
+      "ma60_slope_pct": 7.93,
+      "close": 140.0,
+      "volume": 146694000,
+      "ma5": 132.89999999999992,
+      "ma10": 130.8499999999999,
+      "ma20": 123.95,
+      "ma60": 106.33333333333331,
+      "source": "data/all_tpex/1815_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -38,63 +38,63 @@
             "月線與季線同步上揚",
             "季線站在半年線之上",
             "收盤仍在月線上方",
-            "K棒未轉弱"
+            "紅K收在當日相對高位"
           ]
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts/daily_alert/2884_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/1815_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
-      "stock_no": "6257",
-      "stock_name": "矽格",
-      "date": "2026-10-15",
+      "stock_no": "6505",
+      "stock_name": "台塑化",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
-      "reason": "主升段回測月線",
+      "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
       "score_label": "5/5",
       "score_reasons": [
         "短中期均線維持多頭排列",
         "月線與季線同步上揚",
         "季線站在半年線之上",
-        "回測月線後收盤守住",
-        "低點貼近月線，回測位置乾淨"
+        "收盤仍在月線上方",
+        "紅K收在當日相對高位"
       ],
-      "volume_ratio": 0.79,
-      "ma20_slope_pct": 13.72,
-      "ma60_slope_pct": 4.52,
-      "close": 258.0,
-      "volume": 14380803,
-      "ma5": 276.79999999999995,
-      "ma10": 272.2,
-      "ma20": 252.375,
-      "ma60": 228.19999999999996,
-      "source": "data/all_twse/6257_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 1.3,
+      "ma20_slope_pct": 17.95,
+      "ma60_slope_pct": 22.79,
+      "close": 122.5,
+      "volume": 49582445,
+      "ma5": 116.19999999999997,
+      "ma10": 109.86000000000001,
+      "ma20": 99.10999999999999,
+      "ma60": 81.89166666666662,
+      "source": "data/all_twse/6505_2025-06-01_2026-06-01.csv",
       "reasons": [
-        "主升段回測月線"
+        "10/20MA支撐後跳空站回5/10/20MA"
       ],
       "reason_details": [
         {
-          "reason": "主升段回測月線",
+          "reason": "10/20MA支撐後跳空站回5/10/20MA",
           "score": 5,
           "score_reasons": [
             "短中期均線維持多頭排列",
             "月線與季線同步上揚",
             "季線站在半年線之上",
-            "回測月線後收盤守住",
-            "低點貼近月線，回測位置乾淨"
+            "收盤仍在月線上方",
+            "紅K收在當日相對高位"
           ]
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts/daily_alert/6257_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/6505_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
-      "market": "TPEX",
-      "stock_no": "6148",
-      "stock_name": "驊宏資",
-      "date": "2026-10-15",
+      "market": "TWSE",
+      "stock_no": "2340",
+      "stock_name": "台亞",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
       "reason": "主升段回測10MA",
       "score": 5,
@@ -104,18 +104,18 @@
         "月線與季線同步上揚",
         "季線站在半年線之上",
         "回測10MA後收盤守住",
-        "K棒未轉弱"
+        "紅K收在當日相對高位"
       ],
-      "volume_ratio": 1.37,
-      "ma20_slope_pct": 14.59,
-      "ma60_slope_pct": 4.53,
-      "close": 38.15,
-      "volume": 5965000,
-      "ma5": 37.93000000000002,
-      "ma10": 37.69000000000001,
-      "ma20": 37.502500000000005,
-      "ma60": 31.896666666666658,
-      "source": "data/all_tpex/6148_2025-06-02_2026-06-02.csv",
+      "volume_ratio": 1.43,
+      "ma20_slope_pct": 24.44,
+      "ma60_slope_pct": 5.56,
+      "close": 50.4,
+      "volume": 44019702,
+      "ma5": 51.01999999999993,
+      "ma10": 49.95000000000001,
+      "ma20": 42.8175,
+      "ma60": 36.111666666666665,
+      "source": "data/all_twse/2340_2025-06-02_2026-06-02.csv",
       "reasons": [
         "主升段回測10MA"
       ],
@@ -128,39 +128,39 @@
             "月線與季線同步上揚",
             "季線站在半年線之上",
             "回測10MA後收盤守住",
-            "K棒未轉弱"
+            "紅K收在當日相對高位"
           ]
         }
       ],
-      "weighted_score": 122.878052,
-      "chart_path": "charts/daily_alert/6148_2025-06-02_2026-06-02_kline_ma.png"
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/2340_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
-      "stock_no": "6885",
-      "stock_name": "全福生技",
-      "date": "2026-10-15",
+      "stock_no": "8039",
+      "stock_name": "台虹",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
       "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
       "score_label": "5/5",
       "score_reasons": [
-        "短中期均線維持多頭排列",
-        "月線與季線同步上揚",
+        "月線仍在季線之上",
+        "季線斜率偏強",
         "季線站在半年線之上",
-        "收盤仍在月線上方",
-        "K棒未轉弱"
+        "回測月線後收盤守住",
+        "低點貼近月線，回測位置乾淨"
       ],
-      "volume_ratio": 2.92,
-      "ma20_slope_pct": 11.36,
-      "ma60_slope_pct": 10.91,
-      "close": 33.5,
-      "volume": 4115184,
-      "ma5": 30.579999999999956,
-      "ma10": 30.374999999999993,
-      "ma20": 29.992500000000014,
-      "ma60": 24.538333333333323,
-      "source": "data/all_twse/6885_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 1.12,
+      "ma20_slope_pct": -0.47,
+      "ma60_slope_pct": 23.15,
+      "close": 311.5,
+      "volume": 29291804,
+      "ma5": 293.90000000000003,
+      "ma10": 297.45,
+      "ma20": 284.3,
+      "ma60": 250.64166666666668,
+      "source": "data/all_twse/8039_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -169,69 +169,69 @@
           "reason": "10/20MA支撐後跳空站回5/10/20MA",
           "score": 5,
           "score_reasons": [
-            "短中期均線維持多頭排列",
-            "月線與季線同步上揚",
-            "季線站在半年線之上",
-            "收盤仍在月線上方",
-            "K棒未轉弱"
-          ]
-        }
-      ],
-      "weighted_score": 122.071946,
-      "chart_path": "charts/daily_alert/6885_2025-06-01_2026-06-01_kline_ma.png"
-    },
-    {
-      "market": "TWSE",
-      "stock_no": "2254",
-      "stock_name": "巨鎧精密-創",
-      "date": "2026-10-15",
-      "strategy": "台積電策略",
-      "reason": "主升段回測月線",
-      "score": 5,
-      "score_label": "5/5",
-      "score_reasons": [
-        "月線仍在季線之上",
-        "月線與季線同步上揚",
-        "季線站在半年線之上",
-        "回測月線後收盤守住",
-        "低點貼近月線，回測位置乾淨"
-      ],
-      "volume_ratio": 1.45,
-      "ma20_slope_pct": 22.48,
-      "ma60_slope_pct": 13.77,
-      "close": 94.3,
-      "volume": 4080158,
-      "ma5": 93.75999999999995,
-      "ma10": 94.48999999999995,
-      "ma20": 87.59499999999996,
-      "ma60": 69.57666666666663,
-      "source": "data/all_twse/2254_2025-06-02_2026-06-02.csv",
-      "reasons": [
-        "主升段回測月線"
-      ],
-      "reason_details": [
-        {
-          "reason": "主升段回測月線",
-          "score": 5,
-          "score_reasons": [
             "月線仍在季線之上",
-            "月線與季線同步上揚",
+            "季線斜率偏強",
             "季線站在半年線之上",
             "回測月線後收盤守住",
             "低點貼近月線，回測位置乾淨"
           ]
         }
       ],
-      "weighted_score": 122.053385,
-      "chart_path": "charts/daily_alert/2254_2025-06-02_2026-06-02_kline_ma.png"
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/8039_2025-06-01_2026-06-01_kline_ma.png"
+    },
+    {
+      "market": "TWSE",
+      "stock_no": "1314",
+      "stock_name": "中石化",
+      "date": "2026-10-16",
+      "strategy": "台積電策略",
+      "reason": "主升段回測10MA",
+      "score": 5,
+      "score_label": "5/5",
+      "score_reasons": [
+        "短中期均線維持多頭排列",
+        "月線與季線同步上揚",
+        "季線站在半年線之上",
+        "回測10MA後收盤守住",
+        "紅K收在當日相對高位"
+      ],
+      "volume_ratio": 0.45,
+      "ma20_slope_pct": 4.86,
+      "ma60_slope_pct": 4.01,
+      "close": 8.99,
+      "volume": 24463971,
+      "ma5": 9.050000000000008,
+      "ma10": 8.959000000000001,
+      "ma20": 8.850500000000006,
+      "ma60": 8.466000000000001,
+      "source": "data/all_twse/1314_2025-06-02_2026-06-02.csv",
+      "reasons": [
+        "主升段回測10MA"
+      ],
+      "reason_details": [
+        {
+          "reason": "主升段回測10MA",
+          "score": 5,
+          "score_reasons": [
+            "短中期均線維持多頭排列",
+            "月線與季線同步上揚",
+            "季線站在半年線之上",
+            "回測10MA後收盤守住",
+            "紅K收在當日相對高位"
+          ]
+        }
+      ],
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/1314_2025-06-02_2026-06-02_kline_ma.png"
     }
   ],
   "breakout": [
     {
-      "market": "TWSE",
-      "stock_no": "2884",
-      "stock_name": "玉山金",
-      "date": "2026-10-15",
+      "market": "TPEX",
+      "stock_no": "1815",
+      "stock_name": "富喬",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
       "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
@@ -241,18 +241,18 @@
         "月線與季線同步上揚",
         "季線站在半年線之上",
         "收盤仍在月線上方",
-        "K棒未轉弱"
+        "紅K收在當日相對高位"
       ],
-      "volume_ratio": 1.93,
-      "ma20_slope_pct": 4.21,
-      "ma60_slope_pct": 10.77,
-      "close": 48.8,
-      "volume": 63086494,
-      "ma5": 46.719999999999985,
-      "ma10": 46.03000000000001,
-      "ma20": 45.97,
-      "ma60": 40.4866666666667,
-      "source": "data/all_twse/2884_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 2.32,
+      "ma20_slope_pct": 1.95,
+      "ma60_slope_pct": 7.93,
+      "close": 140.0,
+      "volume": 146694000,
+      "ma5": 132.89999999999992,
+      "ma10": 130.8499999999999,
+      "ma20": 123.95,
+      "ma60": 106.33333333333331,
+      "source": "data/all_tpex/1815_2025-06-02_2026-06-02.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -265,108 +265,18 @@
             "月線與季線同步上揚",
             "季線站在半年線之上",
             "收盤仍在月線上方",
-            "K棒未轉弱"
+            "紅K收在當日相對高位"
           ]
         }
       ],
       "weighted_score": 124.0,
-      "chart_path": "charts/daily_alert/2884_2025-06-01_2026-06-01_kline_ma.png"
+      "chart_path": "charts/daily_alert/1815_2025-06-02_2026-06-02_kline_ma.png"
     },
     {
       "market": "TWSE",
-      "stock_no": "3045",
-      "stock_name": "台灣大",
-      "date": "2026-10-15",
-      "strategy": "台積電策略",
-      "reason": "均線糾結後帶量紅K",
-      "score": 5,
-      "score_label": "5/5",
-      "score_reasons": [
-        "短中期均線維持多頭排列",
-        "季線站在半年線之上",
-        "收盤仍在月線上方",
-        "紅K收在當日相對高位",
-        "量能健康放大至20日均量2.0x"
-      ],
-      "volume_ratio": 2.03,
-      "ma20_slope_pct": 2.79,
-      "ma60_slope_pct": 1.64,
-      "close": 131.0,
-      "volume": 16412294,
-      "ma5": 125.6,
-      "ma10": 124.0,
-      "ma20": 123.325,
-      "ma60": 116.9,
-      "source": "data/all_twse/3045_2025-06-01_2026-06-01.csv",
-      "reasons": [
-        "均線糾結後帶量紅K"
-      ],
-      "reason_details": [
-        {
-          "reason": "均線糾結後帶量紅K",
-          "score": 5,
-          "score_reasons": [
-            "短中期均線維持多頭排列",
-            "季線站在半年線之上",
-            "收盤仍在月線上方",
-            "紅K收在當日相對高位",
-            "量能健康放大至20日均量2.0x"
-          ]
-        }
-      ],
-      "weighted_score": 124.0,
-      "chart_path": "charts/daily_alert/3045_2025-06-01_2026-06-01_kline_ma.png"
-    },
-    {
-      "market": "TWSE",
-      "stock_no": "4904",
-      "stock_name": "遠傳",
-      "date": "2026-10-15",
-      "strategy": "台積電策略",
-      "reason": "均線糾結後帶量紅K",
-      "score": 5,
-      "score_label": "5/5",
-      "score_reasons": [
-        "短中期均線維持多頭排列",
-        "季線站在半年線之上",
-        "回測月線後收盤守住",
-        "紅K收在當日相對高位",
-        "量能健康放大至20日均量2.8x"
-      ],
-      "volume_ratio": 2.84,
-      "ma20_slope_pct": 1.82,
-      "ma60_slope_pct": 0.15,
-      "close": 113.0,
-      "volume": 15938061,
-      "ma5": 107.99999999999991,
-      "ma10": 106.7,
-      "ma20": 106.1,
-      "ma60": 103.52333333333333,
-      "source": "data/all_twse/4904_2025-06-01_2026-06-01.csv",
-      "reasons": [
-        "均線糾結後帶量紅K"
-      ],
-      "reason_details": [
-        {
-          "reason": "均線糾結後帶量紅K",
-          "score": 5,
-          "score_reasons": [
-            "短中期均線維持多頭排列",
-            "季線站在半年線之上",
-            "回測月線後收盤守住",
-            "紅K收在當日相對高位",
-            "量能健康放大至20日均量2.8x"
-          ]
-        }
-      ],
-      "weighted_score": 124.0,
-      "chart_path": "charts/daily_alert/4904_2025-06-01_2026-06-01_kline_ma.png"
-    },
-    {
-      "market": "TWSE",
-      "stock_no": "6885",
-      "stock_name": "全福生技",
-      "date": "2026-10-15",
+      "stock_no": "6505",
+      "stock_name": "台塑化",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
       "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
@@ -376,18 +286,18 @@
         "月線與季線同步上揚",
         "季線站在半年線之上",
         "收盤仍在月線上方",
-        "K棒未轉弱"
+        "紅K收在當日相對高位"
       ],
-      "volume_ratio": 2.92,
-      "ma20_slope_pct": 11.36,
-      "ma60_slope_pct": 10.91,
-      "close": 33.5,
-      "volume": 4115184,
-      "ma5": 30.579999999999956,
-      "ma10": 30.374999999999993,
-      "ma20": 29.992500000000014,
-      "ma60": 24.538333333333323,
-      "source": "data/all_twse/6885_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 1.3,
+      "ma20_slope_pct": 17.95,
+      "ma60_slope_pct": 22.79,
+      "close": 122.5,
+      "volume": 49582445,
+      "ma5": 116.19999999999997,
+      "ma10": 109.86000000000001,
+      "ma20": 99.10999999999999,
+      "ma60": 81.89166666666662,
+      "source": "data/all_twse/6505_2025-06-01_2026-06-01.csv",
       "reasons": [
         "10/20MA支撐後跳空站回5/10/20MA"
       ],
@@ -400,57 +310,147 @@
             "月線與季線同步上揚",
             "季線站在半年線之上",
             "收盤仍在月線上方",
-            "K棒未轉弱"
+            "紅K收在當日相對高位"
           ]
         }
       ],
-      "weighted_score": 122.071946,
-      "chart_path": "charts/daily_alert/6885_2025-06-01_2026-06-01_kline_ma.png"
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/6505_2025-06-01_2026-06-01_kline_ma.png"
     },
     {
       "market": "TWSE",
-      "stock_no": "4961",
-      "stock_name": "天鈺",
-      "date": "2026-10-15",
+      "stock_no": "8039",
+      "stock_name": "台虹",
+      "date": "2026-10-16",
       "strategy": "台積電策略",
-      "reason": "均線糾結後帶量紅K",
+      "reason": "10/20MA支撐後跳空站回5/10/20MA",
       "score": 5,
       "score_label": "5/5",
       "score_reasons": [
         "月線仍在季線之上",
-        "月線與季線同步上揚",
+        "季線斜率偏強",
         "季線站在半年線之上",
         "回測月線後收盤守住",
         "低點貼近月線，回測位置乾淨"
       ],
-      "volume_ratio": 1.51,
-      "ma20_slope_pct": 3.78,
-      "ma60_slope_pct": 2.29,
-      "close": 186.5,
-      "volume": 1792622,
-      "ma5": 181.0,
-      "ma10": 182.3,
-      "ma20": 181.1,
-      "ma60": 170.59166666666667,
-      "source": "data/all_twse/4961_2025-06-01_2026-06-01.csv",
+      "volume_ratio": 1.12,
+      "ma20_slope_pct": -0.47,
+      "ma60_slope_pct": 23.15,
+      "close": 311.5,
+      "volume": 29291804,
+      "ma5": 293.90000000000003,
+      "ma10": 297.45,
+      "ma20": 284.3,
+      "ma60": 250.64166666666668,
+      "source": "data/all_twse/8039_2025-06-01_2026-06-01.csv",
       "reasons": [
-        "均線糾結後帶量紅K"
+        "10/20MA支撐後跳空站回5/10/20MA"
       ],
       "reason_details": [
         {
-          "reason": "均線糾結後帶量紅K",
+          "reason": "10/20MA支撐後跳空站回5/10/20MA",
           "score": 5,
           "score_reasons": [
             "月線仍在季線之上",
-            "月線與季線同步上揚",
+            "季線斜率偏強",
             "季線站在半年線之上",
             "回測月線後收盤守住",
             "低點貼近月線，回測位置乾淨"
           ]
         }
       ],
-      "weighted_score": 120.267444,
-      "chart_path": "charts/daily_alert/4961_2025-06-01_2026-06-01_kline_ma.png"
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/8039_2025-06-01_2026-06-01_kline_ma.png"
+    },
+    {
+      "market": "TWSE",
+      "stock_no": "2332",
+      "stock_name": "友訊",
+      "date": "2026-10-16",
+      "strategy": "台積電策略",
+      "reason": "均線糾結後帶量紅K",
+      "score": 5,
+      "score_label": "5/5",
+      "score_reasons": [
+        "月線與季線同步上揚",
+        "季線站在半年線之上",
+        "回測月線後收盤守住",
+        "低點貼近月線，回測位置乾淨",
+        "紅K收在當日相對高位"
+      ],
+      "volume_ratio": 2.64,
+      "ma20_slope_pct": 3.61,
+      "ma60_slope_pct": 5.22,
+      "close": 21.35,
+      "volume": 23414143,
+      "ma5": 20.750000000000004,
+      "ma10": 20.665,
+      "ma20": 20.259999999999998,
+      "ma60": 20.96666666666668,
+      "source": "data/all_twse/2332_2025-06-02_2026-06-02.csv",
+      "reasons": [
+        "均線糾結後帶量紅K"
+      ],
+      "reason_details": [
+        {
+          "reason": "均線糾結後帶量紅K",
+          "score": 5,
+          "score_reasons": [
+            "月線與季線同步上揚",
+            "季線站在半年線之上",
+            "回測月線後收盤守住",
+            "低點貼近月線，回測位置乾淨",
+            "紅K收在當日相對高位"
+          ]
+        }
+      ],
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/2332_2025-06-02_2026-06-02_kline_ma.png"
+    },
+    {
+      "market": "TPEX",
+      "stock_no": "4939",
+      "stock_name": "亞電",
+      "date": "2026-10-16",
+      "strategy": "台積電策略",
+      "reason": "10/20MA支撐後跳空站回5/10/20MA",
+      "score": 5,
+      "score_label": "5/5",
+      "score_reasons": [
+        "月線仍在季線之上",
+        "季線斜率偏強",
+        "季線站在半年線之上",
+        "回測月線後收盤守住",
+        "低點貼近月線，回測位置乾淨"
+      ],
+      "volume_ratio": 2.33,
+      "ma20_slope_pct": -5.45,
+      "ma60_slope_pct": 7.8,
+      "close": 83.3,
+      "volume": 21338000,
+      "ma5": 76.80000000000003,
+      "ma10": 77.32999999999997,
+      "ma20": 77.565,
+      "ma60": 70.83583333333335,
+      "source": "data/all_tpex/4939_2025-06-02_2026-06-02.csv",
+      "reasons": [
+        "10/20MA支撐後跳空站回5/10/20MA"
+      ],
+      "reason_details": [
+        {
+          "reason": "10/20MA支撐後跳空站回5/10/20MA",
+          "score": 5,
+          "score_reasons": [
+            "月線仍在季線之上",
+            "季線斜率偏強",
+            "季線站在半年線之上",
+            "回測月線後收盤守住",
+            "低點貼近月線，回測位置乾淨"
+          ]
+        }
+      ],
+      "weighted_score": 124.0,
+      "chart_path": "charts/daily_alert/4939_2025-06-02_2026-06-02_kline_ma.png"
     }
   ]
 }
