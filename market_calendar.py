@@ -18,6 +18,14 @@ TRADING_DAY_MARKERS = ("開始交易", "最後交易日")
 CALENDAR_REQUEST_ATTEMPTS = 3
 CALENDAR_RETRY_DELAY_SECONDS = 5
 DAILY_DATA_READY_HOUR_TAIPEI = 18
+# Emergency closures are announced separately and may be absent from the annual
+# holiday API. Only add dates confirmed by an exchange announcement; a failed
+# market-data request alone must never turn a trading day into a holiday.
+# TWSE announcement dated 2026-10-22: 115年10月23日休市一天
+# https://investoredu.twse.com.tw/pages/TWSE_HotNews.aspx
+CONFIRMED_EMERGENCY_CLOSURES = {
+    date(2026, 10, 23): "薔琵颱風：集中交易市場及櫃買市場全日休市",
+}
 
 
 def resolve_target_date(value: str, now: datetime | None = None) -> date:
@@ -56,7 +64,7 @@ def fetch_twse_calendar(year: int) -> list[list[str]]:
 
 
 def is_twse_trading_day(target_date: date) -> bool:
-    if target_date.weekday() >= 5:
+    if target_date.weekday() >= 5 or target_date in CONFIRMED_EMERGENCY_CLOSURES:
         return False
 
     entries = [

@@ -32,6 +32,24 @@ class MarketCalendarTests(unittest.TestCase):
         ):
             self.assertFalse(is_twse_trading_day(date(2026, 10, 9)))
 
+    def test_confirmed_typhoon_closure_does_not_depend_on_annual_calendar(self) -> None:
+        with patch("market_calendar.fetch_twse_calendar") as calendar:
+            self.assertFalse(is_twse_trading_day(date(2026, 10, 23)))
+        calendar.assert_not_called()
+
+    def test_october_27_remains_a_trading_day(self) -> None:
+        with patch("market_calendar.fetch_twse_calendar", return_value=[]):
+            self.assertTrue(is_twse_trading_day(date(2026, 10, 27)))
+
+    def test_october_27_backfill_is_not_blocked_by_typhoon_closure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tracking = Path(tmpdir) / "tracking.json"
+            tracking.write_text('{"tracking":{"as_of_daily_signal_date":"2026-10-22"}}', encoding="utf-8")
+            with patch("market_calendar.fetch_twse_calendar", return_value=[
+                ["2026-10-26", "臺灣光復暨金門古寧頭大捷紀念日", "補假"],
+            ]):
+                self.assertEqual(missing_trading_dates(tracking, date(2026, 10, 27)), [])
+
     def test_calendar_trading_marker_is_a_trading_day(self) -> None:
         with patch(
             "market_calendar.fetch_twse_calendar",
