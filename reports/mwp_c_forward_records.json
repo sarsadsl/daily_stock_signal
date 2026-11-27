@@ -1,9 +1,27 @@
 [
   {
-    "id": "TPEX:4174:2026-11-26:base",
+    "id": "TWSE:2471:2026-11-27:base",
     "source": "mwp_c_exact_daily_scanner",
     "status": "待次日開盤",
     "base_status": "待次日開盤",
+    "addon_status": "-",
+    "unit_type": "base",
+    "market": "TWSE",
+    "stock_no": "2471",
+    "stock_name": "資通",
+    "label": "2471 資通",
+    "signal_date": "2026-11-27",
+    "signal_close": 64.0,
+    "entry_limit_price": 62.72,
+    "ma20_slope5_pct": 5.6679,
+    "created_from_radar_date": "2026-11-27",
+    "unresolved": true
+  },
+  {
+    "id": "TPEX:4174:2026-11-26:base",
+    "source": "mwp_c_exact_daily_scanner",
+    "status": "持有中",
+    "base_status": "持有中",
     "addon_status": "-",
     "unit_type": "base",
     "market": "TPEX",
@@ -15,7 +33,12 @@
     "entry_limit_price": 58.408,
     "ma20_slope5_pct": 5.8224,
     "created_from_radar_date": "2026-11-26",
-    "unresolved": true
+    "unresolved": true,
+    "entry_date": "2026-11-27",
+    "entry_price": 55.1,
+    "unrealized_return_pct": 18.87,
+    "dynamic_structure_update_count": 0,
+    "dynamic_structure_policy": "consolidation30_high_base"
   },
   {
     "id": "TWSE:9933:2026-11-25:base",
@@ -324,7 +347,7 @@
     "unresolved": true,
     "entry_date": "2026-11-20",
     "entry_price": 15.5,
-    "unrealized_return_pct": 4.19,
+    "unrealized_return_pct": 1.94,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -463,7 +486,7 @@
     "unresolved": true,
     "entry_date": "2026-11-20",
     "entry_price": 62.2,
-    "unrealized_return_pct": 15.43,
+    "unrealized_return_pct": 4.18,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1590,7 +1613,7 @@
     "unresolved": true,
     "entry_date": "2026-11-06",
     "entry_price": 23.0,
-    "unrealized_return_pct": 35.65,
+    "unrealized_return_pct": 22.17,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -1613,7 +1636,7 @@
     "unresolved": true,
     "entry_date": "2026-11-06",
     "entry_price": 63.2,
-    "unrealized_return_pct": 15.51,
+    "unrealized_return_pct": 13.92,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -10268,7 +10291,7 @@
     "unresolved": true,
     "entry_date": "2026-07-24",
     "entry_price": 33.4,
-    "unrealized_return_pct": 9.73,
+    "unrealized_return_pct": 6.89,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -10671,7 +10694,7 @@
     "unresolved": true,
     "entry_date": "2026-07-22",
     "entry_price": 17.7,
-    "unrealized_return_pct": 42.09,
+    "unrealized_return_pct": 39.27,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -11558,7 +11581,7 @@
     "unresolved": true,
     "entry_date": "2026-07-16",
     "entry_price": 46.0,
-    "unrealized_return_pct": 4.89,
+    "unrealized_return_pct": 2.28,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -13273,7 +13296,7 @@
     "unresolved": true,
     "entry_date": "2026-07-13",
     "entry_price": 56.0,
-    "unrealized_return_pct": 7.5,
+    "unrealized_return_pct": 7.32,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
@@ -16677,7 +16700,7 @@
     "unresolved": true,
     "entry_date": "2026-06-30",
     "entry_price": 96.8,
-    "unrealized_return_pct": 7.95,
+    "unrealized_return_pct": 5.37,
     "dynamic_structure_update_count": 0,
     "dynamic_structure_policy": "consolidation30_high_base"
   },
